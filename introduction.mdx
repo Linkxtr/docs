@@ -1,0 +1,64 @@
+---
+title: "Laravel QR Code — Clean QR Code Generation for Laravel"
+sidebarTitle: "Introduction"
+description: "Laravel QR Code is a fluent, modern QR code generator for Laravel 11+. Generate SVG, PNG, WebP, and EPS codes via facade, Blade component, or CLI."
+---
+
+Laravel QR Code gives you a clean, fluent API for generating QR codes in any Laravel 11+ application. Whether you need a one-liner in a Blade view, a controller action that encodes a vCard, or a build-script that writes PNGs to disk, the package covers all three with zero boilerplate.
+
+<CardGroup cols={2}>
+  <Card title="Fluent Facade" icon="wand-magic-sparkles">
+    Chain methods on `QrCode::` to set size, color, format, and error correction — then call `generate()` to get the result.
+  </Card>
+  <Card title="Blade Component" icon="code">
+    Drop `<x-qr-code data="…" />` into any template and get an accessible, inline SVG or base64 image with no extra PHP.
+  </Card>
+  <Card title="Artisan CLI" icon="terminal">
+    Run `php artisan qr:generate` for interactive generation or pass flags for scripted, non-interactive output.
+  </Card>
+  <Card title="Rich Data Types" icon="database">
+    Built-in helpers for URLs, Email, SMS, WiFi, vCard, MeCard, Geo, WhatsApp, Telegram, Calendar Events, BTC, and Ethereum.
+  </Card>
+  <Card title="Multiple Formats" icon="file-image">
+    Output SVG (default, no extensions needed), PNG, WebP, or EPS. PNG and WebP use Imagick when available, GD otherwise.
+  </Card>
+  <Card title="Deep Customization" icon="palette">
+    Control colors (RGB, RGBA, CMYK, grayscale), gradients, dot/round/square module styles, eye styles, image merging, and error correction levels.
+  </Card>
+  <Card title="Auto-Discovery" icon="bolt">
+    The service provider and `QrCode` facade alias are registered automatically — no `config/app.php` edits required.
+  </Card>
+  <Card title="Macros" icon="puzzle-piece">
+    Register your own named data types with Laravel's `Macroable` trait and call them as first-class facade methods.
+  </Card>
+</CardGroup>
+
+## Requirements
+
+| Dependency | Required version |
+|---|---|
+| PHP | 8.2 or higher |
+| Laravel | 11.0 or higher |
+| `ext-imagick` | Optional — recommended for PNG/WebP performance |
+| `ext-gd` | Optional — automatic fallback for PNG/WebP when Imagick is absent |
+
+<Note>
+  SVG and EPS generation require no PHP image extensions. `ext-imagick` or `ext-gd` is only needed when you output PNG or WebP.
+</Note>
+
+## Version guidance
+
+| Package version | PHP | Laravel | Status |
+|---|---|---|---|
+| **v2.x** (current) | 8.2+ | 11+ | Active development |
+| v1.x | 8.1+ | 10 | Maintenance only |
+
+Always install `linkxtr/laravel-qrcode` without a version constraint to get the latest v2.x release. If your project runs Laravel 10, pin to `^1.0` instead.
+
+<Tip>
+  Upgrading from v1.x? Read the [Upgrade Guide](https://github.com/Linkxtr/laravel-qrcode/blob/main/docs/UPGRADE-2.0.md) before updating — the v2 API is a breaking change from the `simplesoftwareio/simple-qrcode`-compatible v1 interface.
+</Tip>
+
+## Next steps
+
+Ready to add QR codes to your app? Head to the [Quickstart](/quickstart) to generate your first code in under five minutes.

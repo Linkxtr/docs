@@ -1,0 +1,524 @@
+---
+title: "Data Type Methods — Structured QR Code Payloads"
+sidebarTitle: "Data Type Methods"
+description: "Generate standards-compliant QR codes for email, phone, SMS, WiFi, vCard, crypto wallets, calendar events, WhatsApp, Telegram, and more."
+---
+
+Data type methods are shorthand helpers that format a structured payload according to the relevant standard and immediately pass it to `generate()`, returning a `QrCodeResult` directly. You can chain any styling methods before calling a data type method.
+
+<Warning>
+  Every data type method validates its inputs and throws a subclass of `InvalidDataTypeArgumentException` when something is wrong (empty required field, invalid format, etc.). Wrap calls that consume dynamic user input in a `try/catch` block.
+
+  ```php
+  use Linkxtr\QrCode\Exceptions\InvalidDataTypeArgumentException;
+
+  try {
+      $qr = QrCode::Email($request->email, $request->subject);
+  } catch (InvalidDataTypeArgumentException $e) {
+      return back()->withErrors(['qr' => $e->getMessage()]);
+  }
+  ```
+</Warning>
+
+---
+
+## Email()
+
+```php
+QrCode::Email(string $address, string $subject = '', string $body = '', string $cc = '', string $bcc = ''): QrCodeResult
+```
+
+Generate a `mailto:` QR code.
+
+<ParamField body="address" type="string" required>
+  The primary recipient email address.
+</ParamField>
+
+<ParamField body="subject" type="string">
+  Pre-filled subject line. Defaults to an empty string.
+</ParamField>
+
+<ParamField body="body" type="string">
+  Pre-filled message body. Defaults to an empty string.
+</ParamField>
+
+<ParamField body="cc" type="string">
+  Carbon copy address. Defaults to an empty string.
+</ParamField>
+
+<ParamField body="bcc" type="string">
+  Blind carbon copy address. Defaults to an empty string.
+</ParamField>
+
+```php
+QrCode::Email(
+    'support@example.com',
+    'Hello from Laravel',
+    'I would like to get in touch.',
+    'manager@example.com'
+);
+```
+
+---
+
+## PhoneNumber()
+
+```php
+QrCode::PhoneNumber(string $phoneNumber): QrCodeResult
+```
+
+Generate a `tel:` QR code that opens the device dialler.
+
+<ParamField body="phoneNumber" type="string" required>
+  The phone number to dial, including country code (e.g. `+12025551234`).
+</ParamField>
+
+```php
+QrCode::PhoneNumber('+12025551234');
+```
+
+---
+
+## SMS()
+
+```php
+QrCode::SMS(string $smsAddress = '', string $message = ''): QrCodeResult
+```
+
+Generate an `smsto:` QR code that opens the device SMS app.
+
+<ParamField body="smsAddress" type="string">
+  The recipient phone number. Defaults to an empty string.
+</ParamField>
+
+<ParamField body="message" type="string">
+  Pre-filled SMS message text. Defaults to an empty string.
+</ParamField>
+
+```php
+QrCode::SMS('+12025551234', 'Your verification code is 9182.');
+```
+
+---
+
+## Geo()
+
+```php
+QrCode::Geo(float $latitude, float $longitude, string $name = ''): QrCodeResult
+```
+
+Generate a `geo:` QR code encoding a geographic coordinate. Scanners open the device map application at the given location.
+
+<ParamField body="latitude" type="float" required>
+  Latitude in decimal degrees (e.g. `37.7749`).
+</ParamField>
+
+<ParamField body="longitude" type="float" required>
+  Longitude in decimal degrees (e.g. `-122.4194`).
+</ParamField>
+
+<ParamField body="name" type="string">
+  Optional human-readable place name. Defaults to an empty string.
+</ParamField>
+
+```php
+QrCode::Geo(37.7749, -122.4194, 'San Francisco, CA');
+```
+
+---
+
+## WiFi()
+
+```php
+QrCode::WiFi(array $credentials): QrCodeResult
+```
+
+Generate a WiFi network configuration QR code. Scanning it lets devices join the network without manually entering credentials.
+
+<ParamField body="credentials" type="array" required>
+  An associative array describing the network:
+
+  <Expandable title="credentials keys">
+    <ParamField body="ssid" type="string" required>
+      The network name (SSID). Must not be empty.
+    </ParamField>
+    <ParamField body="encryption" type="string">
+      Security protocol. Accepted values: `WEP`, `WPA`, `WPA2`, `WPA3`, `NOPASS`. `WPA2` and `WPA3` are normalised to `WPA` internally. Defaults to `WPA` when a password is provided and `NOPASS` otherwise.
+    </ParamField>
+    <ParamField body="password" type="string">
+      Network password. Required when `encryption` is `WEP` or `WPA`. Must be omitted or empty when `encryption` is `NOPASS`.
+    </ParamField>
+    <ParamField body="hidden" type="bool">
+      Set to `true` if the network does not broadcast its SSID. Defaults to `false`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<Warning>
+  WEP encryption is deprecated and cryptographically broken. It is supported for legacy device compatibility only. Use WPA or WPA2 wherever possible.
+</Warning>
+
+<CodeGroup>
+
+```php WPA2 network
+QrCode::WiFi([
+    'ssid'       => 'OfficeNetwork',
+    'encryption' => 'WPA2',
+    'password'   => 's3cur3P@ssw0rd',
+]);
+```
+
+```php Open (password-free) network
+QrCode::WiFi([
+    'ssid'       => 'GuestWiFi',
+    'encryption' => 'NOPASS',
+]);
+```
+
+```php Hidden network
+QrCode::WiFi([
+    'ssid'       => 'HiddenNet',
+    'encryption' => 'WPA',
+    'password'   => 'secret',
+    'hidden'     => true,
+]);
+```
+
+</CodeGroup>
+
+---
+
+## BTC()
+
+```php
+QrCode::BTC(string $address, int|float|string $amount, array $options = []): QrCodeResult
+```
+
+Generate a Bitcoin payment request QR code using the `bitcoin:` URI scheme (BIP 21).
+
+<ParamField body="address" type="string" required>
+  The Bitcoin wallet address.
+</ParamField>
+
+<ParamField body="amount" type="int | float | string" required>
+  The requested amount in BTC (e.g. `0.005`). Must be a non-negative numeric value.
+</ParamField>
+
+<ParamField body="options" type="array">
+  An optional associative array of additional BIP 21 parameters such as `label`, `message`, or `r` (payment protocol URL).
+</ParamField>
+
+```php
+QrCode::BTC('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', 0.005, [
+    'label'   => 'Donation',
+    'message' => 'Thanks for your support!',
+]);
+```
+
+---
+
+## Ethereum()
+
+```php
+QrCode::Ethereum(string $address, int|float|string|null $amount = null): QrCodeResult
+```
+
+Generate an Ethereum payment request QR code using the `ethereum:` URI scheme (ERC-67).
+
+<ParamField body="address" type="string" required>
+  The Ethereum wallet address (typically a `0x…` checksummed address).
+</ParamField>
+
+<ParamField body="amount" type="int | float | string | null">
+  The requested amount in ETH. Omit or pass `null` for an amount-agnostic address QR code.
+</ParamField>
+
+<CodeGroup>
+
+```php With amount
+QrCode::Ethereum('0x742d35Cc6634C0532925a3b8D4B2CE1e5BFB043d', 1.5);
+```
+
+```php Address only
+QrCode::Ethereum('0x742d35Cc6634C0532925a3b8D4B2CE1e5BFB043d');
+```
+
+</CodeGroup>
+
+---
+
+## VCard()
+
+```php
+QrCode::VCard(array $properties): QrCodeResult
+```
+
+Generate a vCard 3.0 QR code for contact sharing.
+
+<ParamField body="properties" type="array" required>
+  An associative array of contact properties:
+
+  <Expandable title="properties keys">
+    <ParamField body="name" type="string" required>
+      Full display name (`FN` field). Must not be empty.
+    </ParamField>
+    <ParamField body="first_name" type="string">
+      First name component used in the structured `N` field.
+    </ParamField>
+    <ParamField body="last_name" type="string">
+      Last name component used in the structured `N` field.
+    </ParamField>
+    <ParamField body="email" type="string">
+      Internet email address.
+    </ParamField>
+    <ParamField body="phone" type="string">
+      General phone number.
+    </ParamField>
+    <ParamField body="company" type="string">
+      Organisation name (`ORG` field).
+    </ParamField>
+    <ParamField body="title" type="string">
+      Job title (`TITLE` field).
+    </ParamField>
+    <ParamField body="url" type="string">
+      Personal or company website URL.
+    </ParamField>
+    <ParamField body="address" type="string">
+      Postal address string.
+    </ParamField>
+    <ParamField body="note" type="string">
+      Free-text note.
+    </ParamField>
+    <ParamField body="birthday" type="string">
+      Birthday in `YYYYMMDD` format.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+```php
+QrCode::VCard([
+    'name'       => 'Jane Smith',
+    'first_name' => 'Jane',
+    'last_name'  => 'Smith',
+    'email'      => 'jane@example.com',
+    'phone'      => '+12025551234',
+    'company'    => 'Acme Corp',
+    'title'      => 'Senior Engineer',
+    'url'        => 'https://janesmith.dev',
+]);
+```
+
+---
+
+## MeCard()
+
+```php
+QrCode::MeCard(
+    string|array $name,
+    ?string $phone = null,
+    ?string $email = null,
+    ?string $note = null,
+    ?string $birthday = null,
+    ?string $address = null,
+    ?string $url = null
+): QrCodeResult
+```
+
+Generate a MeCard QR code — a lighter contact format popular in Japan and supported by most mobile QR scanners.
+
+<ParamField body="name" type="string | array" required>
+  The contact's full name as a string, or an associative array of all MeCard properties (see below). Must not be empty.
+</ParamField>
+
+<ParamField body="phone" type="string | null">
+  Phone number. Pass `null` to omit.
+</ParamField>
+
+<ParamField body="email" type="string | null">
+  Email address. Pass `null` to omit.
+</ParamField>
+
+<ParamField body="note" type="string | null">
+  Free-text note. Pass `null` to omit.
+</ParamField>
+
+<ParamField body="birthday" type="string | null">
+  Birthday in `YYYYMMDD` format. Pass `null` to omit.
+</ParamField>
+
+<ParamField body="address" type="string | null">
+  Postal address. Pass `null` to omit.
+</ParamField>
+
+<ParamField body="url" type="string | null">
+  Website URL. Pass `null` to omit.
+</ParamField>
+
+<CodeGroup>
+
+```php Positional arguments
+QrCode::MeCard(
+    'Jane Smith',
+    '+12025551234',
+    'jane@example.com',
+    'Laravel developer',
+    '19900115',
+    '123 Main St',
+    'https://janesmith.dev'
+);
+```
+
+```php Name only
+QrCode::MeCard('Jane Smith');
+```
+
+</CodeGroup>
+
+---
+
+## CalendarEvent()
+
+```php
+QrCode::CalendarEvent(array $attributes): QrCodeResult
+```
+
+Generate a vCalendar (iCalendar / `.ics`) QR code for a single event. Scanners open the native calendar application and pre-fill a new event.
+
+<ParamField body="attributes" type="array" required>
+  <Expandable title="attributes keys">
+    <ParamField body="summary" type="string" required>
+      Event title. Must not be empty.
+    </ParamField>
+    <ParamField body="start" type="Carbon | DateTimeInterface | string | int" required>
+      Event start date/time. Accepts a `Carbon` instance, any `DateTimeInterface`, a parseable date string, or a Unix timestamp integer.
+    </ParamField>
+    <ParamField body="end" type="Carbon | DateTimeInterface | string | int" required>
+      Event end date/time. Must be strictly after `start`.
+    </ParamField>
+    <ParamField body="description" type="string">
+      Optional long description of the event.
+    </ParamField>
+    <ParamField body="location" type="string">
+      Optional venue or address string.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<Note>
+  Per RFC 5545, the generated iCalendar payload includes a `DTSTAMP` property set to the **current UTC timestamp** at the moment of generation. Two calls for the same event will therefore produce different binary output and cannot be byte-for-byte cached. Generate CalendarEvent QR codes at request time rather than caching the raw bytes.
+</Note>
+
+```php
+use Carbon\Carbon;
+
+QrCode::CalendarEvent([
+    'summary'     => 'Laracon US 2025',
+    'description' => 'The official Laravel conference.',
+    'location'    => 'Nashville, TN',
+    'start'       => Carbon::create(2025, 7, 14, 9, 0, 0, 'America/Chicago'),
+    'end'         => Carbon::create(2025, 7, 16, 17, 0, 0, 'America/Chicago'),
+]);
+```
+
+---
+
+## WhatsApp()
+
+```php
+QrCode::WhatsApp(string|array $number, ?string $message = null): QrCodeResult
+```
+
+Generate a `https://wa.me/` deep-link QR code that opens a WhatsApp chat.
+
+<ParamField body="number" type="string | array" required>
+  The recipient phone number (with country code, e.g. `'+12025551234'`), or an associative array with `number` and optional `message` keys.
+</ParamField>
+
+<ParamField body="message" type="string | null">
+  Pre-filled message text. Ignored when `$number` is an array that already includes a `message` key.
+</ParamField>
+
+<CodeGroup>
+
+```php String with message
+QrCode::WhatsApp('+12025551234', 'Hello from Laravel!');
+```
+
+```php Array form
+QrCode::WhatsApp([
+    'number'  => '+12025551234',
+    'message' => 'Hello from Laravel!',
+]);
+```
+
+```php Number only
+QrCode::WhatsApp('+12025551234');
+```
+
+</CodeGroup>
+
+---
+
+## Telegram()
+
+```php
+QrCode::Telegram(string|array $username): QrCodeResult
+```
+
+Generate a `https://t.me/` deep-link QR code that opens a Telegram profile or channel.
+
+<ParamField body="username" type="string | array" required>
+  The Telegram username as a string, or an associative array with a `username` key. The leading `@` is stripped automatically if present. Must be 5–32 characters long and start with a letter, following Telegram's username rules.
+</ParamField>
+
+<CodeGroup>
+
+```php String form
+QrCode::Telegram('laravel');
+// or
+QrCode::Telegram('@laravel');
+```
+
+```php Array form
+QrCode::Telegram(['username' => 'laravel']);
+```
+
+</CodeGroup>
+
+---
+
+## Chaining styling with data types
+
+Because all styling methods return a cloned `Generator`, you can apply size, color, and style options before calling any data type method:
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+use Linkxtr\QrCode\Exceptions\InvalidDataTypeArgumentException;
+use Carbon\Carbon;
+
+try {
+    // Styled WiFi QR
+    $wifi = QrCode::size(300)
+        ->style('dot')
+        ->color(15, 23, 42)
+        ->backgroundColor(248, 250, 252)
+        ->WiFi([
+            'ssid'       => 'OfficeWiFi',
+            'encryption' => 'WPA2',
+            'password'   => 'secr3t!',
+        ]);
+
+    // Styled calendar QR
+    $event = QrCode::size(350)
+        ->errorCorrection('Q')
+        ->gradient('#4f46e5', '#7c3aed', 'vertical')
+        ->CalendarEvent([
+            'summary' => 'Team Standup',
+            'start'   => Carbon::now()->addDay()->setTime(9, 0),
+            'end'     => Carbon::now()->addDay()->setTime(9, 30),
+        ]);
+
+} catch (InvalidDataTypeArgumentException $e) {
+    logger()->error('Invalid QR payload', ['error' => $e->getMessage()]);
+}
+```

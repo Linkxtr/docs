@@ -1,0 +1,195 @@
+---
+title: "Communication QR Codes: Email, SMS & More"
+sidebarTitle: "Communication"
+description: "Create QR codes that pre-fill email drafts, phone dials, SMS messages, WhatsApp chats, and Telegram links with one scan."
+---
+
+Communication data types let you encode a ready-to-send interaction into a QR code. When a user scans one of these codes, their device opens the appropriate app with the address, subject, or message already populated — removing friction from every touchpoint where you want someone to reach you.
+
+<Tip>
+  Use E.164 format for all phone numbers (e.g. `+12025550170`). This international standard is unambiguous across carriers and countries, and is the safest format for SMS, WhatsApp, and phone QR payloads.
+</Tip>
+
+---
+
+## Email
+
+`QrCode::Email()` generates a `mailto:` URI. When scanned, the device opens the default mail client with the recipient address, subject, body, CC, and BCC fields already populated.
+
+```php
+QrCode::Email(
+    string  $address,
+    ?string $subject = null,
+    ?string $body    = null,
+    ?string $cc      = null,
+    ?string $bcc     = null,
+)
+```
+
+The `$address`, `$cc`, and `$bcc` values are validated as proper email addresses. Passing an invalid address throws an `InvalidEmailArgumentException`.
+
+### Example
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+// Address only
+$qr = QrCode::Email('support@example.com');
+
+// Pre-filled subject and body
+$qr = QrCode::Email(
+    address: 'sales@example.com',
+    subject: 'Product Enquiry',
+    body:    'Hi, I would like to know more about your products.',
+);
+
+// With CC and BCC
+$qr = QrCode::Email(
+    address: 'hello@example.com',
+    subject: 'Meeting Follow-up',
+    body:    'Great to meet you today!',
+    cc:      'manager@example.com',
+    bcc:     'archive@example.com',
+);
+
+// Render inline as SVG
+echo QrCode::Email('hello@example.com', 'Say Hi')->generate();
+```
+
+---
+
+## PhoneNumber
+
+`QrCode::PhoneNumber()` generates a `tel:` URI that opens the device dialler with the number pre-filled.
+
+```php
+QrCode::PhoneNumber(string $phoneNumber)
+```
+
+### Example
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+$qr = QrCode::PhoneNumber('+12025550170');
+
+// Chain styling and render
+echo QrCode::PhoneNumber('+442071234567')
+    ->size(300)
+    ->generate();
+```
+
+<Note>
+  Although the constructor accepts integers and floats for convenience (e.g. when pulling from a numeric database column), always prefer a string prefixed with `+` and the country code to ensure the dialler opens correctly on every device.
+</Note>
+
+---
+
+## SMS
+
+`QrCode::SMS()` generates an `sms:` URI. Scanning it opens the device's messaging app with the recipient number and an optional pre-filled message body.
+
+```php
+QrCode::SMS(
+    string  $phoneNumber,
+    ?string $message = null,
+)
+```
+
+### Example
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+// Number only
+$qr = QrCode::SMS('+12025550170');
+
+// Pre-filled message
+$qr = QrCode::SMS(
+    phoneNumber: '+12025550170',
+    message:     'Hi! I scanned your QR code.',
+);
+
+// Save to file
+QrCode::SMS('+12025550170', 'Reply YES to confirm.')
+    ->format('png')
+    ->size(400)
+    ->generate(storage_path('app/qrcodes/sms.png'));
+```
+
+---
+
+## WhatsApp
+
+`QrCode::WhatsApp()` generates a `https://wa.me/` deep-link. Scanning it opens WhatsApp with a pre-selected conversation and an optional pre-filled message.
+
+You can call it with either an array or positional arguments:
+
+```php
+// Array form
+QrCode::WhatsApp(['phoneNumber' => '+12025550170', 'message' => 'Hello!'])
+
+// Positional form
+QrCode::WhatsApp(string $phoneNumber, ?string $message = null)
+```
+
+The `+` prefix is stripped automatically from the number before building the `wa.me` URL, as the WhatsApp API requires a bare numeric international number.
+
+### Example
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+// Number only
+$qr = QrCode::WhatsApp('+12025550170');
+
+// With a pre-filled message — array form
+$qr = QrCode::WhatsApp([
+    'phoneNumber' => '+12025550170',
+    'message'     => 'Hello! I scanned your QR code.',
+]);
+
+// With a pre-filled message — positional form
+$qr = QrCode::WhatsApp('+12025550170', 'Hello! I scanned your QR code.');
+
+// Render inline
+echo QrCode::WhatsApp('+12025550170', 'Hi there!')->generate();
+```
+
+<Warning>
+  Passing an empty string as the phone number throws an `InvalidWhatsAppArgumentException`. Validate and sanitise the number before passing user input.
+</Warning>
+
+---
+
+## Telegram
+
+`QrCode::Telegram()` generates a `https://t.me/` link pointing to a public Telegram profile or channel. Scanning it opens the Telegram app directly on the profile page.
+
+```php
+QrCode::Telegram(string $username)
+```
+
+The username must match the Telegram rule: starts with a letter, 5–32 characters, alphanumeric and underscores only. Leading `@` symbols are stripped automatically, so both `myChannel` and `@myChannel` are accepted. Invalid usernames throw an `InvalidTelegramArgumentException`.
+
+### Example
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+// Without @
+$qr = QrCode::Telegram('laravelphp');
+
+// The @ prefix is stripped automatically
+$qr = QrCode::Telegram('@laravelphp');
+
+// Full example with styling
+echo QrCode::Telegram('laravelphp')
+    ->size(300)
+    ->color(0, 136, 204)   // Telegram blue
+    ->generate();
+```
+
+<Note>
+  This data type links to a **public** Telegram username. Private users or channels without a public username cannot be encoded this way.
+</Note>

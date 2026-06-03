@@ -1,0 +1,255 @@
+---
+title: "Display QR Codes with the x-qr-code Blade Component"
+sidebarTitle: "Blade Component"
+description: "Drop the <x-qr-code> Blade component into any template to render QR codes with automatic accessibility, PNG embedding, and zero PHP required."
+---
+
+The `<x-qr-code>` Blade component is the simplest way to display QR codes directly in your templates. Pass your content as the `data` prop, add any styling options you need, and the component takes care of the rest — including accessibility attributes, inline SVG rendering, and base64-encoded image embedding for PNG and WebP output.
+
+<Tip>
+  The Blade component is the recommended choice for templates. It handles HTML escaping, accessibility markup, and binary-to-base64 conversion automatically. For programmatic generation in controllers or jobs, use the [QrCode facade](/usage/facade) instead.
+</Tip>
+
+## Basic usage
+
+```blade
+<x-qr-code data="https://example.com" />
+```
+
+This renders an inline SVG QR code at the default size of 100 px. No PHP imports or extra configuration needed — the component is auto-registered by the package's service provider.
+
+## Available props
+
+<ParamField path="data" type="string" required>
+  The payload to encode. This is the only required prop. Pass any string: a URL, plain text, a phone number, etc.
+</ParamField>
+
+<ParamField path="size" type="int" default="100">
+  Width and height of the QR code in pixels.
+</ParamField>
+
+<ParamField path="format" type="string" default="svg">
+  Output format: `svg`, `png`, or `webp`. EPS is **not** supported in the Blade component.
+</ParamField>
+
+<ParamField path="color" type="string">
+  Foreground color as a hex string (e.g. `#ff0000`) or a comma-separated RGB value (e.g. `255,0,0`).
+</ParamField>
+
+<ParamField path="backgroundColor" type="string">
+  Background color. Accepts the same formats as `color`.
+</ParamField>
+
+<ParamField path="margin" type="int" default="0">
+  Quiet-zone margin around the QR code.
+</ParamField>
+
+<ParamField path="style" type="string">
+  Module (dot) shape: `square`, `dot`, or `round`.
+</ParamField>
+
+<ParamField path="errorCorrection" type="string">
+  Error correction level: `L` (7 %), `M` (15 %), `Q` (25 %), or `H` (30 %). Defaults to the value in `config/qrcode.php` (package default `M`).
+</ParamField>
+
+<ParamField path="encoding" type="string">
+  Character encoding for the payload, e.g. `UTF-8`.
+</ParamField>
+
+<ParamField path="eye" type="string">
+  Finder-pattern eye style: `square`, `circle`, or `pointy`.
+</ParamField>
+
+<ParamField path="gradient" type="string">
+  A gradient color pair as two hex or RGB values separated by `;` (e.g. `#0000ff;#ff0000`). The component maps the pair to start and end colors.
+</ParamField>
+
+<ParamField path="gradientType" type="string">
+  Direction of the gradient: `vertical` or `horizontal`. Only applied when `gradient` is also set.
+</ParamField>
+
+<ParamField path="merge" type="string">
+  Absolute file path to an image (e.g. a logo) to overlay at the center. Supported for `svg`, `png`, and `webp` formats.
+</ParamField>
+
+<ParamField path="mergeString" type="string">
+  Raw binary image content to overlay at the center, as an alternative to `merge` when you have the image data in memory rather than on disk. Supported for `svg`, `png`, and `webp` formats. Only one of `merge` or `mergeString` is applied; `merge` takes precedence if both are set.
+</ParamField>
+
+<ParamField path="mergePercentage" type="float" default="0.2">
+  The size of the merged image as a fraction of the total QR code size (e.g. `0.3` = 30 %). Applied when either `merge` or `mergeString` is set.
+</ParamField>
+
+<ParamField path="eyeColor0" type="string">
+  Color(s) for finder eye 0. Accepts one or two hex/RGB values separated by `;` — the first for the inner eye, the second for the outer eye ring.
+</ParamField>
+
+<ParamField path="eyeColor1" type="string">
+  Color(s) for finder eye 1. Same format as `eyeColor0`.
+</ParamField>
+
+<ParamField path="eyeColor2" type="string">
+  Color(s) for finder eye 2. Same format as `eyeColor0`.
+</ParamField>
+
+<Warning>
+  EPS format is not supported in the Blade component. Using `format="eps"` throws an `InvalidConfigurationException`. For EPS output, use the [QrCode facade](/usage/facade) directly.
+</Warning>
+
+## Accessibility
+
+The component automatically adds accessibility attributes to every QR code it renders — no extra work required on your part:
+
+- **SVG output** — injects a `<title>QR Code</title>` element inside the `<svg>` tag and merges `role="img"` and `aria-label="QR Code"` onto the root element.
+- **PNG / WebP output** — renders an `<img>` tag with `alt="QR Code"` and a `data:image/…;base64,…` src.
+
+Both the `<title>` text and `aria-label` value run through Laravel's `__()` helper, so they are automatically translated if you provide a translation key in your language files.
+
+## Examples
+
+<CodeGroup>
+
+```blade Minimal
+<x-qr-code data="https://example.com" />
+```
+
+```blade Custom size and margin
+<x-qr-code
+    data="https://example.com"
+    size="250"
+    margin="2"
+/>
+```
+
+```blade Hex colour
+<x-qr-code
+    data="https://example.com"
+    size="200"
+    color="#0066cc"
+    backgroundColor="#ffffff"
+/>
+```
+
+```blade Dot style with circular eyes
+<x-qr-code
+    data="https://example.com"
+    size="250"
+    style="dot"
+    eye="circle"
+    color="#333333"
+/>
+```
+
+```blade PNG format
+<x-qr-code
+    data="https://example.com"
+    format="png"
+    size="300"
+    color="#ff0000"
+/>
+```
+
+```blade High error correction (for logo overlay)
+<x-qr-code
+    data="https://example.com"
+    size="300"
+    errorCorrection="H"
+    :merge="public_path('images/logo.png')"
+    mergePercentage="0.25"
+/>
+```
+
+```blade Gradient
+<x-qr-code
+    data="https://example.com"
+    size="300"
+    gradient="#0000ff;#ff0000"
+    gradientType="vertical"
+/>
+```
+
+```blade Custom eye colours
+<x-qr-code
+    data="https://example.com"
+    size="300"
+    eyeColor0="#ff0000;#0000ff"
+    eyeColor1="#00aa00;#ffaa00"
+    eyeColor2="#aa00aa;#00aaaa"
+/>
+```
+
+</CodeGroup>
+
+## Passing extra HTML attributes
+
+Because `<x-qr-code>` is a standard Blade component, you can pass arbitrary HTML attributes. They are merged onto the root `<svg>` or `<img>` element, so you can add CSS classes, `id` attributes, inline styles, and data attributes freely:
+
+```blade
+<x-qr-code
+    data="https://example.com"
+    size="200"
+    class="mx-auto rounded shadow-md"
+    id="homepage-qr"
+    data-tracking="header"
+/>
+```
+
+## Format comparison
+
+<Tabs>
+  <Tab title="SVG (recommended)">
+    SVG is the default format and the best choice for most templates:
+
+    - **Vector** — scales to any size without pixellation
+    - **Inline** — no extra HTTP request; the markup lives inside the HTML
+    - **Accessible** — `<title>` and `aria-label` are injected automatically
+    - **Styleable** — you can target the `<svg>` with CSS
+
+    ```blade
+    <x-qr-code data="https://example.com" format="svg" size="200" />
+    ```
+  </Tab>
+  <Tab title="PNG">
+    PNG is a raster format rendered server-side and embedded as a base64 `data:` URI:
+
+    - Requires `ext-imagick` or `ext-gd` on the server
+    - Larger HTML payload than SVG due to base64 encoding
+    - Good when you need pixel-level control or a raster export
+
+    ```blade
+    <x-qr-code data="https://example.com" format="png" size="300" />
+    ```
+  </Tab>
+  <Tab title="WebP">
+    WebP offers better compression than PNG at similar quality:
+
+    - Requires `ext-imagick`
+    - Embedded as a base64 `data:image/webp;base64,…` URI
+    - Useful when minimising payload size matters
+
+    ```blade
+    <x-qr-code data="https://example.com" format="webp" size="300" />
+    ```
+  </Tab>
+</Tabs>
+
+## Using inside Livewire and Alpine
+
+The `<x-qr-code>` component works inside Livewire and Alpine.js views with no extra setup. Because the QR code is rendered server-side on every Livewire render cycle, keep `size` values moderate to avoid unnecessary CPU usage on frequent re-renders.
+
+```blade
+{{-- Inside a Livewire component view --}}
+<div>
+    <x-qr-code :data="$qrPayload" size="200" format="svg" />
+</div>
+```
+
+## Comparing the component to the facade
+
+| | `<x-qr-code>` component | `QrCode` facade |
+|---|---|---|
+| Ideal for | Blade templates | Controllers, jobs, services |
+| Escaping | Handled automatically | Use `{!! !!}` for SVG |
+| Accessibility | Automatic `aria-label` / `role` | Manual |
+| PNG/WebP in HTML | Inline base64 `<img>` | Raw binary — handle manually |
+| EPS support | ❌ Not supported | ✅ Supported |

@@ -1,0 +1,212 @@
+---
+title: "WiFi, Geo & Calendar Event QR Codes"
+sidebarTitle: "Other Types"
+description: "Generate QR codes for instant WiFi login, geographic coordinates, and iCalendar events using the WiFi, Geo, and CalendarEvent data types."
+---
+
+The remaining built-in data types cover three everyday use cases that don't fit neatly into contact or communication categories: connecting a device to a wireless network, dropping a pin on a map, and adding a calendar event — all with a single scan.
+
+---
+
+## WiFi
+
+`QrCode::WiFi()` produces a `WIFI:` scheme payload that iOS and Android camera apps parse natively. Scanning the code connects the device to the network without the user having to type the password.
+
+### Signature
+
+```php
+QrCode::WiFi(array $credentials)
+```
+
+<ParamField body="ssid" type="string" required>
+  The network SSID. Must not be empty.
+</ParamField>
+
+<ParamField body="encryption" type="string">
+  The security protocol: `WEP`, `WPA`, `WPA2`, `WPA3`, or `NOPASS`. `WPA2` and `WPA3` are both normalised to `WPA` in the payload (as per the spec). Omit this key to let the package infer `WPA` when a password is provided, or `NOPASS` for open networks.
+</ParamField>
+
+<ParamField body="password" type="string">
+  The network password. Omit for open (`NOPASS`) networks. Passing a password alongside `NOPASS` throws an `InvalidWiFiArgumentException`.
+</ParamField>
+
+<ParamField body="hidden" type="boolean">
+  Set to `true` if the network SSID is hidden. Defaults to `false`.
+</ParamField>
+
+<Warning>
+  **WEP is deprecated and insecure.** It is supported only for compatibility with legacy hardware. Use `WPA` or `WPA2` for all new deployments.
+</Warning>
+
+### Examples
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+// WPA2 network (most common)
+$qr = QrCode::WiFi([
+    'ssid'       => 'OfficeNetwork',
+    'encryption' => 'WPA2',
+    'password'   => 's3cur3P@ssw0rd',
+]);
+
+// Open network — no password
+$qr = QrCode::WiFi([
+    'ssid'       => 'GuestWifi',
+    'encryption' => 'NOPASS',
+]);
+
+// Hidden SSID
+$qr = QrCode::WiFi([
+    'ssid'       => 'HiddenNetwork',
+    'encryption' => 'WPA',
+    'password'   => 'mypassword',
+    'hidden'     => true,
+]);
+
+// Render as a 400 px PNG for printing on a sign
+echo QrCode::WiFi([
+    'ssid'       => 'CafeWifi',
+    'encryption' => 'WPA',
+    'password'   => 'welcome2025',
+])->format('png')->size(400)->generate();
+```
+
+---
+
+## Geo
+
+`QrCode::Geo()` produces a `geo:` URI (RFC 5870). Scanning it opens the device's default maps application with a pin at the specified coordinates and an optional location name.
+
+### Signature
+
+```php
+QrCode::Geo(
+    float   $latitude,
+    float   $longitude,
+    ?string $name = null,
+)
+```
+
+<ParamField body="latitude" type="float" required>
+  Decimal latitude between `-90` and `90`. Values outside this range throw an `InvalidGeoArgumentException`.
+</ParamField>
+
+<ParamField body="longitude" type="float" required>
+  Decimal longitude between `-180` and `180`. Values outside this range throw an `InvalidGeoArgumentException`.
+</ParamField>
+
+<ParamField body="name" type="string">
+  An optional human-readable place name appended as a `name` query parameter.
+</ParamField>
+
+### Examples
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+// Coordinates only
+$qr = QrCode::Geo(37.7749, -122.4194);
+
+// With a place name
+$qr = QrCode::Geo(37.7749, -122.4194, 'San Francisco City Hall');
+
+// Eiffel Tower
+$qr = QrCode::Geo(48.858370, 2.294481, 'Eiffel Tower');
+
+// Render inline
+echo QrCode::Geo(51.5074, -0.1278, 'London')->size(300)->generate();
+
+// Save as PNG
+QrCode::Geo(40.7128, -74.0060, 'New York City')
+    ->format('png')
+    ->size(400)
+    ->generate(storage_path('app/qrcodes/nyc.png'));
+```
+
+---
+
+## CalendarEvent
+
+`QrCode::CalendarEvent()` produces an iCalendar (RFC 5545) `VCALENDAR` payload. Scanning it prompts the device to add the event to the user's calendar with all details pre-filled.
+
+### Signature
+
+```php
+QrCode::CalendarEvent(array $attributes)
+```
+
+<ParamField body="summary" type="string" required>
+  The event title. Must not be empty.
+</ParamField>
+
+<ParamField body="start" type="Carbon|DateTimeInterface|string|int" required>
+  The event start date and time. Accepts a `Carbon` instance, any `DateTimeInterface`, a parseable date string, or a Unix timestamp integer.
+</ParamField>
+
+<ParamField body="end" type="Carbon|DateTimeInterface|string|int" required>
+  The event end date and time. Must be strictly after `start`; otherwise an `InvalidCalendarEventArgumentException` is thrown.
+</ParamField>
+
+<ParamField body="description" type="string">
+  An optional longer description of the event.
+</ParamField>
+
+<ParamField body="location" type="string">
+  An optional event location string.
+</ParamField>
+
+<Note>
+  Per RFC 5545, the `DTSTAMP` field is set to the **current UTC timestamp** every time the payload is serialised. This means generating a QR code for the same event twice will produce different binary outputs and the result **cannot be strictly cached** by content hash. If you need a stable, reproducible QR code, generate it once, save the result to disk, and serve the saved file.
+</Note>
+
+### Examples
+
+```php
+use Carbon\Carbon;
+use Linkxtr\QrCode\Facades\QrCode;
+
+// Basic event
+$qr = QrCode::CalendarEvent([
+    'summary' => 'Team Stand-up',
+    'start'   => Carbon::create(2025, 9, 1, 9, 0, 0, 'America/New_York'),
+    'end'     => Carbon::create(2025, 9, 1, 9, 30, 0, 'America/New_York'),
+]);
+
+// Full event with description and location
+$qr = QrCode::CalendarEvent([
+    'summary'     => 'Laracon US 2025',
+    'description' => 'The official Laravel conference. Join us for talks, workshops, and networking.',
+    'location'    => 'Nashville, TN, USA',
+    'start'       => Carbon::create(2025, 8, 27, 9, 0, 0, 'America/Chicago'),
+    'end'         => Carbon::create(2025, 8, 28, 17, 0, 0, 'America/Chicago'),
+]);
+
+// Using a date string instead of Carbon
+$qr = QrCode::CalendarEvent([
+    'summary' => 'Project Deadline',
+    'start'   => '2025-10-31 08:00:00',
+    'end'     => '2025-10-31 09:00:00',
+]);
+
+// Render inline
+echo QrCode::CalendarEvent([
+    'summary' => 'Coffee Chat',
+    'start'   => Carbon::now()->addDay()->setTime(10, 0),
+    'end'     => Carbon::now()->addDay()->setTime(10, 30),
+])->size(400)->generate();
+
+// Save to disk — do this once and cache the file path, not the QR payload
+QrCode::CalendarEvent([
+    'summary'  => 'Laracon US 2025',
+    'location' => 'Nashville, TN',
+    'start'    => Carbon::create(2025, 8, 27, 9, 0, 0, 'America/Chicago'),
+    'end'      => Carbon::create(2025, 8, 28, 17, 0, 0, 'America/Chicago'),
+])->format('png')
+  ->size(500)
+  ->generate(storage_path('app/qrcodes/laracon-2025.png'));
+```
+
+<Tip>
+  All timestamps are converted to UTC before being written into the payload, regardless of the timezone on the `Carbon` instance you pass in. Pass timezone-aware `Carbon` objects (e.g. `Carbon::create(..., 'America/Chicago')`) to ensure the event appears at the correct local time on the recipient's device.
+</Tip>

@@ -1,0 +1,158 @@
+---
+title: "Merge a Logo into Your Laravel QR Code"
+sidebarTitle: "Image Merge"
+description: "Embed a PNG, WebP, SVG, or EPS logo into the center of a QR code using the merge() method. Includes best practices for error correction and logo sizing."
+---
+
+The `merge()` method lets you embed a logo or image directly into the center of a QR code. This is a common branding technique — the QR code remains fully scannable as long as the logo does not cover too much of the data area.
+
+## How It Works
+
+Call `merge()` before `generate()`, passing the image path and the proportion of the QR it should occupy.
+
+```php
+merge(string $filepath, float $percentage = 0.2)
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$filepath` | `string` | Path to the image file to embed. Relative paths are resolved from your project root; absolute paths are used as-is. |
+| `$percentage` | `float` | Fraction of the QR width the image should occupy (e.g. `0.3` = 30 %). Default: `0.2` |
+
+## Supported Formats
+
+Image merge works with all output formats: **PNG**, **WebP**, **SVG**, and **EPS**.
+
+<Note>
+  EPS merging requires the **GD** PHP extension. PNG and WebP merging requires either **Imagick** or **GD**. SVG merging has no additional PHP extension requirements.
+</Note>
+
+## Basic Examples
+
+<Tabs>
+  <Tab title="PNG with logo">
+    ```php
+    use Linkxtr\QrCode\Facades\QrCode;
+
+    $qr = QrCode::format('png')
+        ->size(400)
+        ->merge(public_path('logo.png'), 0.3)
+        ->generate('https://example.com');
+    ```
+  </Tab>
+  <Tab title="SVG with logo">
+    ```php
+    use Linkxtr\QrCode\Facades\QrCode;
+
+    $qr = QrCode::format('svg')
+        ->size(400)
+        ->merge(public_path('logo.svg'), 0.25)
+        ->generate('https://example.com');
+    ```
+  </Tab>
+  <Tab title="WebP with logo">
+    ```php
+    use Linkxtr\QrCode\Facades\QrCode;
+
+    $qr = QrCode::format('webp')
+        ->size(400)
+        ->merge(public_path('logo.webp'), 0.2)
+        ->generate('https://example.com');
+    ```
+  </Tab>
+</Tabs>
+
+## Use High Error Correction
+
+When you embed a logo you are physically covering part of the QR code's data modules. QR codes compensate for this through built-in error correction. Set the level to **H** (30 % recovery) whenever you merge an image.
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+QrCode::format('png')
+    ->size(400)
+    ->errorCorrection('H')
+    ->merge(public_path('logo.png'), 0.3)
+    ->generate('https://example.com');
+```
+
+<Tip>
+  Error correction level **H** allows up to 30 % of the QR data to be obscured or damaged while keeping the code scannable. Always use it when embedding a logo.
+</Tip>
+
+## Save to a File
+
+Pass a second argument to `generate()` to write the result directly to disk.
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+QrCode::format('png')
+    ->size(500)
+    ->errorCorrection('H')
+    ->merge(public_path('logo.png'), 0.25)
+    ->generate('https://example.com', storage_path('app/qrcodes/branded.png'));
+```
+
+## Merging an In-Memory Image String
+
+If you already have the image content as a string (e.g. fetched from remote storage), use `mergeString()` instead of `merge()`.
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Storage;
+
+$logoContent = Storage::get('logos/company.png');
+
+QrCode::format('png')
+    ->size(400)
+    ->errorCorrection('H')
+    ->mergeString($logoContent, 0.3)
+    ->generate('https://example.com');
+```
+
+## Best Practices
+
+<Steps>
+  <Step title="Keep the logo under 30 % of the QR area">
+    A `$percentage` value above `0.3` risks making the code unreadable on lower-quality scanners. Stay at `0.3` or below for maximum compatibility.
+  </Step>
+  <Step title="Always use error correction level H">
+    Call `->errorCorrection('H')` every time you use `merge()`. This maximises the redundancy available to compensate for the obscured modules.
+  </Step>
+  <Step title="Use a simple, high-contrast logo">
+    Complex logos with thin lines or subtle colour gradients are harder to distinguish at small sizes. A simple monochrome or flat-colour logo works best.
+  </Step>
+  <Step title="Test on a real device">
+    Always scan the final QR code with at least two different scanner apps before distributing it. Automated rendering tests do not catch all edge cases.
+  </Step>
+</Steps>
+
+## Complete Branded Example
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+$qr = QrCode::format('png')
+    ->size(500)
+    ->margin(2)
+    ->errorCorrection('H')
+    ->style('dot')
+    ->eye('circle')
+    ->color(30, 64, 175)           // dark blue foreground
+    ->backgroundColor(255, 255, 255)
+    ->merge(public_path('logo.png'), 0.25)
+    ->generate('https://example.com');
+
+// Render in a Blade view
+// {!! $qr !!}
+```
+
+<CardGroup cols={2}>
+  <Card title="Styling" icon="brush" href="/customization/styling">
+    Control module shape, eye style, size, margin, and format.
+  </Card>
+  <Card title="Colors" icon="palette" href="/customization/colors">
+    Apply RGB, CMYK, grayscale, gradients, and per-eye color overrides.
+  </Card>
+</CardGroup>

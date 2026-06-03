@@ -1,0 +1,344 @@
+---
+title: "Generate QR Codes with the Laravel QrCode Facade API"
+sidebarTitle: "QrCode Facade"
+description: "Use the QrCode facade's fluent, immutable builder API to generate, style, and export QR codes anywhere in your Laravel application."
+---
+
+The `QrCode` facade is the primary way to generate QR codes in PHP code — controllers, jobs, service classes, and Artisan commands. It exposes a fluent builder so you can chain options before calling `generate()`, and every call inherits the global defaults you set in `config/qrcode.php`.
+
+## Import the facade
+
+Add the facade import at the top of any file that generates QR codes:
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+```
+
+## Basic generation
+
+`generate()` accepts a string payload and returns a `QrCodeResult` object. `QrCodeResult` implements `Stringable`, so you can cast it directly to a string to get the raw SVG markup (or binary data for PNG/WebP).
+
+```php
+// Returns a QrCodeResult (Stringable)
+$result = QrCode::generate('https://example.com');
+
+// Cast to string to get the SVG markup
+$svg = (string) $result;
+```
+
+### Save to a file
+
+Pass a second argument — an absolute file path — to write the output directly to disk. The directory must already exist and be writable.
+
+```php
+QrCode::generate(
+    'https://example.com',
+    storage_path('app/qrcodes/example.svg')
+);
+```
+
+<Warning>
+  `generate()` throws `CannotWriteFileException` if the target directory does not exist or the process lacks write permission. Create the directory first or catch the exception explicitly.
+</Warning>
+
+## Fluent builder chaining
+
+Every method on the `QrCode` facade returns a new immutable instance, so you can chain calls freely without mutating global state.
+
+```php
+$qrCode = QrCode::size(300)
+    ->format('png')
+    ->color(255, 0, 0)          // red foreground
+    ->backgroundColor(255, 255, 255)
+    ->margin(2)
+    ->errorCorrection('H')
+    ->generate('https://example.com');
+```
+
+<Tip>
+  Because the builder is immutable, you can create a "base" generator once and reuse it for different payloads without side effects:
+
+  ```php
+  $base = QrCode::size(400)->format('png')->color(0, 102, 204);
+
+  $qr1 = $base->generate('https://example.com');
+  $qr2 = $base->generate('https://laravel.com');
+  ```
+</Tip>
+
+## Builder method reference
+
+<ParamField path="size" type="int">
+  Width and height of the QR code in pixels. The config default is `400`.
+</ParamField>
+
+<ParamField path="format" type="string">
+  Output format: `svg`, `png`, `webp`, or `eps`. The config default is `svg`. PNG and WebP require `ext-imagick` or `ext-gd`. EPS requires no extensions.
+</ParamField>
+
+<ParamField path="color" type="int, int, int, int|null">
+  Foreground color. In RGB mode (default): `color(red, green, blue, alpha?)` where each channel is `0–255` and alpha is `0–100`. In CMYK mode: `color(cyan, magenta, yellow, black)` on a `0–100` scale.
+</ParamField>
+
+<ParamField path="backgroundColor" type="int, int, int, int|null">
+  Background color. Accepts the same arguments as `color()`.
+</ParamField>
+
+<ParamField path="margin" type="int">
+  Quiet-zone margin around the QR code. The config default is `4`.
+</ParamField>
+
+<ParamField path="errorCorrection" type="string">
+  Error correction level: `L` (7 %), `M` (15 %), `Q` (25 %), or `H` (30 %). The config default is `M`.
+</ParamField>
+
+<ParamField path="encoding" type="string">
+  Character encoding for the payload, e.g. `UTF-8`. The config default is `UTF-8`.
+</ParamField>
+
+<ParamField path="style" type="string">
+  Module (dot) shape: `square`, `dot`, or `round`.
+</ParamField>
+
+<ParamField path="eye" type="string">
+  Finder-pattern eye style: `square`, `circle`, or `pointy`.
+</ParamField>
+
+<ParamField path="internalEye" type="string">
+  Inner eye style for composite eye patterns: `square`, `circle`, or `pointy`.
+</ParamField>
+
+<ParamField path="gradient" type="array, array, string">
+  Gradient fill across the QR code modules. Pass start and end colors as RGB arrays and a direction: `vertical` or `horizontal`.
+</ParamField>
+
+<ParamField path="merge" type="string, float">
+  Overlay an image (e.g. a logo) at the center. Pass a file path and an optional size percentage (default `0.2` = 20 %). Supported for SVG, PNG, and WebP — **not** EPS.
+</ParamField>
+
+<ParamField path="mergeString" type="string, float">
+  Overlay an image passed as raw binary string content instead of a file path. Accepts the image content and an optional size percentage (default `0.2` = 20 %). Use this when the image is already loaded into memory rather than stored on disk.
+</ParamField>
+
+<ParamField path="cmyk" type="void">
+  Switch the color model to CMYK. Use `0–100` integer values for each channel.
+</ParamField>
+
+<ParamField path="rgb" type="void">
+  Switch the color model back to RGB (the default). Use `0–255` integer values per channel.
+</ParamField>
+
+<ParamField path="gray" type="int, int|null">
+  Set a grayscale palette. `0` is black, `100` is white. Optionally pass a second value for the background gray level.
+</ParamField>
+
+## Output formats
+
+<CodeGroup>
+
+```php SVG (default)
+$svg = (string) QrCode::generate('https://example.com');
+// $svg contains raw <svg>…</svg> markup
+```
+
+```php PNG
+$png = (string) QrCode::format('png')->generate('https://example.com');
+// $png contains raw PNG binary data
+```
+
+```php WebP
+$webp = (string) QrCode::format('webp')->generate('https://example.com');
+// $webp contains raw WebP binary data
+```
+
+```php EPS
+$eps = (string) QrCode::format('eps')->generate('https://example.com');
+// $eps contains Encapsulated PostScript text
+```
+
+</CodeGroup>
+
+## Using the facade in Blade templates
+
+`QrCodeResult` is `Stringable` and its string value contains raw SVG markup (or binary data). Use the **unescaped** output directive `{!! !!}` so Laravel does not HTML-encode the angle brackets:
+
+```blade
+{{-- ✅ Correct — renders the SVG inline --}}
+{!! QrCode::generate('https://example.com') !!}
+
+{{-- ❌ Wrong — HTML-encodes < and > so the browser shows raw text --}}
+{{ QrCode::generate('https://example.com') }}
+```
+
+<Note>
+  For Blade templates, prefer the `<x-qr-code>` component instead — it handles escaping, accessibility attributes, and PNG/WebP base64 embedding automatically. See [Blade Component](/usage/blade-component).
+</Note>
+
+## Returning a QR code from a controller
+
+<Tabs>
+  <Tab title="SVG response">
+    ```php
+    use Illuminate\Http\Response;
+    use Linkxtr\QrCode\Facades\QrCode;
+
+    public function show(): Response
+    {
+        $svg = (string) QrCode::size(300)->generate('https://example.com');
+
+        return response($svg, 200)
+            ->header('Content-Type', 'image/svg+xml');
+    }
+    ```
+  </Tab>
+  <Tab title="PNG response">
+    ```php
+    use Illuminate\Http\Response;
+    use Linkxtr\QrCode\Facades\QrCode;
+
+    public function show(): Response
+    {
+        $png = (string) QrCode::size(300)->format('png')->generate('https://example.com');
+
+        return response($png, 200)
+            ->header('Content-Type', 'image/png');
+    }
+    ```
+  </Tab>
+  <Tab title="File download">
+    ```php
+    use Illuminate\Http\Response;
+    use Linkxtr\QrCode\Facades\QrCode;
+
+    public function download(): Response
+    {
+        $path = storage_path('app/qrcodes/qr.png');
+
+        QrCode::size(400)
+            ->format('png')
+            ->generate('https://example.com', $path);
+
+        return response()->download($path, 'qrcode.png');
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Styled QR code examples
+
+<CodeGroup>
+
+```php Brand colors
+QrCode::size(300)
+    ->color(58, 94, 255)           // blue modules
+    ->backgroundColor(255, 255, 255)
+    ->style('dot')
+    ->eye('circle')
+    ->generate('https://example.com');
+```
+
+```php Gradient
+QrCode::size(300)
+    ->gradient([0, 0, 255], [255, 0, 0], 'vertical')
+    ->generate('https://example.com');
+```
+
+```php Logo overlay (PNG)
+QrCode::size(400)
+    ->format('png')
+    ->errorCorrection('H')         // use H when merging a logo
+    ->merge(public_path('logo.png'), 0.3)
+    ->generate('https://example.com');
+```
+
+```php CMYK print output (EPS)
+QrCode::size(400)
+    ->format('eps')
+    ->cmyk()
+    ->color(100, 50, 0, 10)        // cyan, magenta, yellow, black
+    ->backgroundColor(0, 0, 0, 0)
+    ->generate('https://example.com');
+```
+
+</CodeGroup>
+
+## Config-driven defaults
+
+When you resolve the `QrCode` facade, the package automatically reads `config/qrcode.php` and uses those values as defaults. Any method you chain overrides only that specific option for the current chain.
+
+```php
+// config/qrcode.php sets size=400, format=svg, margin=4, error_correction=M
+// The chain below only overrides color — everything else comes from config
+QrCode::color(0, 102, 204)->generate('https://example.com');
+```
+
+Publish the config file to customise the global defaults:
+
+```bash
+php artisan vendor:publish --tag=qrcode-config
+```
+
+<Note>
+  Config defaults apply when you use the facade, the Blade component, or resolve `Linkxtr\QrCode\Generator` from the service container. If you instantiate `new Generator()` directly, you get hardcoded package defaults unless you pass the config array yourself.
+</Note>
+
+## Built-in data-type helpers
+
+The facade includes helpers for common structured payloads. Each returns a `QrCodeResult` just like `generate()`.
+
+<CardGroup cols={2}>
+  <Card title="BTC" icon="bitcoin-sign">
+    ```php
+    QrCode::BTC(
+        'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq',
+        0.001
+    );
+    ```
+  </Card>
+  <Card title="Email" icon="envelope">
+    ```php
+    QrCode::Email(
+        'hello@example.com',
+        'Subject',
+        'Body text'
+    );
+    ```
+  </Card>
+  <Card title="WiFi" icon="wifi">
+    ```php
+    QrCode::WiFi([
+        'ssid'       => 'MyNetwork',
+        'encryption' => 'WPA2',
+        'password'   => 's3cr3t',
+    ]);
+    ```
+  </Card>
+  <Card title="vCard" icon="address-card">
+    ```php
+    QrCode::VCard([
+        'name'  => 'Jane Doe',
+        'email' => 'jane@example.com',
+        'phone' => '+1234567890',
+        'url'   => 'https://example.com',
+    ]);
+    ```
+  </Card>
+  <Card title="Geo" icon="location-dot">
+    ```php
+    QrCode::Geo(37.7749, -122.4194);
+    ```
+  </Card>
+  <Card title="SMS" icon="message">
+    ```php
+    QrCode::SMS('+1234567890', 'Hello!');
+    ```
+  </Card>
+  <Card title="WhatsApp" icon="whatsapp">
+    ```php
+    QrCode::WhatsApp([
+        'number'  => '+1234567890',
+        'message' => 'Hi there!',
+    ]);
+    ```
+  </Card>
+</CardGroup>

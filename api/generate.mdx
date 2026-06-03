@@ -1,0 +1,190 @@
+---
+title: "generate() — Core QR Code Generation API Method"
+sidebarTitle: "generate()"
+description: "Generate QR codes from any text payload, save them to disk, or stream as an HTTP response using the fluent Laravel QR Code builder API."
+---
+
+The `generate()` method is the terminal call that renders a QR code from whatever payload and styling you have configured on the builder. Every fluent method (`size()`, `color()`, `style()`, and so on) returns a **cloned** `Generator` instance, leaving the original untouched, so you can safely reuse a partially-configured base and override individual settings per call.
+
+## generate()
+
+```php
+public function generate(string $text, ?string $filename = null): QrCodeResult
+```
+
+Render the QR code for `$text` and, if you supply a `$filename`, write the output to that path on disk. The method always returns a `QrCodeResult` regardless of whether a file was written.
+
+### Parameters
+
+<ParamField body="text" type="string" required>
+  The data payload to encode — a URL, plain string, or the pre-formatted output from any data-type method.
+</ParamField>
+
+<ParamField body="filename" type="string | null">
+  Absolute or app-relative path where the QR code should be saved (e.g. `storage_path('app/qrcodes/qr.svg')`). The **directory must already exist and be writable**; the package will not create it for you. When omitted, the QR code is generated in memory only.
+</ParamField>
+
+### Return value
+
+<ResponseField name="QrCodeResult" type="object">
+  An immutable value object that implements `Stringable`, `Htmlable`, and `Responsable`.
+
+  <Expandable title="QrCodeResult methods">
+    <ResponseField name="__toString()" type="string">
+      Returns the raw QR code content — SVG markup for `svg` format, or binary bytes for `png` / `webp` / `eps`.
+    </ResponseField>
+    <ResponseField name="toHtml()" type="string">
+      Returns an SVG string for the `svg` format, or an `<img>` tag with a base-64 data URI for raster formats. Safe to echo directly into a Blade template.
+    </ResponseField>
+    <ResponseField name="toDataUri()" type="string">
+      Returns a `data:<mime>;base64,…` string suitable for embedding in an `<img src>` attribute.
+    </ResponseField>
+    <ResponseField name="toResponse(Request $request)" type="Illuminate\Http\Response">
+      Returns a full Laravel HTTP response with the correct `Content-Type` header. Return this directly from a controller method.
+    </ResponseField>
+    <ResponseField name="getMimeType()" type="string">
+      Returns the MIME type string for the current format (e.g. `image/svg+xml`, `image/png`).
+    </ResponseField>
+    <ResponseField name="isSvg()" type="bool">
+      Returns `true` when the current format is SVG.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Exceptions
+
+<Warning>
+  `CannotWriteFileException` is thrown when you supply a `$filename` and either the parent directory does not exist or the process lacks write permission. Always ensure the directory exists before calling `generate()` with a filename.
+</Warning>
+
+---
+
+## Fluent builder entry points
+
+You do not need to construct a `Generator` manually. The `QrCode` facade exposes every configuration method as a static entry point. Each call returns a **cloned** `Generator` so the facade's default state is never mutated.
+
+<ParamField query="size" type="int">
+  Set the width and height of the QR code in pixels. Returns a cloned `Generator`.
+
+  ```php
+  QrCode::size(300)->generate('https://example.com');
+  ```
+</ParamField>
+
+<ParamField query="format" type="string">
+  Set the output format before calling `generate()`. Accepted values: `svg`, `png`, `webp`, `eps`. Returns a cloned `Generator`.
+
+  ```php
+  QrCode::format('png')->generate('https://example.com');
+  ```
+</ParamField>
+
+<ParamField query="margin" type="int">
+  Set the quiet-zone (whitespace) margin around the QR code in pixels. Returns a cloned `Generator`.
+
+  ```php
+  QrCode::margin(2)->generate('https://example.com');
+  ```
+</ParamField>
+
+<ParamField query="errorCorrection" type="string">
+  Set the Reed–Solomon error correction level. Accepted values: `L` (7%), `M` (15%), `Q` (25%), `H` (30%). Returns a cloned `Generator`.
+
+  ```php
+  QrCode::errorCorrection('H')->generate('Critical data');
+  ```
+</ParamField>
+
+<ParamField query="encoding" type="string">
+  Set the character encoding used when encoding the payload. Defaults to `UTF-8`. Returns a cloned `Generator`.
+
+  ```php
+  QrCode::encoding('UTF-8')->generate('Unicode: こんにちは');
+  ```
+</ParamField>
+
+<Note>
+  Because every fluent method returns a **clone**, you can safely store a base configuration and derive variations from it without side-effects:
+
+  ```php
+  $base = QrCode::size(300)->errorCorrection('H');
+
+  $red = $base->color(220, 38, 38)->generate('Red QR');
+  $blue = $base->color(37, 99, 235)->generate('Blue QR');
+  // $base is unchanged
+  ```
+</Note>
+
+---
+
+## Examples
+
+<CodeGroup>
+
+```php Return as HTTP response
+use Linkxtr\QrCode\Facades\QrCode;
+
+public function show(): \Illuminate\Http\Response
+{
+    return QrCode::size(300)
+        ->format('svg')
+        ->generate('https://example.com');
+}
+```
+
+```php Embed in a Blade template
+{{-- In your controller --}}
+$qr = QrCode::size(250)->generate('https://example.com');
+
+{{-- In your Blade view (use unescaped output for SVG) --}}
+{!! $qr->toHtml() !!}
+
+{{-- Or with the Blade component --}}
+<x-qr-code data="https://example.com" size="250" />
+```
+
+```php Save to disk
+use Linkxtr\QrCode\Facades\QrCode;
+use Linkxtr\QrCode\Exceptions\CannotWriteFileException;
+
+$dir = storage_path('app/qrcodes');
+
+if (! is_dir($dir)) {
+    mkdir($dir, 0755, true);
+}
+
+try {
+    QrCode::size(400)
+        ->format('png')
+        ->generate('https://example.com', $dir . '/site.png');
+} catch (CannotWriteFileException $e) {
+    // Handle missing/unwritable directory
+}
+```
+
+```php Cast to string
+use Linkxtr\QrCode\Facades\QrCode;
+
+$result = QrCode::generate('Plain text payload');
+
+// Direct string cast — returns raw SVG markup (default format)
+$svgString = (string) $result;
+
+// Embed as data URI in an <img> tag
+$dataUri = $result->toDataUri();
+echo '<img src="' . $dataUri . '" alt="QR Code">';
+```
+
+```php Reuse a base configuration
+use Linkxtr\QrCode\Facades\QrCode;
+
+$branded = QrCode::size(300)
+    ->color(30, 64, 175)   // brand blue
+    ->errorCorrection('Q');
+
+// Each call derives a new clone — $branded stays pristine
+$productQr = $branded->generate('https://example.com/product/1');
+$supportQr = $branded->generate('https://example.com/support');
+```
+
+</CodeGroup>

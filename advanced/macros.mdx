@@ -1,0 +1,163 @@
+---
+title: "Create Reusable QR Code Macros for Your Laravel Application"
+sidebarTitle: "Macros"
+description: "Extend the QrCode facade with custom macros to standardize reusable QR payloads across your Laravel application without subclassing."
+---
+
+The `QrCode` facade uses Laravel's `Macroable` trait, which lets you attach custom methods at runtime — no subclassing or package forks required. Macros are the cleanest way to encapsulate application-specific QR payloads and share them everywhere in your codebase.
+
+## How Macros Work
+
+When you call an unrecognized method on the `QrCode` facade (such as `QrCode::Spotify(...)`), the `Generator` checks whether a macro with that name is registered. If one exists, it calls your closure and handles the return value automatically:
+
+- **Return a `string`** — the Generator encodes it into a QR code using the current config defaults.
+- **Return a `QrCodeResult`** — the Generator passes it through as-is, so all styling you applied inside the macro is preserved.
+
+Any other return type causes an exception at runtime. Always return either a `string` or the result of `$this->generate()`.
+
+<Note>
+  Inside a macro closure, `$this` refers to the `Generator` instance. You can call any fluent builder method — `size()`, `margin()`, `format()`, `color()`, and so on — directly on `$this`.
+</Note>
+
+## Registering Macros
+
+Register macros in the `boot()` method of your `App\Providers\AppServiceProvider`. This ensures they are available for every request after the service container finishes booting.
+
+```php
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\ServiceProvider;
+use Linkxtr\QrCode\Facades\QrCode;
+
+class AppServiceProvider extends ServiceProvider
+{
+    public function boot(): void
+    {
+        // Macros go here
+    }
+}
+```
+
+## Two Registration Approaches
+
+### Approach 1 — Return a String Payload
+
+Return a plain string from your macro. The Generator automatically encodes it into a QR code using whatever config defaults are active.
+
+Use this approach when you only need to format a payload string and do not care about styling inside the macro.
+
+```php
+QrCode::macro('Spotify', function (string $uri) {
+    return 'spotify:track:' . $uri;
+});
+```
+
+**Usage:**
+
+```php
+{!! QrCode::Spotify('4uLU6hMCjMI75M1A2tKUQC') !!}
+```
+
+The facade formats the URI as `spotify:track:4uLU6hMCjMI75M1A2tKUQC` and generates a QR code with your global defaults applied.
+
+---
+
+### Approach 2 — Return a Pre-Styled `QrCodeResult`
+
+Call `$this->generate(...)` inside the macro and return the result. This lets you bake size, margin, format, color, and any other styling into the macro itself.
+
+Use this approach when the macro should always produce a QR code with a specific look — for example, a company asset tag that must always be 300 px with a tight margin.
+
+```php
+QrCode::macro('AssetTag', function (string $serialNumber) {
+    $payload = json_encode(['sn' => $serialNumber]);
+
+    return $this->size(300)->margin(2)->generate($payload);
+});
+```
+
+**Usage:**
+
+```php
+{!! QrCode::AssetTag('SN-99812-X') !!}
+```
+
+The macro encodes the serial number as a JSON blob and returns a fully rendered, 300 px QR code every time, regardless of what the global config says.
+
+## Full AppServiceProvider Example
+
+```php
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\ServiceProvider;
+use Linkxtr\QrCode\Facades\QrCode;
+
+class AppServiceProvider extends ServiceProvider
+{
+    public function boot(): void
+    {
+        // Approach 1: string payload, uses global config defaults
+        QrCode::macro('Spotify', function (string $uri) {
+            return 'spotify:track:' . $uri;
+        });
+
+        // Approach 2: pre-styled QrCodeResult, ignores global defaults
+        QrCode::macro('AssetTag', function (string $serialNumber) {
+            $payload = json_encode(['sn' => $serialNumber]);
+
+            return $this->size(300)->margin(2)->generate($payload);
+        });
+    }
+}
+```
+
+## Using Macros in Blade and Controllers
+
+Once registered, macros behave exactly like the built-in data-type methods. Call them directly on the facade from any Blade template or PHP class.
+
+<CodeGroup>
+
+```blade Blade Template
+{{-- String-payload macro --}}
+{!! QrCode::Spotify('4uLU6hMCjMI75M1A2tKUQC') !!}
+
+{{-- Pre-styled macro --}}
+{!! QrCode::AssetTag('SN-99812-X') !!}
+```
+
+```php Controller
+use Linkxtr\QrCode\Facades\QrCode;
+
+public function show(string $trackId): string
+{
+    return (string) QrCode::Spotify($trackId);
+}
+
+public function label(string $serial): string
+{
+    return (string) QrCode::AssetTag($serial);
+}
+```
+
+</CodeGroup>
+
+## Chaining Before a Macro Call
+
+You can still chain builder methods before calling a macro. The chained options are applied to the cloned `Generator` instance that the macro's `$this` receives.
+
+```php
+// Override the global format to PNG just for this call
+{!! QrCode::format('png')->size(400)->Spotify('4uLU6hMCjMI75M1A2tKUQC') !!}
+```
+
+<Warning>
+  If your macro calls `$this->generate()` internally (Approach 2), any options you chain **before** the macro call will be available inside `$this`. Make sure the macro's internal styling does not conflict with options your caller expects to override.
+</Warning>
+
+<Tip>
+  Macros are ideal for standardizing QR generation patterns across your application. Define one macro per business concept — `AssetTag`, `ProductLabel`, `EventTicket` — and every developer on your team gets a consistent, documented interface without having to know the payload format.
+</Tip>

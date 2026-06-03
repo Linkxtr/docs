@@ -1,0 +1,155 @@
+---
+title: "QR Code Styling: Shapes, Size & Format"
+sidebarTitle: "Styling"
+description: "Customize QR code module shapes, eye styles, composite inner eyes, output size, margin, format, and character encoding using the Laravel QR Code package."
+---
+
+The Laravel QR Code package gives you fine-grained control over the visual appearance of every QR code you generate. You can change the shape of individual data modules, the look of the three positional eyes, output dimensions, surrounding margin, file format, and text encoding — all through a fluent chainable API.
+
+## Module Style
+
+The **module style** controls the shape of every small data block that makes up the body of the QR code. Pass a style string (or the `Style` enum) to `style()`.
+
+| Value | Description |
+|-------|-------------|
+| `square` | Sharp-cornered squares (default) |
+| `dot` | Circular dots |
+| `round` | Rounded squares |
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+// Circular dot modules
+QrCode::style('dot')->generate('https://example.com');
+
+// Rounded-square modules
+QrCode::style('round')->generate('https://example.com');
+
+// Explicit square (same as default)
+QrCode::style('square')->generate('https://example.com');
+```
+
+<Tip>
+  The `style()` method accepts both a plain string (e.g. `'dot'`) and the `Linkxtr\QrCode\Enums\Style` enum case (e.g. `Style::DOT`). Both forms are equivalent.
+</Tip>
+
+## Eye Style
+
+The three large **positional squares** in the corners of every QR code are called eyes. Use `eye()` to set their outer shape.
+
+| Value | Description |
+|-------|-------------|
+| `square` | Traditional sharp-cornered square (default) |
+| `circle` | Fully rounded circle |
+| `pointy` | Inward-pointed corners |
+
+```php
+// Circle eyes with dot modules — a common modern look
+QrCode::style('dot')->eye('circle')->generate('https://example.com');
+
+// Pointy eyes with round modules
+QrCode::style('round')->eye('pointy')->generate('https://example.com');
+```
+
+## Internal (Composite) Eye Style
+
+Each positional eye is made of two parts: an outer frame and an inner marker. By default both share the same style set by `eye()`. Call `internalEye()` to style the **inner marker** independently, giving you composite eyes.
+
+```php
+// Round outer eye, circle inner marker
+QrCode::style('round')->eye('square')->internalEye('circle')->generate('https://example.com');
+
+// Circle outer, pointy inner
+QrCode::style('dot')->eye('circle')->internalEye('pointy')->generate('https://example.com');
+```
+
+<Note>
+  `internalEye()` accepts the same values as `eye()`: `'square'`, `'circle'`, and `'pointy'`.
+</Note>
+
+## Size and Margin
+
+Control the pixel dimensions and quiet zone around the code with `size()` and `margin()`.
+
+```php
+// 300 × 300 px with a 2-module quiet zone
+QrCode::size(300)->margin(2)->generate('https://example.com');
+
+// Larger code with more breathing room
+QrCode::size(500)->margin(6)->generate('https://example.com');
+```
+
+- **`size(int $size)`** — Total width and height in pixels. Default: `400`.
+- **`margin(int $margin)`** — Quiet-zone thickness in modules. Default: `4`.
+
+## Output Format
+
+Use `format()` to choose the image format of the generated QR code.
+
+| Value | Extension | PHP extension required |
+|-------|-----------|----------------------|
+| `svg` | `.svg` | None (default) |
+| `png` | `.png` | `imagick` or `gd` |
+| `webp` | `.webp` | `imagick` |
+| `eps` | `.eps` | None |
+
+```php
+// SVG (default — no extra extensions needed)
+QrCode::format('svg')->generate('https://example.com');
+
+// PNG raster image
+QrCode::format('png')->generate('https://example.com');
+
+// WebP (requires Imagick)
+QrCode::format('webp')->generate('https://example.com');
+
+// EPS vector
+QrCode::format('eps')->generate('https://example.com');
+```
+
+<Warning>
+  When saving to a file, make sure the filename extension matches the chosen format. A mismatch (e.g. `qr.png` with `format('svg')`) will produce a file with incorrect content.
+</Warning>
+
+```php
+// Save a PNG to disk
+QrCode::format('png')->generate('https://example.com', storage_path('app/qr.png'));
+```
+
+## Encoding
+
+By default the package encodes text as **UTF-8**, which handles the vast majority of use cases. Override this with `encoding()` when your payload uses a different character set.
+
+```php
+// Explicit UTF-8 (same as default)
+QrCode::encoding('UTF-8')->generate('Hello, 世界');
+
+// ISO-8859-1 for Western European characters
+QrCode::encoding('ISO-8859-1')->generate('Héllo');
+```
+
+## Putting It All Together
+
+Chain any combination of style options before calling `generate()`.
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+$qr = QrCode::format('png')
+    ->size(400)
+    ->margin(2)
+    ->style('dot')
+    ->eye('circle')
+    ->internalEye('square')
+    ->encoding('UTF-8')
+    ->generate('https://example.com');
+```
+
+<CardGroup cols={2}>
+  <Card title="Colors" icon="palette" href="/customization/colors">
+    Apply RGB, CMYK, grayscale, gradients, and per-eye color overrides.
+  </Card>
+  <Card title="Image Merge" icon="image" href="/customization/image-merge">
+    Embed a logo or image into the center of your QR code.
+  </Card>
+</CardGroup>

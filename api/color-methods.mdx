@@ -1,0 +1,264 @@
+---
+title: "Color Methods — RGB, CMYK, Gradients & Grayscale"
+sidebarTitle: "Color Methods"
+description: "Set foreground and background colors in RGB or CMYK mode, apply grayscale tones, and add directional gradients to your Laravel QR codes."
+---
+
+The package supports three color models — RGB (default), CMYK, and grayscale. Switch between them at any point in the builder chain. Every method returns a **cloned** `Generator` so previous state is never mutated.
+
+<Note>
+  Alpha values throughout this package use a **0–100 scale** (0 = fully opaque, 100 = fully transparent). The package converts this internally to the range PHP's GD library expects (0–127). You do not need to perform this conversion yourself.
+</Note>
+
+---
+
+## color()
+
+```php
+public function color(int $c1, int $c2, int $c3, ?int $c4 = null): static
+```
+
+Set the foreground (module) color. The meaning of each channel depends on the active color model.
+
+<ParamField body="c1" type="int" required>
+  **RGB mode:** Red channel, 0–255.  
+  **CMYK mode:** Cyan channel, 0–100.
+</ParamField>
+
+<ParamField body="c2" type="int" required>
+  **RGB mode:** Green channel, 0–255.  
+  **CMYK mode:** Magenta channel, 0–100.
+</ParamField>
+
+<ParamField body="c3" type="int" required>
+  **RGB mode:** Blue channel, 0–255.  
+  **CMYK mode:** Yellow channel, 0–100.
+</ParamField>
+
+<ParamField body="c4" type="int | null">
+  **RGB mode:** Alpha channel, 0–100 (0 = fully opaque).  
+  **CMYK mode:** Black (Key) channel, 0–100.  
+  Omit for a fully opaque foreground.
+</ParamField>
+
+<CodeGroup>
+
+```php RGB foreground
+QrCode::color(220, 38, 38)           // solid red
+    ->generate('https://example.com');
+```
+
+```php RGB with alpha
+QrCode::color(220, 38, 38, 20)       // red at 80% opacity
+    ->generate('https://example.com');
+```
+
+```php CMYK foreground
+QrCode::cmyk()
+    ->color(0, 100, 100, 0)          // CMYK red
+    ->generate('https://example.com');
+```
+
+</CodeGroup>
+
+---
+
+## backgroundColor()
+
+```php
+public function backgroundColor(int $c1, int $c2, int $c3, ?int $c4 = null): static
+```
+
+Set the background color. Accepts the same channel layout as `color()` and respects the active color model.
+
+<ParamField body="c1" type="int" required>
+  **RGB mode:** Red, 0–255. **CMYK mode:** Cyan, 0–100.
+</ParamField>
+
+<ParamField body="c2" type="int" required>
+  **RGB mode:** Green, 0–255. **CMYK mode:** Magenta, 0–100.
+</ParamField>
+
+<ParamField body="c3" type="int" required>
+  **RGB mode:** Blue, 0–255. **CMYK mode:** Yellow, 0–100.
+</ParamField>
+
+<ParamField body="c4" type="int | null">
+  **RGB mode:** Alpha, 0–100. **CMYK mode:** Black, 0–100. Omit for a fully opaque background.
+</ParamField>
+
+<CodeGroup>
+
+```php White background (explicit)
+QrCode::color(0, 0, 0)
+    ->backgroundColor(255, 255, 255)
+    ->generate('https://example.com');
+```
+
+```php Transparent background (PNG)
+QrCode::format('png')
+    ->color(0, 0, 0)
+    ->backgroundColor(255, 255, 255, 100) // fully transparent
+    ->generate('https://example.com');
+```
+
+</CodeGroup>
+
+---
+
+## rgb()
+
+```php
+public function rgb(): static
+```
+
+Switch the active color model to **RGB**. This is the default mode — call it explicitly only when you need to revert from CMYK in a chain.
+
+Each channel uses a 0–255 scale. Alpha uses a 0–100 scale.
+
+```php
+QrCode::rgb()
+    ->color(59, 130, 246)
+    ->generate('https://example.com');
+```
+
+---
+
+## cmyk()
+
+```php
+public function cmyk(): static
+```
+
+Switch the active color model to **CMYK**. All subsequent calls to `color()` and `backgroundColor()` interpret channel values on a **0–100** scale (percentage).
+
+<Warning>
+  Gradients (`gradient()`) are only available in RGB mode. Calling `gradient()` while in CMYK mode will produce unexpected results. Switch back to `rgb()` before using gradients.
+</Warning>
+
+```php
+QrCode::size(300)
+    ->cmyk()
+    ->color(100, 50, 0, 10)          // deep blue in CMYK
+    ->backgroundColor(0, 0, 0, 0)   // white background in CMYK
+    ->generate('https://example.com');
+```
+
+---
+
+## gray()
+
+```php
+public function gray(int $gray, ?int $backgroundGray = null): static
+```
+
+Switch to **grayscale** mode and set both foreground and background tones in a single call. Internally this sets the color model to `GRAY`.
+
+<ParamField body="gray" type="int" required>
+  Foreground luminance: `0` = black, `100` = white.
+</ParamField>
+
+<ParamField body="backgroundGray" type="int | null">
+  Background luminance on the same 0–100 scale. When `null`, the background defaults to white (`100`).
+</ParamField>
+
+<CodeGroup>
+
+```php Black on white (default grayscale)
+QrCode::gray(0)->generate('https://example.com');
+```
+
+```php Dark gray on light gray
+QrCode::gray(20, 90)->generate('https://example.com');
+```
+
+</CodeGroup>
+
+---
+
+## gradient()
+
+```php
+public function gradient(string|array $start, string|array $end, string|GradientType $type = GradientType::VERTICAL): static
+```
+
+Apply a two-stop color gradient to the QR code modules. Gradient operates in **RGB mode only**.
+
+<ParamField body="start" type="string | array" required>
+  The gradient start color. Pass a hex string (e.g. `'#3b82f6'`) or an RGB array (e.g. `[59, 130, 246]`).
+</ParamField>
+
+<ParamField body="end" type="string | array" required>
+  The gradient end color. Accepts the same formats as `start`.
+</ParamField>
+
+<ParamField body="type" type="string" required>
+  The gradient direction. Accepted values:
+
+  | Value | Description |
+  |-------|-------------|
+  | `vertical` | Top-to-bottom (default) |
+  | `horizontal` | Left-to-right |
+  | `diagonal` | Top-left to bottom-right |
+  | `inverse_diagonal` | Top-right to bottom-left |
+  | `radial` | Radiating from the centre outward |
+</ParamField>
+
+<Note>
+  `gradient()` takes color values directly rather than using whatever was set by a prior `color()` call. The gradient replaces the foreground color entirely.
+</Note>
+
+<CodeGroup>
+
+```php Vertical gradient (hex strings)
+QrCode::size(300)
+    ->gradient('#3b82f6', '#8b5cf6', 'vertical')
+    ->generate('https://example.com');
+```
+
+```php Horizontal gradient (RGB arrays)
+QrCode::size(300)
+    ->gradient([59, 130, 246], [139, 92, 246], 'horizontal')
+    ->generate('https://example.com');
+```
+
+```php Radial gradient
+QrCode::size(350)
+    ->gradient('#f59e0b', '#ef4444', 'radial')
+    ->generate('https://example.com');
+```
+
+```php Diagonal gradient with white background
+QrCode::size(300)
+    ->backgroundColor(255, 255, 255)
+    ->gradient([0, 200, 100], [0, 50, 200], 'diagonal')
+    ->generate('https://example.com');
+```
+
+</CodeGroup>
+
+---
+
+## Color model comparison
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+// Default RGB — channels 0-255, optional alpha 0-100
+$rgb = QrCode::color(30, 64, 175)
+    ->backgroundColor(239, 246, 255)
+    ->generate('https://example.com');
+
+// CMYK — channels 0-100 (percentage)
+$cmyk = QrCode::cmyk()
+    ->color(83, 64, 0, 31)           // dark blue in CMYK
+    ->backgroundColor(0, 0, 0, 0)
+    ->generate('https://example.com');
+
+// Grayscale — luminance 0-100
+$gray = QrCode::gray(10, 95)->generate('https://example.com');
+
+// Gradient (RGB only)
+$gradient = QrCode::gradient('#1e40af', '#7c3aed', 'vertical')
+    ->generate('https://example.com');
+```

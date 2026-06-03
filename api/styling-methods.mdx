@@ -1,0 +1,297 @@
+---
+title: "Styling Methods — Shape, Format & Error Correction"
+sidebarTitle: "Styling Methods"
+description: "Control size, margin, module style, eye shapes, output format, character encoding, and error correction level for every QR code you generate."
+---
+
+Every method documented here returns a **cloned** `Generator` instance, keeping the original state intact. Chain as many calls as you need before calling `generate()` or any data-type method to produce your final `QrCodeResult`.
+
+---
+
+## style()
+
+```php
+public function style(string|Style $style, ?float $size = null): static
+```
+
+Set the shape used to draw each QR module (the individual dots that make up the code).
+
+<ParamField body="style" type="string" required>
+  The module style. Accepted values:
+
+  | Value | Description |
+  |-------|-------------|
+  | `square` | Standard filled squares (default) |
+  | `dot` | Circular dots |
+  | `round` | Squares with rounded corners |
+</ParamField>
+
+<ParamField body="size" type="float">
+  Optional scaling factor for the module size, between `0.0` and `1.0`. Useful with `dot` style to add spacing between dots. Defaults to the renderer's built-in size.
+</ParamField>
+
+<CodeGroup>
+
+```php Dot style
+QrCode::size(300)
+    ->style('dot')
+    ->generate('https://example.com');
+```
+
+```php Round style with custom module size
+QrCode::size(300)
+    ->style('round', 0.8)
+    ->generate('https://example.com');
+```
+
+</CodeGroup>
+
+---
+
+## eye()
+
+```php
+public function eye(string|EyeStyle $style): static
+```
+
+Set the style of the three **outer** finder-pattern squares (the large corner squares that help scanners locate the code).
+
+<ParamField body="style" type="string" required>
+  Accepted values:
+
+  | Value | Description |
+  |-------|-------------|
+  | `square` | Standard square outline (default) |
+  | `circle` | Circular outer ring |
+  | `pointy` | Square with pointed inner corners |
+</ParamField>
+
+```php
+QrCode::size(300)
+    ->eye('circle')
+    ->generate('https://example.com');
+```
+
+---
+
+## internalEye()
+
+```php
+public function internalEye(string|EyeStyle $style): static
+```
+
+Set the style of the three **inner** finder-pattern squares independently of the outer eye. Use this together with `eye()` to create composite eye designs.
+
+<ParamField body="style" type="string" required>
+  Accepted values: `square`, `circle`, `pointy` — same as `eye()`.
+</ParamField>
+
+```php
+QrCode::size(300)
+    ->eye('circle')
+    ->internalEye('square')
+    ->generate('https://example.com');
+```
+
+---
+
+## eyeColor()
+
+```php
+public function eyeColor(int $eyeNumber, string|array $inner, string|array|null $outer = null): static
+```
+
+Override the color of a single finder-pattern eye. Call this method up to three times to style each eye independently.
+
+<ParamField body="eyeNumber" type="int" required>
+  The index of the eye to color. Accepted values: `0`, `1`, `2` (top-left, top-right, bottom-left respectively).
+</ParamField>
+
+<ParamField body="inner" type="string | array" required>
+  Color for the **inner** square of the eye. Pass a hex string (e.g. `'#e11d48'`) or an RGB array (e.g. `[225, 29, 72]`).
+</ParamField>
+
+<ParamField body="outer" type="string | array | null">
+  Color for the **outer** ring of the eye. Accepts the same formats as `inner`. When `null`, the outer ring inherits the global foreground color set by `color()`.
+</ParamField>
+
+<CodeGroup>
+
+```php Hex string colors
+QrCode::size(300)
+    ->eyeColor(0, '#1d4ed8', '#93c5fd') // eye 0: blue theme
+    ->eyeColor(1, '#15803d', '#86efac') // eye 1: green theme
+    ->eyeColor(2, '#b91c1c', '#fca5a5') // eye 2: red theme
+    ->generate('https://example.com');
+```
+
+```php RGB array colors
+QrCode::size(300)
+    ->eyeColor(0, [29, 78, 216], [147, 197, 253])
+    ->generate('https://example.com');
+```
+
+```php Inner color only (outer inherits foreground)
+QrCode::size(300)
+    ->color(0, 0, 0)
+    ->eyeColor(0, '#e11d48') // outer stays black
+    ->generate('https://example.com');
+```
+
+</CodeGroup>
+
+---
+
+## size()
+
+```php
+public function size(int $size): static
+```
+
+Set the output image width and height in pixels. The QR code is always square.
+
+<ParamField body="size" type="int" required>
+  Pixel dimensions for both width and height. The default from the package config is `400`.
+</ParamField>
+
+```php
+QrCode::size(250)->generate('https://example.com');
+```
+
+---
+
+## margin()
+
+```php
+public function margin(int $margin): static
+```
+
+Set the quiet-zone margin — the blank border surrounding the QR code. A margin of at least `4` modules is recommended by the QR specification for reliable scanning.
+
+<ParamField body="margin" type="int" required>
+  Margin thickness in pixels. The package default is `4`.
+</ParamField>
+
+```php
+QrCode::margin(6)->generate('https://example.com');
+```
+
+---
+
+## format()
+
+```php
+public function format(string|Format $format): static
+```
+
+Set the output image format.
+
+<ParamField body="format" type="string" required>
+  Accepted values:
+
+  | Value | Requires | Notes |
+  |-------|----------|-------|
+  | `svg` | — | Default. Vector format; no PHP extension required. |
+  | `png` | `ext-imagick` or `ext-gd` | Raster format. Falls back to GD if Imagick is unavailable. |
+  | `webp` | `ext-imagick` | Raster format. Requires Imagick. |
+  | `eps` | — | PostScript vector. Image merging is not supported for EPS. |
+</ParamField>
+
+<CodeGroup>
+
+```php PNG
+QrCode::format('png')->size(400)->generate('https://example.com');
+```
+
+```php SVG (default)
+QrCode::format('svg')->generate('https://example.com');
+```
+
+```php WebP
+QrCode::format('webp')->size(400)->generate('https://example.com');
+```
+
+</CodeGroup>
+
+---
+
+## encoding()
+
+```php
+public function encoding(string $encoding): static
+```
+
+Set the character encoding used when converting the text payload to QR code data. The default is `UTF-8`, which handles most use cases including multibyte characters.
+
+<ParamField body="encoding" type="string" required>
+  Any valid PHP character encoding string, such as `UTF-8`, `ISO-8859-1`, or `Shift_JIS`.
+</ParamField>
+
+```php
+QrCode::encoding('UTF-8')->generate('日本語テキスト');
+```
+
+---
+
+## errorCorrection()
+
+```php
+public function errorCorrection(string|ErrorCorrectionLevel $errorCorrection): static
+```
+
+Set the Reed–Solomon error correction level. Higher correction means the QR code can recover from more physical damage or obstruction, but also produces a denser, larger code for the same payload.
+
+<ParamField body="errorCorrection" type="string" required>
+  Accepted values:
+
+  | Level | Recovery capacity | Typical use |
+  |-------|-------------------|-------------|
+  | `L` | ~7% | Maximum data density; minimal redundancy |
+  | `M` | ~15% | Balanced default for most use cases |
+  | `Q` | ~25% | Good choice when embedding a logo |
+  | `H` | ~30% | Best durability; use for printed materials |
+</ParamField>
+
+<Tip>
+  Use `H` error correction when you overlay a logo using `merge()` or `mergeString()`. The extra redundancy ensures scanners can still read the code even though part of it is covered.
+</Tip>
+
+<CodeGroup>
+
+```php High correction for logo overlay
+QrCode::size(400)
+    ->errorCorrection('H')
+    ->merge(public_path('logo.png'), 0.3)
+    ->generate('https://example.com');
+```
+
+```php Low correction for high-density data
+QrCode::size(600)
+    ->errorCorrection('L')
+    ->generate(str_repeat('A', 400));
+```
+
+</CodeGroup>
+
+---
+
+## Full styling example
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+$qr = QrCode::size(350)
+    ->format('svg')
+    ->margin(4)
+    ->errorCorrection('Q')
+    ->encoding('UTF-8')
+    ->style('dot', 0.9)
+    ->eye('circle')
+    ->internalEye('square')
+    ->color(15, 23, 42)
+    ->backgroundColor(248, 250, 252)
+    ->generate('https://example.com');
+
+// Return as an HTTP response
+return $qr;
+```

@@ -1,0 +1,157 @@
+---
+title: "QR Code Colors: RGB, CMYK & Gradients"
+sidebarTitle: "Colors"
+description: "Set foreground and background colors using RGB, CMYK, or grayscale models. Add gradients and per-eye color overrides for fully branded Laravel QR codes."
+---
+
+The Laravel QR Code package supports three color models — RGB, CMYK, and grayscale — plus gradients and individual per-eye color overrides. Every color method is chainable, so you can combine them freely before calling `generate()`.
+
+## RGB (Default)
+
+RGB is the default color model. Pass red, green, and blue values on a **0–255** scale to `color()` and `backgroundColor()`.
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+// Red foreground, white background
+QrCode::color(220, 38, 38)
+    ->backgroundColor(255, 255, 255)
+    ->generate('https://example.com');
+```
+
+### RGB with Alpha
+
+Add a fourth argument to include an **alpha (transparency) channel**. The scale is **0–100**, where `0` is fully opaque and `100` is fully transparent.
+
+```php
+// 50 % transparent foreground on a transparent background
+QrCode::color(220, 38, 38, 50)
+    ->backgroundColor(255, 255, 255, 0)
+    ->generate('https://example.com');
+```
+
+<Warning>
+  Alpha values use a **0–100 scale**, not the 0–255 scale you may be used to from CSS or image editors. The package converts this to the correct internal representation automatically.
+</Warning>
+
+## CMYK
+
+Switch to CMYK mode by calling `cmyk()` before `color()`. All four channel values use a **0–100** scale (percentage).
+
+```php
+// Call cmyk() first, then set C / M / Y / K values
+QrCode::cmyk()
+    ->color(0, 100, 100, 0)      // pure red in CMYK
+    ->backgroundColor(0, 0, 0, 0) // white in CMYK
+    ->generate('https://example.com');
+```
+
+<Note>
+  Gradients are only available in RGB mode. Calling `gradient()` while in CMYK mode is not supported.
+</Note>
+
+You can switch back to RGB at any point by calling `rgb()`.
+
+```php
+QrCode::cmyk()
+    ->color(100, 50, 0, 10)
+    ->rgb() // switch back to RGB for the background
+    ->backgroundColor(255, 255, 255)
+    ->generate('https://example.com');
+```
+
+## Grayscale
+
+Use `gray()` for a one-call shorthand that sets both foreground and (optionally) background to shades of gray. The scale is **0–100**, where `0` is black and `100` is white.
+
+```php
+// Dark gray foreground, light gray background
+QrCode::gray(20, 90)->generate('https://example.com');
+
+// Black foreground, white background (defaults)
+QrCode::gray(0)->generate('https://example.com');
+```
+
+- **First argument** — foreground shade (0 = black, 100 = white).
+- **Second argument** — background shade. Defaults to `100` (white) when omitted.
+
+## Gradients
+
+Apply a two-color gradient to the QR code foreground with `gradient()`. Provide start and end colors as RGB arrays or hex strings, then choose a direction.
+
+```php
+// Vertical gradient: blue → red
+QrCode::gradient([0, 0, 255], [255, 0, 0], 'vertical')
+    ->generate('https://example.com');
+
+// Horizontal gradient: green → purple
+QrCode::gradient([34, 197, 94], [168, 85, 247], 'horizontal')
+    ->generate('https://example.com');
+
+// Diagonal gradient
+QrCode::gradient([255, 165, 0], [255, 0, 128], 'diagonal')
+    ->generate('https://example.com');
+```
+
+### Gradient Types
+
+| Value | Direction |
+|-------|-----------|
+| `vertical` | Top to bottom |
+| `horizontal` | Left to right |
+| `diagonal` | Top-left to bottom-right |
+| `inverse_diagonal` | Top-right to bottom-left |
+| `radial` | Radiates outward from the center |
+
+<Warning>
+  Gradients are only available in **RGB mode**. Using `gradient()` after calling `cmyk()` is not supported.
+</Warning>
+
+## Per-Eye Color Overrides
+
+Override the color of any individual eye with `eyeColor()`. Each QR code has three positional eyes indexed `0`, `1`, and `2`.
+
+```php
+// eyeColor(index, innerColor, outerColor)
+QrCode::eyeColor(0, [220, 38, 38], [30, 64, 175])  // eye 0: red inner, blue outer
+    ->eyeColor(1, [22, 163, 74], [126, 34, 206])    // eye 1: green inner, purple outer
+    ->eyeColor(2, [245, 158, 11], [15, 118, 110])   // eye 2: amber inner, teal outer
+    ->generate('https://example.com');
+```
+
+- **Index** — `0` (top-left), `1` (top-right), `2` (bottom-left).
+- **Inner color** — color of the small inner marker square.
+- **Outer color** — color of the outer frame. Omit this argument to apply the inner color to both parts.
+
+```php
+// Same color for both inner and outer parts of eye 0
+QrCode::eyeColor(0, [220, 38, 38])->generate('https://example.com');
+```
+
+## Complete Color Example
+
+Chain color options with style and format options to build a fully branded QR code.
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+$qr = QrCode::format('png')
+    ->size(400)
+    ->style('dot')
+    ->eye('circle')
+    ->gradient([99, 102, 241], [236, 72, 153], 'diagonal')
+    ->backgroundColor(255, 255, 255)
+    ->eyeColor(0, [99, 102, 241], [30, 27, 75])
+    ->eyeColor(1, [99, 102, 241], [30, 27, 75])
+    ->eyeColor(2, [99, 102, 241], [30, 27, 75])
+    ->generate('https://example.com');
+```
+
+<CardGroup cols={2}>
+  <Card title="Styling" icon="brush" href="/customization/styling">
+    Set module shape, eye style, size, margin, and output format.
+  </Card>
+  <Card title="Image Merge" icon="image" href="/customization/image-merge">
+    Embed a logo or image into the center of your QR code.
+  </Card>
+</CardGroup>

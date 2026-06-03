@@ -1,0 +1,125 @@
+{
+  "projectType": "sdk-library",
+  "projectName": "Laravel QR Code",
+  "projectDescription": "A clean, modern QR code generator for Laravel that supports multiple output formats, rich data types, and deep customization via a fluent API, Blade component, and Artisan CLI.",
+  "theme": "luma",
+  "primaryColor": "#7c7c80",
+  "lightColor": "#151c28",
+  "darkColor": "#f2f2f2",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Usage",
+            "pages": [
+              "usage/facade",
+              "usage/blade-component",
+              "usage/artisan-cli"
+            ]
+          },
+          {
+            "group": "Customization",
+            "pages": [
+              "customization/styling",
+              "customization/colors",
+              "customization/image-merge"
+            ]
+          },
+          {
+            "group": "Data Types",
+            "pages": [
+              "data-types/overview",
+              "data-types/contact",
+              "data-types/communication",
+              "data-types/payment",
+              "data-types/other"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "configuration/config-file",
+              "configuration/environment-variables"
+            ]
+          },
+          {
+            "group": "Advanced",
+            "pages": [
+              "advanced/macros",
+              "advanced/upgrade-guide",
+              "advanced/troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Core API",
+            "pages": [
+              "api/generate",
+              "api/styling-methods",
+              "api/color-methods",
+              "api/data-type-methods"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Fluent chainable API via QrCode facade",
+    "Blade component <x-qr-code> for templates",
+    "Artisan CLI command qr:generate",
+    "Multiple output formats: SVG, PNG, WebP, EPS",
+    "Rich built-in data types: WiFi, vCard, Email, SMS, Geo, BTC, Ethereum, WhatsApp, Telegram, CalendarEvent",
+    "Customizable styles, eye shapes, gradients, and color models (RGB, CMYK, Grayscale)",
+    "Image/logo merging for PNG, WebP, and SVG",
+    "Extensible via Laravel Macros",
+    "Auto-discovery service provider and facade registration",
+    "GD fallback when Imagick is unavailable"
+  ],
+  "publicApiSurface": [
+    "QrCode::generate(string $text, ?string $filename = null)",
+    "QrCode::size(int $size)",
+    "QrCode::format(string $format)",
+    "QrCode::color(int $c1, int $c2, int $c3, ?int $c4 = null)",
+    "QrCode::backgroundColor(int $c1, int $c2, int $c3, ?int $c4 = null)",
+    "QrCode::cmyk()",
+    "QrCode::rgb()",
+    "QrCode::gray(int $gray, ?int $backgroundGray = null)",
+    "QrCode::style(string $style)",
+    "QrCode::eye(string $style)",
+    "QrCode::internalEye(string $style)",
+    "QrCode::gradient(int $startR, int $startG, int $startB, int $endR, int $endG, int $endB, string $type)",
+    "QrCode::margin(int $margin)",
+    "QrCode::errorCorrection(string $level)",
+    "QrCode::encoding(string $encoding)",
+    "QrCode::merge(string $image, float $percentage, bool $absolute)",
+    "QrCode::Email(string $to, string $subject, string $body)",
+    "QrCode::PhoneNumber(string $phone)",
+    "QrCode::SMS(string $phone, string $message)",
+    "QrCode::Geo(float $lat, float $lng)",
+    "QrCode::WiFi(array $config)",
+    "QrCode::BTC(array $config)",
+    "QrCode::Ethereum(string $address, float|null $amount)",
+    "QrCode::VCard(array $config)",
+    "QrCode::CalendarEvent(array $config)",
+    "QrCode::WhatsApp(array $params)",
+    "QrCode::Telegram(string $username)",
+    "QrCode::macro(string $name, Closure $macro)",
+    "<x-qr-code data='' size='' format='' color='' margin='' style='' errorCorrection='' />",
+    "php artisan qr:generate [data] [--output] [--format] [--size] [--color] [--backgroundColor] [--errorCorrection] [--margin]"
+  ]
+}

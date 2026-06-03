@@ -1,0 +1,187 @@
+---
+title: "Contact QR Codes: VCard and MeCard"
+sidebarTitle: "Contact"
+description: "Generate scannable contact QR codes with VCard 3.0 or MeCard format so users can save details directly to their address book."
+---
+
+Contact data types encode personal and professional details into a QR code that any modern smartphone camera app can parse and offer to save as a new contact. The package supports two standards: **VCard** (RFC 6350 / version 3.0) and **MeCard** (NTT DoCoMo format). Both let a user scan once and skip the manual entry entirely.
+
+## VCard
+
+Use `QrCode::VCard(array $config)` to produce a vCard 3.0 payload. VCard is the most widely supported contact format across iOS, Android, and desktop mail clients, making it the safest default choice for business cards, event badges, and printed marketing materials.
+
+### Supported Keys
+
+<ParamField body="name" type="string" required>
+  The full display name of the contact (`FN` field). This is the only required key.
+</ParamField>
+
+<ParamField body="firstName" type="string">
+  The contact's given name. Used alongside `lastName` to populate the structured `N` field.
+</ParamField>
+
+<ParamField body="lastName" type="string">
+  The contact's family name.
+</ParamField>
+
+<ParamField body="email" type="string">
+  A general internet email address.
+</ParamField>
+
+<ParamField body="emailWork" type="string">
+  A work-typed internet email address (`EMAIL;type=INTERNET,WORK`).
+</ParamField>
+
+<ParamField body="emailHome" type="string">
+  A home-typed internet email address (`EMAIL;type=INTERNET,HOME`).
+</ParamField>
+
+<ParamField body="phone" type="string">
+  A general phone number (`TEL`).
+</ParamField>
+
+<ParamField body="phoneWork" type="string">
+  A work-typed phone number (`TEL;type=WORK`).
+</ParamField>
+
+<ParamField body="phoneHome" type="string">
+  A home-typed phone number (`TEL;type=HOME`).
+</ParamField>
+
+<ParamField body="phoneCell" type="string">
+  A mobile/cell phone number (`TEL;type=CELL`).
+</ParamField>
+
+<ParamField body="company" type="string">
+  The organisation name (`ORG`).
+</ParamField>
+
+<ParamField body="job" type="string">
+  The job title (`TITLE`).
+</ParamField>
+
+<ParamField body="role" type="string">
+  The role within the organisation (`ROLE`).
+</ParamField>
+
+<ParamField body="address" type="string">
+  A street address (`ADR`).
+</ParamField>
+
+<ParamField body="url" type="string">
+  A personal or company website URL (`URL`).
+</ParamField>
+
+<ParamField body="note" type="string">
+  A free-text note (`NOTE`).
+</ParamField>
+
+<ParamField body="birthday" type="string">
+  Date of birth in `YYYYMMDD` format (`BDAY`).
+</ParamField>
+
+### Example
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+// Minimal — name only
+$qr = QrCode::VCard(['name' => 'Jane Smith']);
+
+// Full business card
+$qr = QrCode::VCard([
+    'name'      => 'Jane Smith',
+    'firstName' => 'Jane',
+    'lastName'  => 'Smith',
+    'email'     => 'jane@example.com',
+    'emailWork' => 'jane.smith@acme.com',
+    'phone'     => '+12025550170',
+    'phoneCell' => '+12025550195',
+    'company'   => 'Acme Inc.',
+    'job'       => 'Software Engineer',
+    'address'   => '123 Main St, Springfield, IL 62701',
+    'url'       => 'https://janesmith.dev',
+    'note'      => 'Met at Laracon 2025',
+    'birthday'  => '19900315',
+]);
+
+// Render as SVG inline
+echo QrCode::VCard([
+    'name'    => 'Jane Smith',
+    'email'   => 'jane@example.com',
+    'phone'   => '+12025550170',
+    'company' => 'Acme Inc.',
+])->generate();
+```
+
+<Note>
+  Always wrap in `try/catch` when using user-supplied data. The only hard requirement is a non-empty `name`; all other keys are optional.
+</Note>
+
+---
+
+## MeCard
+
+Use `QrCode::MeCard(string $name, ...)` to produce a MeCard payload. MeCard is a lighter-weight format originating from NTT DoCoMo and is prevalent in Japan and some Asian markets. It carries slightly fewer fields than vCard but produces a shorter payload, resulting in a less complex QR code.
+
+### Signature
+
+```php
+QrCode::MeCard(
+    string  $name,
+    ?string $phone        = null,
+    ?string $email        = null,
+    ?string $url          = null,
+    ?string $address      = null,
+    ?string $reading      = null,  // Phonetic reading of the name (SOUND)
+    ?string $nickname     = null,
+    ?string $phone2       = null,
+    ?string $phone3       = null,
+    ?string $videoPhone   = null,
+    ?string $note         = null,
+    ?string $birthday     = null,  // YYYYMMDD format
+    ?string $postOfficeBox = null,
+)
+```
+
+### Example
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+// Basic
+$qr = QrCode::MeCard('Jane Smith');
+
+// With contact details
+$qr = QrCode::MeCard(
+    name:     'Jane Smith',
+    phone:    '+12025550170',
+    email:    'jane@example.com',
+    url:      'https://janesmith.dev',
+    address:  '123 Main St, Springfield, IL',
+    note:     'Laracon 2025',
+    birthday: '19900315',
+);
+
+// Render to a PNG file
+QrCode::MeCard(
+    name:  'Jane Smith',
+    phone: '+12025550170',
+    email: 'jane@example.com',
+)->format('png')->size(400)->generate(storage_path('app/qrcodes/jane.png'));
+```
+
+---
+
+## VCard vs MeCard — Which Should You Use?
+
+| | VCard 3.0 | MeCard |
+|---|---|---|
+| **Compatibility** | iOS, Android, Outlook, macOS — universally supported | Excellent on Android; supported on iOS 11+; less so on desktop |
+| **Fields** | Rich: multiple emails, phone types, role, birthday, notes | Core fields only: name, phone, email, URL, address, note |
+| **Payload size** | Larger (more verbose) | Smaller (shorter QR code at the same error-correction level) |
+| **Best for** | Business cards, event badges, marketing collateral | Simple personal cards, space-constrained prints |
+
+<Tip>
+  When in doubt, choose **VCard**. It is more widely supported and handles multiple phone numbers and email addresses in a single payload.
+</Tip>

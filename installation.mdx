@@ -1,0 +1,208 @@
+---
+title: "Install Laravel QR Code in Your Laravel Application"
+sidebarTitle: "Installation"
+description: "Add the linkxtr/laravel-qrcode package to your Laravel 11+ project with Composer, then optionally publish the config to set app-wide defaults."
+---
+
+Installing Laravel QR Code takes about a minute. The package uses Laravel's package auto-discovery, so you won't touch `config/app.php` at all — just require the package and start generating.
+
+<Steps>
+  <Step title="Require the package">
+    Run the following command from your project root:
+
+    ```bash
+    composer require linkxtr/laravel-qrcode
+    ```
+
+    Composer resolves the package and its only production dependency, `bacon/bacon-qr-code`.
+  </Step>
+
+  <Step title="Confirm auto-discovery (nothing to do)">
+    Laravel automatically registers the service provider and the `QrCode` facade alias. You don't need to edit `config/app.php`.
+
+    To verify, run:
+
+    ```bash
+    php artisan about
+    ```
+
+    You should see `Linkxtr\QrCode\QrCodeServiceProvider` listed under **Providers**.
+
+    <Note>
+      If your application has disabled package auto-discovery, add the provider and alias manually in `config/app.php`:
+
+      ```php
+      'providers' => [
+          Linkxtr\QrCode\QrCodeServiceProvider::class,
+      ],
+
+      'aliases' => [
+          'QrCode' => Linkxtr\QrCode\Facades\QrCode::class,
+      ],
+      ```
+    </Note>
+  </Step>
+
+  <Step title="Publish the config (optional)">
+    If you want to set app-wide defaults — such as a different output format, a custom size, or a brand color — publish the config file:
+
+    ```bash
+    php artisan vendor:publish --tag=qrcode-config
+    ```
+
+    This creates `config/qrcode.php` in your project:
+
+    ```php config/qrcode.php
+    <?php
+
+    declare(strict_types=1);
+
+    return [
+
+        /*
+        |--------------------------------------------------------------------------
+        | Default Format
+        |--------------------------------------------------------------------------
+        |
+        | Supported: "png", "eps", "svg", "webp"
+        | Default: "svg" (no image extension required)
+        |
+        */
+        'format' => env('QR_CODE_FORMAT', 'svg'),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Default Size
+        |--------------------------------------------------------------------------
+        |
+        | Size of the QR code in pixels. Default: 400.
+        |
+        */
+        'size' => (int) (env('QR_CODE_SIZE') ?? 400),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Default Margin
+        |--------------------------------------------------------------------------
+        |
+        | Quiet-zone margin around the QR code. Default: 4.
+        |
+        */
+        'margin' => (int) (env('QR_CODE_MARGIN') ?? 4),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Default Color
+        |--------------------------------------------------------------------------
+        |
+        | Foreground color. Accepted formats:
+        |   CSV string  "R,G,B"       e.g. "0,0,0"
+        |   CSV string  "R,G,B,A"     e.g. "0,0,0,100"  (alpha 0–100)
+        |   Hex string  "#RRGGBB"     e.g. "#000000"
+        |
+        */
+        'color' => env('QR_CODE_COLOR', '0,0,0'),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Default Background Color
+        |--------------------------------------------------------------------------
+        |
+        | Background color. Accepts the same formats as 'color' above.
+        |
+        */
+        'background_color' => env('QR_CODE_BACKGROUND_COLOR', '255,255,255'),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Error Correction Level
+        |--------------------------------------------------------------------------
+        |
+        | Supported: 'L' (7%), 'M' (15%), 'Q' (25%), 'H' (30%)
+        | Default: 'M'
+        |
+        */
+        'error_correction' => env('QR_CODE_ERROR_CORRECTION', 'M'),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Encoding
+        |--------------------------------------------------------------------------
+        |
+        | Character encoding used when building the QR payload. Default: 'UTF-8'.
+        |
+        */
+        'encoding' => env('QR_CODE_ENCODING', 'UTF-8'),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Force GD Backend
+        |--------------------------------------------------------------------------
+        |
+        | Set to true if Imagick is installed but you want to force GD instead
+        | (e.g., strict server security policies).
+        |
+        */
+        'force_gd' => env('QR_CODE_FORCE_GD', false),
+    ];
+    ```
+
+    ### Environment variable overrides
+
+    Every key in the config file reads from a corresponding environment variable, so you can change defaults per-environment without touching the published file:
+
+    | Environment variable | Config key | Default |
+    |---|---|---|
+    | `QR_CODE_FORMAT` | `format` | `svg` |
+    | `QR_CODE_SIZE` | `size` | `400` |
+    | `QR_CODE_MARGIN` | `margin` | `4` |
+    | `QR_CODE_COLOR` | `color` | `0,0,0` |
+    | `QR_CODE_BACKGROUND_COLOR` | `background_color` | `255,255,255` |
+    | `QR_CODE_ERROR_CORRECTION` | `error_correction` | `M` |
+    | `QR_CODE_ENCODING` | `encoding` | `UTF-8` |
+    | `QR_CODE_FORCE_GD` | `force_gd` | `false` |
+
+    <Tip>
+      Config-driven defaults apply automatically when you use the `QrCode` facade, the `<x-qr-code>` Blade component, or resolve `Linkxtr\QrCode\Generator` from Laravel's container. They do **not** apply when you call `new Generator()` directly without passing a config array.
+    </Tip>
+  </Step>
+
+  <Step title="Install ext-imagick for PNG/WebP (optional)">
+    SVG and EPS output require no image extensions. For PNG and WebP, the package needs either `ext-imagick` or `ext-gd`.
+
+    <CardGroup cols={2}>
+      <Card title="Imagick (recommended)" icon="star">
+        Provides higher-quality raster output. Install via your system package manager:
+
+        ```bash
+        # Ubuntu / Debian
+        sudo apt-get install php-imagick
+
+        # macOS (Homebrew)
+        brew install imagemagick
+        pecl install imagick
+        ```
+      </Card>
+      <Card title="GD (automatic fallback)" icon="rotate-left">
+        GD ships with most PHP distributions. If `ext-imagick` is not detected, the package silently falls back to GD for PNG and WebP — no configuration needed.
+      </Card>
+    </CardGroup>
+
+    <Warning>
+      WebP output requires `ext-imagick`. GD can produce PNG but **not** WebP. If you set `format` to `webp` without Imagick, the package will throw a `MissingExtensionException`.
+    </Warning>
+
+    To force GD even when Imagick is present, set `QR_CODE_FORCE_GD=true` in your `.env` file or publish the config and set `'force_gd' => true`.
+  </Step>
+</Steps>
+
+## What's installed
+
+After completing the steps above, your application has:
+
+- The `QrCode` facade available globally
+- The `<x-qr-code>` and `<x-qrcode>` Blade components registered
+- The `php artisan qr:generate` Artisan command available
+- An optional `config/qrcode.php` with app-wide defaults
+
+Continue to the [Quickstart](/quickstart) to generate your first QR code.

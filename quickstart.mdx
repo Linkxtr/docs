@@ -1,0 +1,181 @@
+---
+title: "Generate Your First QR Code in a Laravel Application"
+sidebarTitle: "Quickstart"
+description: "Generate a working QR code in under five minutes using the QrCode facade, Blade component, or Artisan CLI — pick the approach that fits your workflow."
+---
+
+Once you've [installed the package](/installation), you can generate a QR code in a single line. Choose the approach that best fits where you need it: a controller, a Blade template, or a terminal session.
+
+<Tabs>
+  <Tab title="Facade">
+    Use the `QrCode` facade anywhere PHP runs — controllers, jobs, service classes, or commands.
+
+    ```php
+    use Linkxtr\QrCode\Facades\QrCode;
+
+    // Generate an SVG string (default format)
+    $svg = QrCode::generate('https://example.com');
+    ```
+
+    `generate()` returns a `QrCodeResult` object that casts to a string, so you can echo it directly or pass it to a response.
+
+    **Return an SVG response from a controller:**
+
+    ```php
+    use Illuminate\Http\Response;
+    use Linkxtr\QrCode\Facades\QrCode;
+
+    public function show(): Response
+    {
+        $svg = QrCode::size(300)->generate('https://example.com');
+
+        return response((string) $svg, 200)
+            ->header('Content-Type', 'image/svg+xml');
+    }
+    ```
+
+    **Save a PNG to disk:**
+
+    ```php
+    QrCode::format('png')
+        ->size(400)
+        ->generate('https://example.com', storage_path('app/qrcodes/site.png'));
+    ```
+
+    **Render inline SVG in a Blade template:**
+
+    ```blade
+    {{-- Use {!! !!} to output raw (unescaped) SVG markup --}}
+    {!! QrCode::size(200)->generate('https://example.com') !!}
+    ```
+
+    <Warning>
+      Always use `{!! ... !!}` — not `{{ ... }}` — when rendering SVG output in Blade. The double-curly syntax HTML-escapes the string, which breaks the SVG tags.
+    </Warning>
+  </Tab>
+
+  <Tab title="Blade Component">
+    The `<x-qr-code>` component is the simplest way to embed a QR code in a template. It handles SVG injection and accessibility attributes automatically.
+
+    ```blade
+    {{-- Minimal usage — renders a 100px SVG --}}
+    <x-qr-code data="https://example.com" />
+    ```
+
+    **Common options:**
+
+    ```blade
+    <x-qr-code
+        data="https://example.com"
+        size="300"
+        format="svg"
+        color="#1a56db"
+        background-color="#ffffff"
+        margin="2"
+    />
+    ```
+
+    **Generate a PNG embedded as a base64 data URI:**
+
+    ```blade
+    <x-qr-code
+        data="https://example.com"
+        format="png"
+        size="400"
+    />
+    ```
+
+    <Note>
+      When `format` is `svg`, the component injects the SVG inline (including an accessible `<title>` and `role="img"`). When `format` is `png` or `webp`, it renders an `<img>` tag with a base64 `src` attribute — no file needs to be written to disk.
+    </Note>
+
+    **Pass extra HTML attributes directly:**
+
+    Any attributes not recognized as component props are forwarded to the rendered element:
+
+    ```blade
+    <x-qr-code
+        data="https://example.com"
+        size="200"
+        class="rounded shadow"
+        id="product-qr"
+    />
+    ```
+
+    <Tip>
+      Both `<x-qr-code>` and `<x-qrcode>` (no hyphen) are registered. Use whichever naming convention matches your project style.
+    </Tip>
+  </Tab>
+
+  <Tab title="Artisan CLI">
+    Use `php artisan qr:generate` to create QR codes from the terminal — useful for build scripts, deployment hooks, or quick ad-hoc exports.
+
+    **Interactive mode** — run without arguments and follow the prompts:
+
+    ```bash
+    php artisan qr:generate
+    ```
+
+    **Non-interactive mode** — pass data and flags directly:
+
+    ```bash
+    php artisan qr:generate "https://example.com" --output=public/qr.svg
+    ```
+
+    **All available options:**
+
+    ```bash
+    php artisan qr:generate "https://example.com" \
+      --output=public/qr.svg \
+      --format=svg \
+      --size=400 \
+      --color=0,0,0 \
+      --backgroundColor=255,255,255 \
+      --errorCorrection=M \
+      --margin=4
+    ```
+
+    | Flag | Short | Description | Default |
+    |---|---|---|---|
+    | `--output` | `-O` | File path to save the QR code. Omit to print to console. | — |
+    | `--format` | `-F` | Output format: `svg`, `png`, `webp`, `eps` | `svg` |
+    | `--size` | `-S` | Size in pixels | `400` |
+    | `--color` | `-C` | Foreground color as `R,G,B` or `R,G,B,A` (alpha 0–100) | `0,0,0` |
+    | `--backgroundColor` | `-B` | Background color as `R,G,B` or `R,G,B,A` | `255,255,255` |
+    | `--errorCorrection` | `-E` | Error correction level: `L`, `M`, `Q`, `H` | `M` |
+    | `--margin` | `-M` | Quiet-zone margin around the QR code | `4` |
+
+    <Note>
+      CLI flags use camelCase (`--errorCorrection`, `--backgroundColor`) while the config file uses snake_case (`error_correction`, `background_color`). Keep this in mind when translating config values to shell commands.
+    </Note>
+
+    **Print SVG to the console (no file saved):**
+
+    ```bash
+    php artisan qr:generate "https://example.com"
+    ```
+
+    **Generate a PNG with a custom color:**
+
+    ```bash
+    php artisan qr:generate "https://example.com" \
+      --output=public/qr.png \
+      --format=png \
+      --color=58,94,255
+    ```
+  </Tab>
+</Tabs>
+
+## Next steps
+
+<CardGroup cols={3}>
+  <Card title="Facade Reference" icon="wand-magic-sparkles" href="/usage/facade">
+    Explore the full `QrCode` facade API — colors, gradients, styles, image merging, and all fluent methods.
+  </Card>
+  <Card title="Blade Component" icon="code" href="/usage/blade-component">
+    See every prop the `<x-qr-code>` component accepts, including gradient and eye-style customization.
+  </Card>
+  <Card title="Data Types" icon="database" href="/data-types/overview">
+    Generate QR codes for WiFi, vCard, SMS, Email, WhatsApp, Telegram, BTC, Ethereum, and more.
+  </Card>
+</CardGroup>

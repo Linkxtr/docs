@@ -1,0 +1,97 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Laravel QR Code",
+  "theme": "maple",
+  "favicon": "https://media.brand.dev/ed1ea708-4249-4d42-9233-93fde61f32fc.jpg",
+  "colors": {
+    "primary": "#ff5600",
+    "light": "#151c28",
+    "dark": "#f2f2f2"
+  },
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/Linkxtr/laravel-qrcode"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Usage",
+            "pages": [
+              "usage/facade",
+              "usage/blade-component",
+              "usage/artisan-cli"
+            ]
+          },
+          {
+            "group": "Customization",
+            "pages": [
+              "customization/styling",
+              "customization/colors",
+              "customization/image-merge"
+            ]
+          },
+          {
+            "group": "Data Types",
+            "pages": [
+              "data-types/overview",
+              "data-types/contact",
+              "data-types/communication",
+              "data-types/payment",
+              "data-types/other"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "configuration/config-file",
+              "configuration/environment-variables"
+            ]
+          },
+          {
+            "group": "Advanced",
+            "pages": [
+              "advanced/macros",
+              "advanced/upgrade-guide",
+              "advanced/troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Core API",
+            "pages": [
+              "api/generate",
+              "api/styling-methods",
+              "api/color-methods",
+              "api/data-type-methods"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "background": {
+    "decoration": "gradient"
+  },
+  "api": {
+    "playground": {
+      "display": "simple"
+    }
+  }
+}

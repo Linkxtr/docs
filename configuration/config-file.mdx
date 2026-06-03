@@ -1,0 +1,241 @@
+---
+title: "Laravel QR Code Package Configuration File Reference"
+sidebarTitle: "Config File"
+description: "Publish and customize config/qrcode.php to set package-wide defaults for format, size, margin, colors, error correction, encoding, and rendering backend."
+---
+
+The `config/qrcode.php` file is the central place to define default values that apply across every QR code your application generates through the facade, Blade component, or service container. Publishing it is optional — the package ships with sensible defaults — but it gives you full control without touching a single line of generation code.
+
+## Publish the config file
+
+Run the following Artisan command to copy the config file into your application's `config/` directory:
+
+```bash
+php artisan vendor:publish --tag=qrcode-config
+```
+
+After publishing, open `config/qrcode.php` and adjust the values to match your needs. Every QR code generated via the `QrCode` facade, the `<x-qr-code>` Blade component, or type-hinted `Generator` instances will automatically pick up these defaults.
+
+## Full config file
+
+```php config/qrcode.php
+<?php
+
+declare(strict_types=1);
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Format
+    |--------------------------------------------------------------------------
+    |
+    | Supported: "png", "eps", "svg", "webp"
+    | Note: As of v2.4.x, the default 'format' is now "svg" (previously "png").
+    |
+    */
+    'format' => env('QR_CODE_FORMAT', 'svg'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Size
+    |--------------------------------------------------------------------------
+    |
+    | Controls the default size of the QR code in pixels.
+    | Note: As of v2.4.x, the default 'size' is now 400 (previously 200).
+    |
+    */
+    'size' => (int) (env('QR_CODE_SIZE') ?? 400),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Margin
+    |--------------------------------------------------------------------------
+    |
+    | Controls the default quiet zone (margin) around the QR code.
+    |
+    */
+    'margin' => (int) (env('QR_CODE_MARGIN') ?? 4),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Color
+    |--------------------------------------------------------------------------
+    |
+    | Controls the default foreground color of the QR code.
+    | RGB (csv string):  "R,G,B"       e.g. "0,0,0"
+    | RGBA (csv string): "R,G,B,A"     e.g. "0,0,0,100"
+    | RGB (array):       [R, G, B]     e.g. [0, 0, 0]
+    | RGBA (array):      [R, G, B, A]  e.g. [0, 0, 0, 100]
+    | Hex:               "#RRGGBB"     e.g. "#000000"
+    |
+    */
+    'color' => env('QR_CODE_COLOR', '0,0,0'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Background Color
+    |--------------------------------------------------------------------------
+    |
+    | Controls the default background color of the QR code.
+    | Accepts the same formats as 'color' above.
+    |
+    */
+    'background_color' => env('QR_CODE_BACKGROUND_COLOR', '255,255,255'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Error Correction Level
+    |--------------------------------------------------------------------------
+    |
+    | Supported: 'L', 'M', 'Q', 'H'
+    | Note: As of v2.4.x, the default 'error_correction' is now 'M' (previously 'H').
+    |
+    */
+    'error_correction' => env('QR_CODE_ERROR_CORRECTION', 'M'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Encoding
+    |--------------------------------------------------------------------------
+    |
+    | Controls the character encoding of the QR code.
+    |
+    */
+    'encoding' => env('QR_CODE_ENCODING', 'UTF-8'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Force GD Backend
+    |--------------------------------------------------------------------------
+    |
+    | Force the package to bypass Imagick and fall back to the GD extension
+    | for rendering raster images (PNG/WebP).
+    |
+    */
+    'force_gd' => env('QR_CODE_FORCE_GD', false),
+
+];
+```
+
+## Config options
+
+<ParamField path="format" type="string" default="svg">
+  The image format used for every generated QR code.
+
+  | Value | Description |
+  |-------|-------------|
+  | `svg` | Scalable vector graphic — no image extension required, renders crisply at any size |
+  | `png` | Raster PNG — requires GD or Imagick |
+  | `webp` | Modern raster format — requires GD or Imagick |
+  | `eps` | Encapsulated PostScript — vector, for print workflows |
+
+  <Note>
+    The default changed from `png` to `svg` in v2.4.x. If you're upgrading and rely on PNG output, set `'format' => 'png'` (or `QR_CODE_FORMAT=png` in your `.env`).
+  </Note>
+</ParamField>
+
+<ParamField path="size" type="integer" default="400">
+  The width and height of the generated QR code, in pixels. Applies to raster formats (`png`, `webp`). For `svg` and `eps` this sets the `viewBox` dimensions.
+
+  ```php
+  'size' => 300,
+  ```
+</ParamField>
+
+<ParamField path="margin" type="integer" default="4">
+  The quiet zone (blank border) around the QR code, measured in module units. QR code specifications require a minimum margin of 4 for reliable scanning. Reduce this only when embedding QR codes inside a pre-padded container.
+
+  ```php
+  'margin' => 2,
+  ```
+</ParamField>
+
+<ParamField path="color" type="string | array" default="[0, 0, 0]">
+  The foreground (module) color of the QR code. Accepts any of the following formats:
+
+  | Format | Example |
+  |--------|---------|
+  | RGB CSV string | `"0,0,0"` |
+  | RGBA CSV string (alpha 0–100) | `"0,0,0,100"` |
+  | RGB array | `[0, 0, 0]` |
+  | RGBA array (alpha 0–100) | `[0, 0, 0, 100]` |
+  | Hex string | `"#000000"` |
+
+  ```php
+  // Deep blue foreground
+  'color' => [30, 64, 175],
+  ```
+
+  <Note>
+    The alpha channel uses a **0–100** scale (not the 0–127 scale used internally by PHP GD). The package scales the value automatically.
+  </Note>
+</ParamField>
+
+<ParamField path="background_color" type="string | array" default="[255, 255, 255]">
+  The background color of the QR code. Accepts the same formats as `color`.
+
+  ```php
+  // Transparent background (PNG/WebP only)
+  'background_color' => [255, 255, 255, 0],
+  ```
+</ParamField>
+
+<ParamField path="error_correction" type="string" default="M">
+  The Reed-Solomon error correction level. Higher levels let scanners recover data from damaged or partially obscured codes, but increase the QR code's visual density.
+
+  | Level | Data recovery | Recommended use |
+  |-------|--------------|-----------------|
+  | `L` | ~7 % | Clean digital displays |
+  | `M` | ~15 % | General purpose (default) |
+  | `Q` | ~25 % | Printed materials |
+  | `H` | ~30 % | Codes with an embedded logo |
+
+  ```php
+  // Use H when merging a logo into the center of the QR code
+  'error_correction' => 'H',
+  ```
+</ParamField>
+
+<ParamField path="encoding" type="string" default="UTF-8">
+  The character encoding applied to the data payload before it is encoded into the QR code. Change this only if you need to encode content in a non-Unicode encoding supported by the underlying `bacon/bacon-qr-code` library.
+
+  ```php
+  'encoding' => 'UTF-8',
+  ```
+</ParamField>
+
+<ParamField path="force_gd" type="boolean" default="false">
+  When `true`, the package skips Imagick entirely and uses PHP's GD extension to render raster images (`png`, `webp`), even when Imagick is installed.
+
+  Enable this if your server has Imagick installed but restricts its usage through strict security policies (e.g., ImageMagick security policy XML).
+
+  ```php
+  'force_gd' => true,
+  ```
+
+  <Warning>
+    GD produces lower-quality raster output than Imagick and does not support all color operations. Leave this `false` unless you have a specific reason to bypass Imagick.
+  </Warning>
+</ParamField>
+
+## How defaults are applied
+
+<Note>
+  Config-driven defaults apply automatically when you use:
+  - The **`QrCode` facade** — `QrCode::generate(...)`
+  - The **`<x-qr-code>` Blade component**
+  - **Type-hinting** `Linkxtr\QrCode\Generator` via Laravel's service container
+
+  They do **not** apply when you instantiate the generator directly with `new Generator()` and omit the config array. In that case the package uses its hardcoded defaults.
+</Note>
+
+<Tip>
+  Any method you chain on a per-call basis always overrides the config default for that call only. The config file is never mutated.
+
+  ```php
+  // config: 'format' => 'svg', 'size' => 400
+  // This call uses png at 200px; the config is unchanged.
+  QrCode::format('png')->size(200)->generate('https://example.com');
+  ```
+</Tip>
