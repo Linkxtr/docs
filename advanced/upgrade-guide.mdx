@@ -1,20 +1,20 @@
 ---
-title: "Upgrade Guide: Laravel QR Code v1.x to v2.x Migration"
+title: "Upgrade Guide: Laravel QR Code v1.x to v3.x Migration"
 sidebarTitle: "Upgrade Guide"
-description: "Complete upgrade instructions for moving from linkxtr/laravel-qrcode v1.x to v2.x, including breaking changes, required code updates, and rollback steps."
+description: "Complete upgrade instructions for moving from linkxtr/laravel-qrcode v1.x to v3.x, including breaking changes, required code updates, and rollback steps."
 ---
 
-Version 2.x is a significant release that upgrades the underlying `bacon/bacon-qr-code` library from v2 to v3, hardens the API with strict types, and drops legacy compatibility layers. Most applications need only a few targeted changes to upgrade cleanly.
+Version 3.x is a significant release that upgrades the underlying `bacon/bacon-qr-code` library from v2 to v3, hardens the API with strict types, and drops legacy compatibility layers. Most applications need only a few targeted changes to upgrade cleanly.
 
 <Note>
-  **Laravel 10 users:** v2.x requires Laravel 11+ and PHP 8.2+. If you are on
+  **Laravel 10 users:** v3.x requires Laravel 11+ and PHP 8.2+. If you are on
   Laravel 10 or PHP 8.1, stay on v1.x — it receives maintenance fixes and is the
   supported path for those environments.
 </Note>
 
 ## System Requirements
 
-| Requirement | v1.x     | v2.x                   |
+| Requirement | v1.x     | v3.x                   |
 | ----------- | -------- | ---------------------- |
 | PHP         | 8.1+     | **8.2+**               |
 | Laravel     | 10+      | **11+**                |
@@ -59,7 +59,7 @@ The underlying `bacon/bacon-qr-code` library reorganized several namespaces betw
 // ❌ v1.x — strings were silently accepted
 QrCode::color('255', '0', '0');
 
-// ✅ v2.x — integers required
+// ✅ v3.x — integers required
 QrCode::color(255, 0, 0);
 ```
 
@@ -68,19 +68,19 @@ Search your codebase for calls to `->color(` and `->backgroundColor(` and confir
 </Accordion>
 
 <Accordion title="4. simplesoftwareio/simple-qrcode compatibility dropped">
-  v2.x removes the compatibility layer that allowed the `QrCode` facade to act as a drop-in replacement for `simplesoftwareio/simple-qrcode`. If you migrated from that package and relied on any method signatures that do not exist in `linkxtr/laravel-qrcode`'s own API, you will need to update those call sites to use the new API.
+  v3.x removed the compatibility layer that allowed the `QrCode` facade to act as a drop-in replacement for `simplesoftwareio/simple-qrcode`. If you migrated from that package and relied on any method signatures that do not exist in `linkxtr/laravel-qrcode`'s own API, you will need to update those call sites to use the new API.
 
 Check the [API reference in the README](https://github.com/Linkxtr/laravel-qrcode/blob/main/README.md#-api-reference) for the current method signatures.
 
 </Accordion>
 
 <Accordion title="5. Strict data validation — InvalidArgumentException on bad input">
-  In v1.x, passing malformed data to type methods (such as a bad phone number or an incomplete WiFi config) could silently generate a corrupted QR code. In v2.x, all data types validate their inputs strictly and throw `InvalidArgumentException` on failure.
+  In v1.x, passing malformed data to type methods (such as a bad phone number or an incomplete WiFi config) could silently generate a corrupted QR code. In v3.x, all data types validate their inputs strictly and throw `InvalidArgumentException` on failure.
 
 Wrap any call that accepts dynamic user input in a `try/catch`:
 
 ```php
-use InvalidArgumentException;
+use Linkxtr\QrCode\Contracts\QrCodeExceptionInterface;
 
 try {
     $qr = QrCode::WiFi([
@@ -88,7 +88,7 @@ try {
         'encryption' => $request->encryption,
         'password'   => $request->password,
     ]);
-} catch (InvalidArgumentException $e) {
+} catch (QrCodeExceptionInterface $e) {
     // Return validation error to the user
     return back()->withErrors(['wifi' => $e->getMessage()]);
 }
@@ -99,11 +99,11 @@ try {
 <Accordion title="6. Config defaults changed in v2.4.x">
   Starting in v2.4.0, the package ships with updated defaults to better reflect modern usage:
 
-| Key                | v1.x / pre-2.4 default | v2.4.x+ default |
-| ------------------ | ---------------------- | --------------- |
-| `format`           | `png`                  | `svg`           |
-| `size`             | `200`                  | `400`           |
-| `error_correction` | `H`                    | `M`             |
+| Key                | v1.x / pre-2.4 default | v2.4.x+ / v3.x+ default |
+| ------------------ | ---------------------- | ----------------------- |
+| `format`           | `png`                  | `svg`                   |
+| `size`             | `200`                  | `400`                   |
+| `error_correction` | `H`                    | `M`                     |
 
 If your application relied on the previous defaults and you have not published the config file, you may notice changes in QR code output after upgrading. Publish the config and set these values explicitly to lock in your preferred defaults.
 
@@ -116,10 +116,10 @@ If your application relied on the previous defaults and you have not published t
     Run the following command in your project root:
 
     ```bash
-    composer require linkxtr/laravel-qrcode:^2.0
+    composer require linkxtr/laravel-qrcode:^3.0
     ```
 
-    Composer will pull in the latest v2.x release along with `bacon/bacon-qr-code` v3.
+    Composer will pull in the latest v3.x release along with `bacon/bacon-qr-code` v3.
 
   </Step>
 
@@ -205,7 +205,7 @@ php artisan view:clear
 ```
 
 <Warning>
-  If you published `config/qrcode.php` during the v2.x migration and changed
+  If you published `config/qrcode.php` during the v3.x migration and changed
   values, review the config after rolling back — the v1.x config schema may
-  differ from v2.x.
+  differ from v3.x.
 </Warning>
