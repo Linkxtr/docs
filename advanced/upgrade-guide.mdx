@@ -7,34 +7,34 @@ description: "Complete upgrade instructions for moving from linkxtr/laravel-qrco
 Version 3.x is a significant release that upgrades the underlying `bacon/bacon-qr-code` library from v2 to v3, hardens the API with strict types, and drops legacy compatibility layers. Most applications need only a few targeted changes to upgrade cleanly.
 
 <Note>
-  **Laravel 10 users:** v3.x requires Laravel 11+ and PHP 8.2+. If you are on
+  **Laravel 10 users:** v3.x requires Laravel 12+ and PHP 8.2+. If you are on
   Laravel 10 or PHP 8.1, stay on v1.x — it receives maintenance fixes and is the
   supported path for those environments.
 </Note>
 
 ## System Requirements
 
-| Requirement | v1.x     | v3.x                   |
-| ----------- | -------- | ---------------------- |
-| PHP         | 8.1+     | **8.2+**               |
-| Laravel     | 10+      | **11+**                |
-| ext-gd      | Required | Required               |
-| ext-imagick | Optional | Optional (recommended) |
-| Composer    | 2.x      | 2.x                    |
+| Requirement | v1.x     | v2.x     | v3.x                   |
+| ----------- | -------- | -------- | ---------------------- |
+| PHP         | 8.1+     | 8.2+     | **8.2+**               |
+| Laravel     | 10+      | 11+      | **12+**                |
+| ext-gd      | Required | Optional | Optional               |
+| ext-imagick | Optional | Optional | Optional (recommended) |
+| Composer    | 2.x      | 2.x      | 2.x                    |
 
 ## Breaking Changes
 
 Review every item below before running the upgrade command. Most changes affect only a small number of call sites.
 
 <Accordion title="1. PHP and Laravel version requirements raised">
-  The minimum PHP version is now **8.2** and the minimum Laravel version is **11.0**, matching the requirements of `bacon/bacon-qr-code` v3.
+  The minimum PHP version is now **8.2** and the minimum Laravel version is **12.0**, matching the requirements of `bacon/bacon-qr-code` v3.
 
 If your `composer.json` pins PHP or Laravel to an older constraint, update it first:
 
 ```json
 "require": {
     "php": "^8.2",
-    "laravel/framework": "^11.0"
+    "laravel/framework": "^12.0"
 }
 ```
 
