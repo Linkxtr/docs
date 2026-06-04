@@ -7,7 +7,10 @@ description: "Generate BIP-21 Bitcoin and EIP-681 Ethereum payment QR codes that
 Payment data types produce standardised cryptocurrency payment request URIs that are recognised by all major wallet applications. A single scan pre-fills the recipient address, the requested amount, and optional metadata so the payer never has to type an address by hand.
 
 <Note>
-  These data types generate standard `bitcoin:` and `ethereum:` scheme URIs. They are compatible with wallets including MetaMask, Trust Wallet, Coinbase Wallet, BlueWallet, Muun, and any other app that implements BIP-21 (Bitcoin) or EIP-681 (Ethereum).
+  These data types generate standard `bitcoin:` and `ethereum:` scheme URIs.
+  They are compatible with wallets including MetaMask, Trust Wallet, Coinbase
+  Wallet, BlueWallet, Muun, and any other app that implements BIP-21 (Bitcoin)
+  or EIP-681 (Ethereum).
 </Note>
 
 ---
@@ -33,19 +36,23 @@ QrCode::BTC(
 </ParamField>
 
 <ParamField body="amount" type="float|string" required>
-  The amount in BTC. Must be a positive numeric value. Pass as a string (e.g. `'0.005'`) to avoid floating-point precision issues with very small values.
+  The amount in BTC. Must be a positive numeric value. Pass as a string (e.g.
+  `'0.005'`) to avoid floating-point precision issues with very small values.
 </ParamField>
 
 <ParamField body="label" type="string">
-  A human-readable label for the payment destination, shown in the wallet UI (maps to the `label` query parameter).
+  A human-readable label for the payment destination, shown in the wallet UI
+  (maps to the `label` query parameter).
 </ParamField>
 
 <ParamField body="message" type="string">
-  A message or note to attach to the payment request (maps to the `message` query parameter).
+  A message or note to attach to the payment request (maps to the `message`
+  query parameter).
 </ParamField>
 
 <ParamField body="returnAddress" type="string">
-  A URL the wallet should redirect to after the transaction is broadcast (maps to the `r` query parameter).
+  A URL the wallet should redirect to after the transaction is broadcast (maps
+  to the `r` query parameter).
 </ParamField>
 
 ### Examples
@@ -85,7 +92,9 @@ QrCode::BTC('bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh', 0.005)
 ```
 
 <Warning>
-  Passing an empty address or a non-numeric amount throws an `InvalidBTCArgumentException`. Always validate wallet addresses from user input before encoding them.
+  Passing an empty address or a non-numeric amount throws an
+  `InvalidBTCArgumentException`. Always validate wallet addresses from user
+  input before encoding them.
 </Warning>
 
 ---
@@ -104,11 +113,13 @@ QrCode::Ethereum(
 ```
 
 <ParamField body="address" type="string" required>
-  The recipient Ethereum address. Must be a non-empty string (e.g. an EIP-55 checksummed address).
+  The recipient Ethereum address. Must be a non-empty string (e.g. an EIP-55
+  checksummed address).
 </ParamField>
 
 <ParamField body="amount" type="float|string|null">
-  The requested amount in ETH. Omit or pass `null` to create an address-only QR code with no fixed amount.
+  The requested amount in ETH. Omit or pass `null` to create an address-only QR
+  code with no fixed amount.
 </ParamField>
 
 ### Examples
@@ -138,9 +149,13 @@ QrCode::Ethereum('0x742d35Cc6634C0532925a3b8D2b2CE1e5bfb043d', 1.5)
 ```
 
 <Tip>
-  Pass the amount as a **string** (e.g. `'0.005'`) rather than a float when dealing with very small values to avoid PHP floating-point representation issues producing an invalid URI.
+  Pass the amount as a **string** (e.g. `'0.005'`) rather than a float when
+  dealing with very small values to avoid PHP floating-point representation
+  issues producing an invalid URI.
 </Tip>
 
 <Warning>
-  An empty address or a non-numeric amount throws an `InvalidEthereumArgumentException`. Validate the address format before encoding user-supplied values.
+  An empty address or a non-numeric amount throws an
+  `InvalidEthereumArgumentException`. Validate the address format before
+  encoding user-supplied values.
 </Warning>

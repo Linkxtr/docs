@@ -21,17 +21,13 @@
         "groups": [
           {
             "group": "Get Started",
-            "pages": [
-              "introduction",
-              "installation",
-              "quickstart"
-            ]
+            "pages": ["introduction", "installation", "quickstart"]
           },
           {
             "group": "Usage",
             "pages": [
-              "usage/facade",
               "usage/blade-component",
+              "usage/facade",
               "usage/artisan-cli"
             ]
           },

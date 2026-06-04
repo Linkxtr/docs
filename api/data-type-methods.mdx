@@ -9,15 +9,16 @@ Data type methods are shorthand helpers that format a structured payload accordi
 <Warning>
   Every data type method validates its inputs and throws a subclass of `InvalidDataTypeArgumentException` when something is wrong (empty required field, invalid format, etc.). Wrap calls that consume dynamic user input in a `try/catch` block.
 
-  ```php
-  use Linkxtr\QrCode\Exceptions\InvalidDataTypeArgumentException;
+```php
+use Linkxtr\QrCode\Exceptions\InvalidDataTypeArgumentException;
 
-  try {
-      $qr = QrCode::Email($request->email, $request->subject);
-  } catch (InvalidDataTypeArgumentException $e) {
-      return back()->withErrors(['qr' => $e->getMessage()]);
-  }
-  ```
+try {
+    $qr = QrCode::Email($request->email, $request->subject);
+} catch (InvalidDataTypeArgumentException $e) {
+    return back()->withErrors(['qr' => $e->getMessage()]);
+}
+```
+
 </Warning>
 
 ---
@@ -155,7 +156,8 @@ Generate a WiFi network configuration QR code. Scanning it lets devices join the
 </ParamField>
 
 <Warning>
-  WEP encryption is deprecated and cryptographically broken. It is supported for legacy device compatibility only. Use WPA or WPA2 wherever possible.
+  WEP encryption is deprecated and cryptographically broken. It is supported for
+  legacy device compatibility only. Use WPA or WPA2 wherever possible.
 </Warning>
 
 <CodeGroup>
@@ -201,11 +203,13 @@ Generate a Bitcoin payment request QR code using the `bitcoin:` URI scheme (BIP 
 </ParamField>
 
 <ParamField body="amount" type="int | float | string" required>
-  The requested amount in BTC (e.g. `0.005`). Must be a non-negative numeric value.
+  The requested amount in BTC (e.g. `0.005`). Must be a non-negative numeric
+  value.
 </ParamField>
 
 <ParamField body="options" type="array">
-  An optional associative array of additional BIP 21 parameters such as `label`, `message`, or `r` (payment protocol URL).
+  An optional associative array of additional BIP 21 parameters such as `label`,
+  `message`, or `r` (payment protocol URL).
 </ParamField>
 
 ```php
@@ -230,7 +234,8 @@ Generate an Ethereum payment request QR code using the `ethereum:` URI scheme (E
 </ParamField>
 
 <ParamField body="amount" type="int | float | string | null">
-  The requested amount in ETH. Omit or pass `null` for an amount-agnostic address QR code.
+  The requested amount in ETH. Omit or pass `null` for an amount-agnostic
+  address QR code.
 </ParamField>
 
 <CodeGroup>
@@ -327,7 +332,8 @@ QrCode::MeCard(
 Generate a MeCard QR code — a lighter contact format popular in Japan and supported by most mobile QR scanners.
 
 <ParamField body="name" type="string | array" required>
-  The contact's full name as a string, or an associative array of all MeCard properties (see below). Must not be empty.
+  The contact's full name as a string, or an associative array of all MeCard
+  properties (see below). Must not be empty.
 </ParamField>
 
 <ParamField body="phone" type="string | null">
@@ -389,10 +395,19 @@ Generate a vCalendar (iCalendar / `.ics`) QR code for a single event. Scanners o
     <ParamField body="summary" type="string" required>
       Event title. Must not be empty.
     </ParamField>
-    <ParamField body="start" type="Carbon | DateTimeInterface | string | int" required>
-      Event start date/time. Accepts a `Carbon` instance, any `DateTimeInterface`, a parseable date string, or a Unix timestamp integer.
+    <ParamField
+      body="start"
+      type="Carbon | DateTimeInterface | string | int"
+      required
+    >
+      Event start date/time. Accepts a `Carbon` instance, any
+      `DateTimeInterface`, a parseable date string, or a Unix timestamp integer.
     </ParamField>
-    <ParamField body="end" type="Carbon | DateTimeInterface | string | int" required>
+    <ParamField
+      body="end"
+      type="Carbon | DateTimeInterface | string | int"
+      required
+    >
       Event end date/time. Must be strictly after `start`.
     </ParamField>
     <ParamField body="description" type="string">
@@ -405,7 +420,11 @@ Generate a vCalendar (iCalendar / `.ics`) QR code for a single event. Scanners o
 </ParamField>
 
 <Note>
-  Per RFC 5545, the generated iCalendar payload includes a `DTSTAMP` property set to the **current UTC timestamp** at the moment of generation. Two calls for the same event will therefore produce different binary output and cannot be byte-for-byte cached. Generate CalendarEvent QR codes at request time rather than caching the raw bytes.
+  Per RFC 5545, the generated iCalendar payload includes a `DTSTAMP` property
+  set to the **current UTC timestamp** at the moment of generation. Two calls
+  for the same event will therefore produce different binary output and cannot
+  be byte-for-byte cached. Generate CalendarEvent QR codes at request time
+  rather than caching the raw bytes.
 </Note>
 
 ```php
@@ -431,11 +450,13 @@ QrCode::WhatsApp(string|array $number, ?string $message = null): QrCodeResult
 Generate a `https://wa.me/` deep-link QR code that opens a WhatsApp chat.
 
 <ParamField body="number" type="string | array" required>
-  The recipient phone number (with country code, e.g. `'+12025551234'`), or an associative array with `number` and optional `message` keys.
+  The recipient phone number (with country code, e.g. `'+12025551234'`), or an
+  associative array with `number` and optional `message` keys.
 </ParamField>
 
 <ParamField body="message" type="string | null">
-  Pre-filled message text. Ignored when `$number` is an array that already includes a `message` key.
+  Pre-filled message text. Ignored when `$number` is an array that already
+  includes a `message` key.
 </ParamField>
 
 <CodeGroup>
@@ -468,7 +489,9 @@ QrCode::Telegram(string|array $username): QrCodeResult
 Generate a `https://t.me/` deep-link QR code that opens a Telegram profile or channel.
 
 <ParamField body="username" type="string | array" required>
-  The Telegram username as a string, or an associative array with a `username` key. The leading `@` is stripped automatically if present. Must be 5–32 characters long and start with a letter, following Telegram's username rules.
+  The Telegram username as a string, or an associative array with a `username`
+  key. The leading `@` is stripped automatically if present. Must be 5–32
+  characters long and start with a letter, following Telegram's username rules.
 </ParamField>
 
 <CodeGroup>

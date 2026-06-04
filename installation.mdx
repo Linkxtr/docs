@@ -15,6 +15,7 @@ Installing Laravel QR Code takes about a minute. The package uses Laravel's pack
     ```
 
     Composer resolves the package and its only production dependency, `bacon/bacon-qr-code`.
+
   </Step>
 
   <Step title="Confirm auto-discovery (nothing to do)">
@@ -41,6 +42,7 @@ Installing Laravel QR Code takes about a minute. The package uses Laravel's pack
       ],
       ```
     </Note>
+
   </Step>
 
   <Step title="Publish the config (optional)">
@@ -165,6 +167,7 @@ Installing Laravel QR Code takes about a minute. The package uses Laravel's pack
     <Tip>
       Config-driven defaults apply automatically when you use the `QrCode` facade, the `<x-qr-code>` Blade component, or resolve `Linkxtr\QrCode\Generator` from Laravel's container. They do **not** apply when you call `new Generator()` directly without passing a config array.
     </Tip>
+
   </Step>
 
   <Step title="Install ext-imagick for PNG/WebP (optional)">
@@ -193,6 +196,7 @@ Installing Laravel QR Code takes about a minute. The package uses Laravel's pack
     </Warning>
 
     To force GD even when Imagick is present, set `QR_CODE_FORCE_GD=true` in your `.env` file or publish the config and set `'force_gd' => true`.
+
   </Step>
 </Steps>
 

@@ -55,97 +55,104 @@ QR_CODE_FORCE_GD=false
 <ParamField path="QR_CODE_FORMAT" type="string" default="svg">
   Sets the default image format for every generated QR code.
 
-  | Value | Notes |
-  |-------|-------|
-  | `svg` | Vector — scales perfectly at any size, no image extension needed |
-  | `png` | Raster — requires GD or Imagick |
-  | `webp` | Modern raster — requires GD or Imagick |
-  | `eps` | Vector for print; image merging is not supported in this format |
+| Value  | Notes                                                            |
+| ------ | ---------------------------------------------------------------- |
+| `svg`  | Vector — scales perfectly at any size, no image extension needed |
+| `png`  | Raster — requires GD or Imagick                                  |
+| `webp` | Modern raster — requires GD or Imagick                           |
+| `eps`  | Vector for print; image merging is not supported in this format  |
 
-  ```ini
-  QR_CODE_FORMAT=png
-  ```
+```ini
+QR_CODE_FORMAT=png
+```
+
 </ParamField>
 
 <ParamField path="QR_CODE_SIZE" type="integer" default="400">
   Sets the default pixel dimensions of the generated QR code. For `svg` and `eps` this controls the `viewBox` size; for `png` and `webp` it sets the actual pixel dimensions.
 
-  ```ini
-  QR_CODE_SIZE=300
-  ```
+```ini
+QR_CODE_SIZE=300
+```
+
 </ParamField>
 
 <ParamField path="QR_CODE_MARGIN" type="integer" default="4">
   Sets the default quiet zone (blank border) around the QR code in module units. The QR code specification recommends a minimum of 4 for reliable scanning.
 
-  ```ini
-  QR_CODE_MARGIN=2
-  ```
+```ini
+QR_CODE_MARGIN=2
+```
+
 </ParamField>
 
 <ParamField path="QR_CODE_COLOR" type="string" default="0,0,0">
   Sets the default foreground (module) color. Three formats are accepted:
 
-  | Format | Example value |
-  |--------|--------------|
-  | RGB comma-separated | `0,0,0` |
-  | RGBA comma-separated (alpha 0–100) | `0,0,0,100` |
-  | Hex | `#000000` |
+| Format                             | Example value |
+| ---------------------------------- | ------------- |
+| RGB comma-separated                | `0,0,0`       |
+| RGBA comma-separated (alpha 0–100) | `0,0,0,100`   |
+| Hex                                | `#000000`     |
 
-  ```ini
-  # Deep blue modules
-  QR_CODE_COLOR=30,64,175
+```ini
+# Deep blue modules
+QR_CODE_COLOR=30,64,175
 
-  # Red modules with full opacity
-  QR_CODE_COLOR=255,0,0,100
+# Red modules with full opacity
+QR_CODE_COLOR=255,0,0,100
 
-  # Hex shorthand
-  QR_CODE_COLOR=#1E40AF
-  ```
+# Hex shorthand
+QR_CODE_COLOR=#1E40AF
+```
+
 </ParamField>
 
 <ParamField path="QR_CODE_BACKGROUND_COLOR" type="string" default="255,255,255">
   Sets the default background color. Accepts the same three formats as `QR_CODE_COLOR`.
 
-  ```ini
-  # Transparent background (PNG/WebP only; alpha 0 = fully transparent)
-  QR_CODE_BACKGROUND_COLOR=255,255,255,0
+```ini
+# Transparent background (PNG/WebP only; alpha 0 = fully transparent)
+QR_CODE_BACKGROUND_COLOR=255,255,255,0
 
-  # Light gray background
-  QR_CODE_BACKGROUND_COLOR=243,244,246
-  ```
+# Light gray background
+QR_CODE_BACKGROUND_COLOR=243,244,246
+```
+
 </ParamField>
 
 <ParamField path="QR_CODE_ERROR_CORRECTION" type="string" default="M">
   Sets the default Reed-Solomon error correction level.
 
-  | Value | Recovery capacity | When to use |
-  |-------|------------------|-------------|
-  | `L` | ~7 % | Clean digital displays |
-  | `M` | ~15 % | General purpose (default) |
-  | `Q` | ~25 % | Printed materials |
-  | `H` | ~30 % | Codes with an embedded logo |
+| Value | Recovery capacity | When to use                 |
+| ----- | ----------------- | --------------------------- |
+| `L`   | ~7 %              | Clean digital displays      |
+| `M`   | ~15 %             | General purpose (default)   |
+| `Q`   | ~25 %             | Printed materials           |
+| `H`   | ~30 %             | Codes with an embedded logo |
 
-  ```ini
-  # Increase to H when merging a logo into the QR code
-  QR_CODE_ERROR_CORRECTION=H
-  ```
+```ini
+# Increase to H when merging a logo into the QR code
+QR_CODE_ERROR_CORRECTION=H
+```
+
 </ParamField>
 
 <ParamField path="QR_CODE_ENCODING" type="string" default="UTF-8">
   Sets the default character encoding applied to the data payload before it is encoded. Only change this if you need a specific non-Unicode encoding supported by the underlying `bacon/bacon-qr-code` library.
 
-  ```ini
-  QR_CODE_ENCODING=UTF-8
-  ```
+```ini
+QR_CODE_ENCODING=UTF-8
+```
+
 </ParamField>
 
 <ParamField path="QR_CODE_FORCE_GD" type="boolean" default="false">
   When set to `true`, the package skips Imagick and renders raster images using PHP's GD extension, even when Imagick is available. Use this when your server installs Imagick but restricts it via security policies.
 
-  ```ini
-  QR_CODE_FORCE_GD=true
-  ```
+```ini
+QR_CODE_FORCE_GD=true
+```
 
   <Warning>
     GD produces lower-quality raster output and lacks some color features available in Imagick. Keep this `false` in production unless you have a specific compatibility requirement.
@@ -164,13 +171,14 @@ Use different defaults for local development vs. production without changing any
   QR_CODE_ERROR_CORRECTION=L
   ```
 
-  ```ini .env.production
-  QR_CODE_FORMAT=png
-  QR_CODE_SIZE=400
-  QR_CODE_COLOR=0,0,0
-  QR_CODE_ERROR_CORRECTION=H
-  QR_CODE_FORCE_GD=false
-  ```
+```ini .env.production
+QR_CODE_FORMAT=png
+QR_CODE_SIZE=400
+QR_CODE_COLOR=0,0,0
+QR_CODE_ERROR_CORRECTION=H
+QR_CODE_FORCE_GD=false
+```
+
 </CodeGroup>
 
 ## Color format reference
@@ -178,20 +186,25 @@ Use different defaults for local development vs. production without changing any
 <Tip>
   The `QR_CODE_COLOR` and `QR_CODE_BACKGROUND_COLOR` variables accept three interchangeable string formats. Choose whichever fits your workflow:
 
-  | Format | `.env` value | PHP config equivalent |
-  |--------|--------------|-----------------------|
-  | RGB CSV | `"255,0,0"` | `[255, 0, 0]` |
-  | RGBA CSV (alpha 0–100) | `"255,0,0,100"` | `[255, 0, 0, 100]` |
-  | Hex | `"#FF0000"` | — |
+| Format                 | `.env` value    | PHP config equivalent |
+| ---------------------- | --------------- | --------------------- |
+| RGB CSV                | `"255,0,0"`     | `[255, 0, 0]`         |
+| RGBA CSV (alpha 0–100) | `"255,0,0,100"` | `[255, 0, 0, 100]`    |
+| Hex                    | `"#FF0000"`     | —                     |
 
-  When using **PHP arrays** directly in `config/qrcode.php` (after publishing the config), you can also write:
+When using **PHP arrays** directly in `config/qrcode.php` (after publishing the config), you can also write:
 
-  ```php
-  'color' => [255, 0, 0],           // RGB
-  'color' => [255, 0, 0, 50],       // RGBA — 50% opacity
-  ```
+```php
+'color' => [255, 0, 0],           // RGB
+'color' => [255, 0, 0, 50],       // RGBA — 50% opacity
+```
+
 </Tip>
 
 <Note>
-  Environment variables are read by `config/qrcode.php` at boot time. **You do not need to publish the config file** to use env vars — the unpublished config that ships with the package already calls `env('QR_CODE_*', ...)` for every option. Publishing the config only adds the ability to set PHP array values (such as `[R, G, B]`) directly in PHP, which is not possible in a `.env` file.
+  Environment variables are read by `config/qrcode.php` at boot time. **You do
+  not need to publish the config file** to use env vars — the unpublished config
+  that ships with the package already calls `env('QR_CODE_*', ...)` for every
+  option. Publishing the config only adds the ability to set PHP array values
+  (such as `[R, G, B]`) directly in PHP, which is not possible in a `.env` file.
 </Note>

@@ -38,7 +38,9 @@ QrCode::generate(
 ```
 
 <Warning>
-  `generate()` throws `CannotWriteFileException` if the target directory does not exist or the process lacks write permission. Create the directory first or catch the exception explicitly.
+  `generate()` throws `CannotWriteFileException` if the target directory does
+  not exist or the process lacks write permission. Create the directory first or
+  catch the exception explicitly.
 </Warning>
 
 ## Fluent builder chaining
@@ -58,12 +60,13 @@ $qrCode = QrCode::size(300)
 <Tip>
   Because the builder is immutable, you can create a "base" generator once and reuse it for different payloads without side effects:
 
-  ```php
-  $base = QrCode::size(400)->format('png')->color(0, 102, 204);
+```php
+$base = QrCode::size(400)->format('png')->color(0, 102, 204);
 
-  $qr1 = $base->generate('https://example.com');
-  $qr2 = $base->generate('https://laravel.com');
-  ```
+$qr1 = $base->generate('https://example.com');
+$qr2 = $base->generate('https://laravel.com');
+```
+
 </Tip>
 
 ## Builder method reference
@@ -73,11 +76,14 @@ $qrCode = QrCode::size(300)
 </ParamField>
 
 <ParamField path="format" type="string">
-  Output format: `svg`, `png`, `webp`, or `eps`. The config default is `svg`. PNG and WebP require `ext-imagick` or `ext-gd`. EPS requires no extensions.
+  Output format: `svg`, `png`, `webp`, or `eps`. The config default is `svg`.
+  PNG and WebP require `ext-imagick` or `ext-gd`. EPS requires no extensions.
 </ParamField>
 
 <ParamField path="color" type="int, int, int, int|null">
-  Foreground color. In RGB mode (default): `color(red, green, blue, alpha?)` where each channel is `0–255` and alpha is `0–100`. In CMYK mode: `color(cyan, magenta, yellow, black)` on a `0–100` scale.
+  Foreground color. In RGB mode (default): `color(red, green, blue, alpha?)`
+  where each channel is `0–255` and alpha is `0–100`. In CMYK mode: `color(cyan,
+  magenta, yellow, black)` on a `0–100` scale.
 </ParamField>
 
 <ParamField path="backgroundColor" type="int, int, int, int|null">
@@ -89,11 +95,13 @@ $qrCode = QrCode::size(300)
 </ParamField>
 
 <ParamField path="errorCorrection" type="string">
-  Error correction level: `L` (7 %), `M` (15 %), `Q` (25 %), or `H` (30 %). The config default is `M`.
+  Error correction level: `L` (7 %), `M` (15 %), `Q` (25 %), or `H` (30 %). The
+  config default is `M`.
 </ParamField>
 
 <ParamField path="encoding" type="string">
-  Character encoding for the payload, e.g. `UTF-8`. The config default is `UTF-8`.
+  Character encoding for the payload, e.g. `UTF-8`. The config default is
+  `UTF-8`.
 </ParamField>
 
 <ParamField path="style" type="string">
@@ -109,15 +117,21 @@ $qrCode = QrCode::size(300)
 </ParamField>
 
 <ParamField path="gradient" type="array, array, string">
-  Gradient fill across the QR code modules. Pass start and end colors as RGB arrays and a direction: `vertical` or `horizontal`.
+  Gradient fill across the QR code modules. Pass start and end colors as RGB
+  arrays and a direction: `vertical` or `horizontal`.
 </ParamField>
 
 <ParamField path="merge" type="string, float">
-  Overlay an image (e.g. a logo) at the center. Pass a file path and an optional size percentage (default `0.2` = 20 %). Supported for SVG, PNG, and WebP — **not** EPS.
+  Overlay an image (e.g. a logo) at the center. Pass a file path and an optional
+  size percentage (default `0.2` = 20 %). Supported for SVG, PNG, and WebP —
+  **not** EPS.
 </ParamField>
 
 <ParamField path="mergeString" type="string, float">
-  Overlay an image passed as raw binary string content instead of a file path. Accepts the image content and an optional size percentage (default `0.2` = 20 %). Use this when the image is already loaded into memory rather than stored on disk.
+  Overlay an image passed as raw binary string content instead of a file path.
+  Accepts the image content and an optional size percentage (default `0.2` = 20
+  %). Use this when the image is already loaded into memory rather than stored
+  on disk.
 </ParamField>
 
 <ParamField path="cmyk" type="void">
@@ -125,11 +139,13 @@ $qrCode = QrCode::size(300)
 </ParamField>
 
 <ParamField path="rgb" type="void">
-  Switch the color model back to RGB (the default). Use `0–255` integer values per channel.
+  Switch the color model back to RGB (the default). Use `0–255` integer values
+  per channel.
 </ParamField>
 
 <ParamField path="gray" type="int, int|null">
-  Set a grayscale palette. `0` is black, `100` is white. Optionally pass a second value for the background gray level.
+  Set a grayscale palette. `0` is black, `100` is white. Optionally pass a
+  second value for the background gray level.
 </ParamField>
 
 ## Output formats
@@ -190,6 +206,7 @@ $eps = (string) QrCode::format('eps')->generate('https://example.com');
             ->header('Content-Type', 'image/svg+xml');
     }
     ```
+
   </Tab>
   <Tab title="PNG response">
     ```php
@@ -204,6 +221,7 @@ $eps = (string) QrCode::format('eps')->generate('https://example.com');
             ->header('Content-Type', 'image/png');
     }
     ```
+
   </Tab>
   <Tab title="File download">
     ```php
@@ -221,6 +239,7 @@ $eps = (string) QrCode::format('eps')->generate('https://example.com');
         return response()->download($path, 'qrcode.png');
     }
     ```
+
   </Tab>
 </Tabs>
 
@@ -279,7 +298,10 @@ php artisan vendor:publish --tag=qrcode-config
 ```
 
 <Note>
-  Config defaults apply when you use the facade, the Blade component, or resolve `Linkxtr\QrCode\Generator` from the service container. If you instantiate `new Generator()` directly, you get hardcoded package defaults unless you pass the config array yourself.
+  Config defaults apply when you use the facade, the Blade component, or resolve
+  `Linkxtr\QrCode\Generator` from the service container. If you instantiate `new
+  Generator()` directly, you get hardcoded package defaults unless you pass the
+  config array yourself.
 </Note>
 
 ## Built-in data-type helpers

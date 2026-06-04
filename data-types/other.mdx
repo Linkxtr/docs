@@ -23,11 +23,15 @@ QrCode::WiFi(array $credentials)
 </ParamField>
 
 <ParamField body="encryption" type="string">
-  The security protocol: `WEP`, `WPA`, `WPA2`, `WPA3`, or `NOPASS`. `WPA2` and `WPA3` are both normalised to `WPA` in the payload (as per the spec). Omit this key to let the package infer `WPA` when a password is provided, or `NOPASS` for open networks.
+  The security protocol: `WEP`, `WPA`, `WPA2`, `WPA3`, or `NOPASS`. `WPA2` and
+  `WPA3` are both normalised to `WPA` in the payload (as per the spec). Omit
+  this key to let the package infer `WPA` when a password is provided, or
+  `NOPASS` for open networks.
 </ParamField>
 
 <ParamField body="password" type="string">
-  The network password. Omit for open (`NOPASS`) networks. Passing a password alongside `NOPASS` throws an `InvalidWiFiArgumentException`.
+  The network password. Omit for open (`NOPASS`) networks. Passing a password
+  alongside `NOPASS` throws an `InvalidWiFiArgumentException`.
 </ParamField>
 
 <ParamField body="hidden" type="boolean">
@@ -35,7 +39,8 @@ QrCode::WiFi(array $credentials)
 </ParamField>
 
 <Warning>
-  **WEP is deprecated and insecure.** It is supported only for compatibility with legacy hardware. Use `WPA` or `WPA2` for all new deployments.
+  **WEP is deprecated and insecure.** It is supported only for compatibility
+  with legacy hardware. Use `WPA` or `WPA2` for all new deployments.
 </Warning>
 
 ### Examples
@@ -89,11 +94,13 @@ QrCode::Geo(
 ```
 
 <ParamField body="latitude" type="float" required>
-  Decimal latitude between `-90` and `90`. Values outside this range throw an `InvalidGeoArgumentException`.
+  Decimal latitude between `-90` and `90`. Values outside this range throw an
+  `InvalidGeoArgumentException`.
 </ParamField>
 
 <ParamField body="longitude" type="float" required>
-  Decimal longitude between `-180` and `180`. Values outside this range throw an `InvalidGeoArgumentException`.
+  Decimal longitude between `-180` and `180`. Values outside this range throw an
+  `InvalidGeoArgumentException`.
 </ParamField>
 
 <ParamField body="name" type="string">
@@ -141,11 +148,13 @@ QrCode::CalendarEvent(array $attributes)
 </ParamField>
 
 <ParamField body="start" type="Carbon|DateTimeInterface|string|int" required>
-  The event start date and time. Accepts a `Carbon` instance, any `DateTimeInterface`, a parseable date string, or a Unix timestamp integer.
+  The event start date and time. Accepts a `Carbon` instance, any
+  `DateTimeInterface`, a parseable date string, or a Unix timestamp integer.
 </ParamField>
 
 <ParamField body="end" type="Carbon|DateTimeInterface|string|int" required>
-  The event end date and time. Must be strictly after `start`; otherwise an `InvalidCalendarEventArgumentException` is thrown.
+  The event end date and time. Must be strictly after `start`; otherwise an
+  `InvalidCalendarEventArgumentException` is thrown.
 </ParamField>
 
 <ParamField body="description" type="string">
@@ -157,7 +166,11 @@ QrCode::CalendarEvent(array $attributes)
 </ParamField>
 
 <Note>
-  Per RFC 5545, the `DTSTAMP` field is set to the **current UTC timestamp** every time the payload is serialised. This means generating a QR code for the same event twice will produce different binary outputs and the result **cannot be strictly cached** by content hash. If you need a stable, reproducible QR code, generate it once, save the result to disk, and serve the saved file.
+  Per RFC 5545, the `DTSTAMP` field is set to the **current UTC timestamp**
+  every time the payload is serialised. This means generating a QR code for the
+  same event twice will produce different binary outputs and the result **cannot
+  be strictly cached** by content hash. If you need a stable, reproducible QR
+  code, generate it once, save the result to disk, and serve the saved file.
 </Note>
 
 ### Examples
@@ -208,5 +221,9 @@ QrCode::CalendarEvent([
 ```
 
 <Tip>
-  All timestamps are converted to UTC before being written into the payload, regardless of the timezone on the `Carbon` instance you pass in. Pass timezone-aware `Carbon` objects (e.g. `Carbon::create(..., 'America/Chicago')`) to ensure the event appears at the correct local time on the recipient's device.
+  All timestamps are converted to UTC before being written into the payload,
+  regardless of the timezone on the `Carbon` instance you pass in. Pass
+  timezone-aware `Carbon` objects (e.g. `Carbon::create(...,
+  'America/Chicago')`) to ensure the event appears at the correct local time on
+  the recipient's device.
 </Tip>

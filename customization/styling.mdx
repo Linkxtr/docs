@@ -10,11 +10,11 @@ The Laravel QR Code package gives you fine-grained control over the visual appea
 
 The **module style** controls the shape of every small data block that makes up the body of the QR code. Pass a style string (or the `Style` enum) to `style()`.
 
-| Value | Description |
-|-------|-------------|
+| Value    | Description                      |
+| -------- | -------------------------------- |
 | `square` | Sharp-cornered squares (default) |
-| `dot` | Circular dots |
-| `round` | Rounded squares |
+| `dot`    | Circular dots                    |
+| `round`  | Rounded squares                  |
 
 ```php
 use Linkxtr\QrCode\Facades\QrCode;
@@ -30,18 +30,20 @@ QrCode::style('square')->generate('https://example.com');
 ```
 
 <Tip>
-  The `style()` method accepts both a plain string (e.g. `'dot'`) and the `Linkxtr\QrCode\Enums\Style` enum case (e.g. `Style::DOT`). Both forms are equivalent.
+  The `style()` method accepts both a plain string (e.g. `'dot'`) and the
+  `Linkxtr\QrCode\Enums\Style` enum case (e.g. `Style::DOT`). Both forms are
+  equivalent.
 </Tip>
 
 ## Eye Style
 
 The three large **positional squares** in the corners of every QR code are called eyes. Use `eye()` to set their outer shape.
 
-| Value | Description |
-|-------|-------------|
+| Value    | Description                                 |
+| -------- | ------------------------------------------- |
 | `square` | Traditional sharp-cornered square (default) |
-| `circle` | Fully rounded circle |
-| `pointy` | Inward-pointed corners |
+| `circle` | Fully rounded circle                        |
+| `pointy` | Inward-pointed corners                      |
 
 ```php
 // Circle eyes with dot modules — a common modern look
@@ -64,7 +66,8 @@ QrCode::style('dot')->eye('circle')->internalEye('pointy')->generate('https://ex
 ```
 
 <Note>
-  `internalEye()` accepts the same values as `eye()`: `'square'`, `'circle'`, and `'pointy'`.
+  `internalEye()` accepts the same values as `eye()`: `'square'`, `'circle'`,
+  and `'pointy'`.
 </Note>
 
 ## Size and Margin
@@ -86,12 +89,12 @@ QrCode::size(500)->margin(6)->generate('https://example.com');
 
 Use `format()` to choose the image format of the generated QR code.
 
-| Value | Extension | PHP extension required |
-|-------|-----------|----------------------|
-| `svg` | `.svg` | None (default) |
-| `png` | `.png` | `imagick` or `gd` |
-| `webp` | `.webp` | `imagick` |
-| `eps` | `.eps` | None |
+| Value  | Extension | PHP extension required |
+| ------ | --------- | ---------------------- |
+| `svg`  | `.svg`    | None (default)         |
+| `png`  | `.png`    | `imagick` or `gd`      |
+| `webp` | `.webp`   | `imagick`              |
+| `eps`  | `.eps`    | None                   |
 
 ```php
 // SVG (default — no extra extensions needed)
@@ -108,7 +111,9 @@ QrCode::format('eps')->generate('https://example.com');
 ```
 
 <Warning>
-  When saving to a file, make sure the filename extension matches the chosen format. A mismatch (e.g. `qr.png` with `format('svg')`) will produce a file with incorrect content.
+  When saving to a file, make sure the filename extension matches the chosen
+  format. A mismatch (e.g. `qr.png` with `format('svg')`) will produce a file
+  with incorrect content.
 </Warning>
 
 ```php

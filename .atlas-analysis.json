@@ -13,11 +13,7 @@
         "groups": [
           {
             "group": "Get Started",
-            "pages": [
-              "introduction",
-              "installation",
-              "quickstart"
-            ]
+            "pages": ["introduction", "installation", "quickstart"]
           },
           {
             "group": "Usage",

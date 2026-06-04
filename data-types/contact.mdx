@@ -13,11 +13,13 @@ Use `QrCode::VCard(array $config)` to produce a vCard 3.0 payload. VCard is the 
 ### Supported Keys
 
 <ParamField body="name" type="string" required>
-  The full display name of the contact (`FN` field). This is the only required key.
+  The full display name of the contact (`FN` field). This is the only required
+  key.
 </ParamField>
 
 <ParamField body="firstName" type="string">
-  The contact's given name. Used alongside `lastName` to populate the structured `N` field.
+  The contact's given name. Used alongside `lastName` to populate the structured
+  `N` field.
 </ParamField>
 
 <ParamField body="lastName" type="string">
@@ -115,7 +117,8 @@ echo QrCode::VCard([
 ```
 
 <Note>
-  Always wrap in `try/catch` when using user-supplied data. The only hard requirement is a non-empty `name`; all other keys are optional.
+  Always wrap in `try/catch` when using user-supplied data. The only hard
+  requirement is a non-empty `name`; all other keys are optional.
 </Note>
 
 ---
@@ -175,13 +178,14 @@ QrCode::MeCard(
 
 ## VCard vs MeCard — Which Should You Use?
 
-| | VCard 3.0 | MeCard |
-|---|---|---|
-| **Compatibility** | iOS, Android, Outlook, macOS — universally supported | Excellent on Android; supported on iOS 11+; less so on desktop |
-| **Fields** | Rich: multiple emails, phone types, role, birthday, notes | Core fields only: name, phone, email, URL, address, note |
-| **Payload size** | Larger (more verbose) | Smaller (shorter QR code at the same error-correction level) |
-| **Best for** | Business cards, event badges, marketing collateral | Simple personal cards, space-constrained prints |
+|                   | VCard 3.0                                                 | MeCard                                                         |
+| ----------------- | --------------------------------------------------------- | -------------------------------------------------------------- |
+| **Compatibility** | iOS, Android, Outlook, macOS — universally supported      | Excellent on Android; supported on iOS 11+; less so on desktop |
+| **Fields**        | Rich: multiple emails, phone types, role, birthday, notes | Core fields only: name, phone, email, URL, address, note       |
+| **Payload size**  | Larger (more verbose)                                     | Smaller (shorter QR code at the same error-correction level)   |
+| **Best for**      | Business cards, event badges, marketing collateral        | Simple personal cards, space-constrained prints                |
 
 <Tip>
-  When in doubt, choose **VCard**. It is more widely supported and handles multiple phone numbers and email addresses in a single payload.
+  When in doubt, choose **VCard**. It is more widely supported and handles
+  multiple phone numbers and email addresses in a single payload.
 </Tip>

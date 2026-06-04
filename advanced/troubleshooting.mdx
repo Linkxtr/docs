@@ -7,7 +7,11 @@ description: "Fix the most common Laravel QR Code problems: blank output in Blad
 If your QR codes aren't rendering, saving, or generating as expected, the sections below cover the most common root causes and their fixes. Each issue includes a concise diagnostic step and a working solution you can apply immediately.
 
 <Note>
-  If your problem isn't listed here, [open a GitHub issue](https://github.com/linkxtr/laravel-qrcode/issues) and include your **PHP version**, **Laravel version**, the **QR code method you called**, and the **full error message or stack trace**. Those four details dramatically speed up diagnosis.
+  If your problem isn't listed here, [open a GitHub
+  issue](https://github.com/linkxtr/laravel-qrcode/issues) and include your
+  **PHP version**, **Laravel version**, the **QR code method you called**, and
+  the **full error message or stack trace**. Those four details dramatically
+  speed up diagnosis.
 </Note>
 
 ## Common Issues
@@ -15,177 +19,184 @@ If your QR codes aren't rendering, saving, or generating as expected, the sectio
 <Accordion title="QR code not rendering in Blade">
   **Symptom:** The QR code shows as a literal escaped string like `&lt;svg ...&gt;` or a blank area instead of the actual image.
 
-  **Cause:** Blade's `{{ }}` syntax HTML-escapes its output. QR codes returned as SVG or raw binary must not be escaped.
+**Cause:** Blade's `{{ }}` syntax HTML-escapes its output. QR codes returned as SVG or raw binary must not be escaped.
 
-  **Fix — unescaped echo syntax:**
+**Fix — unescaped echo syntax:**
 
-  ```blade
-  {{-- ❌ Escapes the SVG/PNG string — shows garbled text --}}
-  {{ QrCode::generate('Hello World') }}
+```blade
+{{-- ❌ Escapes the SVG/PNG string — shows garbled text --}}
+{{ QrCode::generate('Hello World') }}
 
-  {{-- ✅ Outputs raw SVG/binary correctly --}}
-  {!! QrCode::generate('Hello World') !!}
-  ```
+{{-- ✅ Outputs raw SVG/binary correctly --}}
+{!! QrCode::generate('Hello World') !!}
+```
 
-  **Alternative — use the Blade component instead:**
+**Alternative — use the Blade component instead:**
 
-  The `<x-qr-code>` component handles output escaping automatically and is the recommended approach for Blade templates:
+The `<x-qr-code>` component handles output escaping automatically and is the recommended approach for Blade templates:
 
-  ```blade
-  <x-qr-code data="Hello World" />
+```blade
+<x-qr-code data="Hello World" />
 
-  {{-- With options --}}
-  <x-qr-code
-      data="https://example.com"
-      size="300"
-      color="#ff0000"
-      margin="2"
-  />
-  ```
+{{-- With options --}}
+<x-qr-code
+    data="https://example.com"
+    size="300"
+    color="#ff0000"
+    margin="2"
+/>
+```
+
 </Accordion>
 
 <Accordion title="PNG or WebP generation fails">
   **Symptom:** An exception is thrown when you call `->format('png')->generate(...)` or `->format('webp')->generate(...)`. SVG generation works fine.
 
-  **Cause:** PNG and WebP rasterisation requires either the `ext-imagick` or `ext-gd` PHP extension. If neither is available, the renderer has no way to produce a bitmap image.
+**Cause:** PNG and WebP rasterisation requires either the `ext-imagick` or `ext-gd` PHP extension. If neither is available, the renderer has no way to produce a bitmap image.
 
-  **Fix — verify your extensions:**
+**Fix — verify your extensions:**
 
-  Run the following in your project to see which extensions are loaded:
+Run the following in your project to see which extensions are loaded:
 
-  ```bash
-  php -m | grep -iE 'imagick|gd'
-  ```
+```bash
+php -m | grep -iE 'imagick|gd'
+```
 
-  Or check `phpinfo()` in a browser request and search for "imagick" or "gd".
+Or check `phpinfo()` in a browser request and search for "imagick" or "gd".
 
-  - **Install Imagick (recommended):** Follow your system's package manager instructions, e.g. `sudo apt install php-imagick` on Ubuntu, then restart PHP-FPM.
-  - **Install GD:** Most PHP distributions include GD by default. Enable it in `php.ini` by uncommenting `extension=gd`.
+- **Install Imagick (recommended):** Follow your system's package manager instructions, e.g. `sudo apt install php-imagick` on Ubuntu, then restart PHP-FPM.
+- **Install GD:** Most PHP distributions include GD by default. Enable it in `php.ini` by uncommenting `extension=gd`.
 
-  Once at least one extension is active, PNG and WebP generation will work automatically.
+Once at least one extension is active, PNG and WebP generation will work automatically.
+
 </Accordion>
 
 <Accordion title="File permission error when saving">
   **Symptom:** `CannotWriteFileException` (or a generic PHP warning) when you pass a `$filename` argument to `generate()`.
 
-  **Cause:** The target directory does not exist, or the web server process does not have write permission to it.
+**Cause:** The target directory does not exist, or the web server process does not have write permission to it.
 
-  **Fix — create the directory and confirm permissions:**
+**Fix — create the directory and confirm permissions:**
 
-  ```php
-  use Linkxtr\QrCode\Facades\QrCode;
+```php
+use Linkxtr\QrCode\Facades\QrCode;
 
-  $path = storage_path('app/qrcodes/qr.svg');
+$path = storage_path('app/qrcodes/qr.svg');
 
-  // Ensure the directory exists and is writable before generating
-  if (! is_dir(dirname($path))) {
-      mkdir(dirname($path), 0755, true);
-  }
+// Ensure the directory exists and is writable before generating
+if (! is_dir(dirname($path))) {
+    mkdir(dirname($path), 0755, true);
+}
 
-  QrCode::generate('https://example.com', $path);
-  ```
+QrCode::generate('https://example.com', $path);
+```
 
-  On a Linux server, also confirm the web server user (typically `www-data`) owns or has write access to the directory:
+On a Linux server, also confirm the web server user (typically `www-data`) owns or has write access to the directory:
 
-  ```bash
-  sudo chown -R www-data:www-data storage/app/qrcodes
-  sudo chmod -R 755 storage/app/qrcodes
-  ```
+```bash
+sudo chown -R www-data:www-data storage/app/qrcodes
+sudo chmod -R 755 storage/app/qrcodes
+```
+
 </Accordion>
 
 <Accordion title="QR code data too large — scanner fails to read it">
   **Symptom:** The QR code generates successfully but scanners struggle or refuse to read it. The code looks extremely dense.
 
-  **Cause:** QR codes have a finite data capacity. Long strings, high error correction levels, and small physical sizes all reduce scannability.
+**Cause:** QR codes have a finite data capacity. Long strings, high error correction levels, and small physical sizes all reduce scannability.
 
-  **Fix — reduce data and increase size with high error correction:**
+**Fix — reduce data and increase size with high error correction:**
 
-  ```php
-  // ✅ Use a short URL instead of embedding the full payload
-  QrCode::size(400)
-      ->errorCorrection('H')
-      ->generate('https://short.url/abc123');
-  ```
+```php
+// ✅ Use a short URL instead of embedding the full payload
+QrCode::size(400)
+    ->errorCorrection('H')
+    ->generate('https://short.url/abc123');
+```
 
-  Guidelines:
-  - Keep the data payload as short as possible. Encode an ID or short URL, not a full JSON blob.
-  - Use `errorCorrection('H')` (30 % recovery) for codes that will be printed small or on uneven surfaces.
-  - Set `size()` to at least `400` when using `H` error correction.
-  - For extremely long data, consider storing it server-side and encoding only a lookup key.
-</Accordion>
+Guidelines:
+
+- Keep the data payload as short as possible. Encode an ID or short URL, not a full JSON blob.
+- Use `errorCorrection('H')` (30 % recovery) for codes that will be printed small or on uneven surfaces.
+- Set `size()` to at least `400` when using `H` error correction.
+- For extremely long data, consider storing it server-side and encoding only a lookup key.
+  </Accordion>
 
 <Accordion title="InvalidArgumentException on data type methods">
   **Symptom:** An `InvalidArgumentException` is thrown when calling a data-type method like `WiFi()`, `PhoneNumber()`, `Email()`, or `VCard()`.
 
-  **Cause:** Since v2.0, all data types validate their inputs strictly. Passing malformed data (wrong keys, missing required fields, bad phone format, etc.) throws an exception instead of silently generating a broken QR code.
+**Cause:** Since v2.0, all data types validate their inputs strictly. Passing malformed data (wrong keys, missing required fields, bad phone format, etc.) throws an exception instead of silently generating a broken QR code.
 
-  **Fix — validate user input before passing it in:**
+**Fix — validate user input before passing it in:**
 
-  ```php
-  use InvalidArgumentException;
-  use Linkxtr\QrCode\Facades\QrCode;
+```php
+use InvalidArgumentException;
+use Linkxtr\QrCode\Facades\QrCode;
 
-  try {
-      $qr = QrCode::WiFi([
-          'ssid'       => $request->validated('ssid'),
-          'encryption' => $request->validated('encryption'), // WEP | WPA | WPA2 | NOPASS
-          'password'   => $request->validated('password'),
-      ]);
-  } catch (InvalidArgumentException $e) {
-      return back()->withErrors(['qr' => 'Invalid WiFi credentials: ' . $e->getMessage()]);
-  }
-  ```
+try {
+    $qr = QrCode::WiFi([
+        'ssid'       => $request->validated('ssid'),
+        'encryption' => $request->validated('encryption'), // WEP | WPA | WPA2 | NOPASS
+        'password'   => $request->validated('password'),
+    ]);
+} catch (InvalidArgumentException $e) {
+    return back()->withErrors(['qr' => 'Invalid WiFi credentials: ' . $e->getMessage()]);
+}
+```
 
-  Always run `$request->validate(...)` or equivalent before passing user-supplied values to any data-type method.
+Always run `$request->validate(...)` or equivalent before passing user-supplied values to any data-type method.
+
 </Accordion>
 
 <Accordion title="Imagick is installed but I want to force GD">
   **Symptom:** The package uses Imagick for PNG/WebP rendering, but you need to use GD — for example, because your Imagick build has a known bug, or your deployment environment restricts Imagick.
 
-  **Cause:** By default, the package prefers Imagick over GD when both are available.
+**Cause:** By default, the package prefers Imagick over GD when both are available.
 
-  **Fix — set the environment variable or config key:**
+**Fix — set the environment variable or config key:**
 
-  In your `.env` file:
+In your `.env` file:
 
-  ```ini
-  QR_CODE_FORCE_GD=true
-  ```
+```ini
+QR_CODE_FORCE_GD=true
+```
 
-  Or, if you have published `config/qrcode.php`, set the key directly:
+Or, if you have published `config/qrcode.php`, set the key directly:
 
-  ```php
-  return [
-      // ... other options
-      'force_gd' => true,
-  ];
-  ```
+```php
+return [
+    // ... other options
+    'force_gd' => true,
+];
+```
 
-  With either setting in place, the package always uses GD for bitmap rendering, even when Imagick is installed.
+With either setting in place, the package always uses GD for bitmap rendering, even when Imagick is installed.
+
 </Accordion>
 
 <Accordion title="Config defaults not applying to generated QR codes">
   **Symptom:** You published `config/qrcode.php` and changed defaults like `size`, `format`, or `error_correction`, but generated QR codes still use the old values.
 
-  **Cause:** Config-driven defaults are injected only when the `Generator` is resolved through Laravel's service container — via the `QrCode` facade, the `<x-qr-code>` Blade component, or constructor injection. If you instantiate `Generator` manually with `new Generator()`, it receives the hardcoded package defaults, not your published config.
+**Cause:** Config-driven defaults are injected only when the `Generator` is resolved through Laravel's service container — via the `QrCode` facade, the `<x-qr-code>` Blade component, or constructor injection. If you instantiate `Generator` manually with `new Generator()`, it receives the hardcoded package defaults, not your published config.
 
-  **Fix — use the facade or container injection:**
+**Fix — use the facade or container injection:**
 
-  ```php
-  // ❌ Bypasses config/qrcode.php — uses hardcoded defaults
-  $qr = (new \Linkxtr\QrCode\Generator())->generate('Hello');
+```php
+// ❌ Bypasses config/qrcode.php — uses hardcoded defaults
+$qr = (new \Linkxtr\QrCode\Generator())->generate('Hello');
 
-  // ✅ Reads config/qrcode.php defaults
-  use Linkxtr\QrCode\Facades\QrCode;
-  $qr = QrCode::generate('Hello');
+// ✅ Reads config/qrcode.php defaults
+use Linkxtr\QrCode\Facades\QrCode;
+$qr = QrCode::generate('Hello');
 
-  // ✅ Also reads config/qrcode.php defaults via the container
-  public function __construct(private \Linkxtr\QrCode\Generator $qrCode) {}
-  ```
+// ✅ Also reads config/qrcode.php defaults via the container
+public function __construct(private \Linkxtr\QrCode\Generator $qrCode) {}
+```
 
-  After changing `config/qrcode.php`, clear the config cache so Laravel picks up your edits:
+After changing `config/qrcode.php`, clear the config cache so Laravel picks up your edits:
 
-  ```bash
-  php artisan config:clear
-  ```
+```bash
+php artisan config:clear
+```
+
 </Accordion>

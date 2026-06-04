@@ -7,7 +7,10 @@ description: "Set foreground and background colors in RGB or CMYK mode, apply gr
 The package supports three color models — RGB (default), CMYK, and grayscale. Switch between them at any point in the builder chain. Every method returns a **cloned** `Generator` so previous state is never mutated.
 
 <Note>
-  Alpha values throughout this package use a **0–100 scale** (0 = fully opaque, 100 = fully transparent). The package converts this internally to the range PHP's GD library expects (0–127). You do not need to perform this conversion yourself.
+  Alpha values throughout this package use a **0–100 scale** (0 = fully opaque,
+  100 = fully transparent). The package converts this internally to the range
+  PHP's GD library expects (0–127). You do not need to perform this conversion
+  yourself.
 </Note>
 
 ---
@@ -21,24 +24,20 @@ public function color(int $c1, int $c2, int $c3, ?int $c4 = null): static
 Set the foreground (module) color. The meaning of each channel depends on the active color model.
 
 <ParamField body="c1" type="int" required>
-  **RGB mode:** Red channel, 0–255.  
-  **CMYK mode:** Cyan channel, 0–100.
+  **RGB mode:** Red channel, 0–255. **CMYK mode:** Cyan channel, 0–100.
 </ParamField>
 
 <ParamField body="c2" type="int" required>
-  **RGB mode:** Green channel, 0–255.  
-  **CMYK mode:** Magenta channel, 0–100.
+  **RGB mode:** Green channel, 0–255. **CMYK mode:** Magenta channel, 0–100.
 </ParamField>
 
 <ParamField body="c3" type="int" required>
-  **RGB mode:** Blue channel, 0–255.  
-  **CMYK mode:** Yellow channel, 0–100.
+  **RGB mode:** Blue channel, 0–255. **CMYK mode:** Yellow channel, 0–100.
 </ParamField>
 
 <ParamField body="c4" type="int | null">
-  **RGB mode:** Alpha channel, 0–100 (0 = fully opaque).  
-  **CMYK mode:** Black (Key) channel, 0–100.  
-  Omit for a fully opaque foreground.
+  **RGB mode:** Alpha channel, 0–100 (0 = fully opaque). **CMYK mode:** Black
+  (Key) channel, 0–100. Omit for a fully opaque foreground.
 </ParamField>
 
 <CodeGroup>
@@ -84,7 +83,8 @@ Set the background color. Accepts the same channel layout as `color()` and respe
 </ParamField>
 
 <ParamField body="c4" type="int | null">
-  **RGB mode:** Alpha, 0–100. **CMYK mode:** Black, 0–100. Omit for a fully opaque background.
+  **RGB mode:** Alpha, 0–100. **CMYK mode:** Black, 0–100. Omit for a fully
+  opaque background.
 </ParamField>
 
 <CodeGroup>
@@ -133,7 +133,9 @@ public function cmyk(): static
 Switch the active color model to **CMYK**. All subsequent calls to `color()` and `backgroundColor()` interpret channel values on a **0–100** scale (percentage).
 
 <Warning>
-  Gradients (`gradient()`) are only available in RGB mode. Calling `gradient()` while in CMYK mode will produce unexpected results. Switch back to `rgb()` before using gradients.
+  Gradients (`gradient()`) are only available in RGB mode. Calling `gradient()`
+  while in CMYK mode will produce unexpected results. Switch back to `rgb()`
+  before using gradients.
 </Warning>
 
 ```php
@@ -159,7 +161,8 @@ Switch to **grayscale** mode and set both foreground and background tones in a s
 </ParamField>
 
 <ParamField body="backgroundGray" type="int | null">
-  Background luminance on the same 0–100 scale. When `null`, the background defaults to white (`100`).
+  Background luminance on the same 0–100 scale. When `null`, the background
+  defaults to white (`100`).
 </ParamField>
 
 <CodeGroup>
@@ -185,7 +188,8 @@ public function gradient(string|array $start, string|array $end, string|Gradient
 Apply a two-stop color gradient to the QR code modules. Gradient operates in **RGB mode only**.
 
 <ParamField body="start" type="string | array" required>
-  The gradient start color. Pass a hex string (e.g. `'#3b82f6'`) or an RGB array (e.g. `[59, 130, 246]`).
+  The gradient start color. Pass a hex string (e.g. `'#3b82f6'`) or an RGB array
+  (e.g. `[59, 130, 246]`).
 </ParamField>
 
 <ParamField body="end" type="string | array" required>
@@ -195,17 +199,19 @@ Apply a two-stop color gradient to the QR code modules. Gradient operates in **R
 <ParamField body="type" type="string" required>
   The gradient direction. Accepted values:
 
-  | Value | Description |
-  |-------|-------------|
-  | `vertical` | Top-to-bottom (default) |
-  | `horizontal` | Left-to-right |
-  | `diagonal` | Top-left to bottom-right |
-  | `inverse_diagonal` | Top-right to bottom-left |
-  | `radial` | Radiating from the centre outward |
+| Value              | Description                       |
+| ------------------ | --------------------------------- |
+| `vertical`         | Top-to-bottom (default)           |
+| `horizontal`       | Left-to-right                     |
+| `diagonal`         | Top-left to bottom-right          |
+| `inverse_diagonal` | Top-right to bottom-left          |
+| `radial`           | Radiating from the centre outward |
+
 </ParamField>
 
 <Note>
-  `gradient()` takes color values directly rather than using whatever was set by a prior `color()` call. The gradient replaces the foreground color entirely.
+  `gradient()` takes color values directly rather than using whatever was set by
+  a prior `color()` call. The gradient replaces the foreground color entirely.
 </Note>
 
 <CodeGroup>

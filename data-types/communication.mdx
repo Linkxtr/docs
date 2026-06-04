@@ -7,7 +7,9 @@ description: "Create QR codes that pre-fill email drafts, phone dials, SMS messa
 Communication data types let you encode a ready-to-send interaction into a QR code. When a user scans one of these codes, their device opens the appropriate app with the address, subject, or message already populated — removing friction from every touchpoint where you want someone to reach you.
 
 <Tip>
-  Use E.164 format for all phone numbers (e.g. `+12025550170`). This international standard is unambiguous across carriers and countries, and is the safest format for SMS, WhatsApp, and phone QR payloads.
+  Use E.164 format for all phone numbers (e.g. `+12025550170`). This
+  international standard is unambiguous across carriers and countries, and is
+  the safest format for SMS, WhatsApp, and phone QR payloads.
 </Tip>
 
 ---
@@ -80,7 +82,10 @@ echo QrCode::PhoneNumber('+442071234567')
 ```
 
 <Note>
-  Although the constructor accepts integers and floats for convenience (e.g. when pulling from a numeric database column), always prefer a string prefixed with `+` and the country code to ensure the dialler opens correctly on every device.
+  Although the constructor accepts integers and floats for convenience (e.g.
+  when pulling from a numeric database column), always prefer a string prefixed
+  with `+` and the country code to ensure the dialler opens correctly on every
+  device.
 </Note>
 
 ---
@@ -157,7 +162,9 @@ echo QrCode::WhatsApp('+12025550170', 'Hi there!')->generate();
 ```
 
 <Warning>
-  Passing an empty string as the phone number throws an `InvalidWhatsAppArgumentException`. Validate and sanitise the number before passing user input.
+  Passing an empty string as the phone number throws an
+  `InvalidWhatsAppArgumentException`. Validate and sanitise the number before
+  passing user input.
 </Warning>
 
 ---
@@ -191,5 +198,6 @@ echo QrCode::Telegram('laravelphp')
 ```
 
 <Note>
-  This data type links to a **public** Telegram username. Private users or channels without a public username cannot be encoded this way.
+  This data type links to a **public** Telegram username. Private users or
+  channels without a public username cannot be encoded this way.
 </Note>

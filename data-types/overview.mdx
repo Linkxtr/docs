@@ -15,47 +15,53 @@ Every data type method returns a `QrCodeResult`, which means you can chain rende
 <Warning>
   All data types validate their inputs strictly and throw typed exceptions on invalid values. Always wrap user-supplied input in a `try/catch` block to handle validation errors gracefully.
 
-  ```php
-  use Linkxtr\QrCode\Facades\QrCode;
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+use Linkxtr\QrCode\Contracts\QrCodeExceptionInterface;
 
-  try {
-      $qr = QrCode::Email($request->input('email'));
-  } catch (\Throwable $e) {
-      // Handle validation error
-  }
-  ```
+try {
+    $qr = QrCode::Email($request->input('email'));
+} catch (QrCodeExceptionInterface $e) {
+    // Handle validation error
+}
+```
+
 </Warning>
 
 ## Available Data Types
 
 <CardGroup cols={2}>
   <Card title="Contact" icon="address-card" href="/data-types/contact">
-    Encode full contact details as a scannable vCard or MeCard that can be saved directly to a phone's address book.
+    Encode full contact details as a scannable vCard or MeCard that can be saved
+    directly to a phone's address book.
   </Card>
   <Card title="Communication" icon="message" href="/data-types/communication">
-    Pre-fill email drafts, phone dials, SMS messages, WhatsApp chats, and Telegram profile links with a single scan.
+    Pre-fill email drafts, phone dials, SMS messages, WhatsApp chats, and
+    Telegram profile links with a single scan.
   </Card>
   <Card title="Payment" icon="bitcoin-sign" href="/data-types/payment">
-    Generate Bitcoin and Ethereum payment requests compatible with all major crypto wallets.
+    Generate Bitcoin and Ethereum payment requests compatible with all major
+    crypto wallets.
   </Card>
   <Card title="Other Types" icon="grid" href="/data-types/other">
-    Connect devices to Wi-Fi instantly, drop a pin on a map, or add a calendar event — all with a scan.
+    Connect devices to Wi-Fi instantly, drop a pin on a map, or add a calendar
+    event — all with a scan.
   </Card>
 </CardGroup>
 
 ## Quick Reference
 
-| Method | Category | Key Parameters |
-|---|---|---|
-| `QrCode::VCard(array $config)` | Contact | `name`, `email`, `phone`, `company`, … |
-| `QrCode::MeCard(string $name, …)` | Contact | `name`, `phone`, `email`, `url`, … |
-| `QrCode::Email(string $address, …)` | Communication | `address`, `subject`, `body`, `cc`, `bcc` |
-| `QrCode::PhoneNumber(string $phone)` | Communication | E.164 phone number |
-| `QrCode::SMS(string $phoneNumber, …)` | Communication | `phoneNumber`, `message` |
-| `QrCode::WhatsApp(string\|array …)` | Communication | `number`, `message` |
-| `QrCode::Telegram(string $username)` | Communication | Telegram username |
-| `QrCode::BTC(string $address, …)` | Payment | `address`, `amount`, `label`, `message` |
-| `QrCode::Ethereum(string $address, …)` | Payment | `address`, `amount` in ETH |
-| `QrCode::WiFi(array $credentials)` | Other | `ssid`, `encryption`, `password` |
-| `QrCode::Geo(float $lat, float $lng, …)` | Other | `latitude`, `longitude`, `name` |
-| `QrCode::CalendarEvent(array $attrs)` | Other | `summary`, `start`, `end`, … |
+| Method                                   | Category      | Key Parameters                            |
+| ---------------------------------------- | ------------- | ----------------------------------------- |
+| `QrCode::VCard(array $config)`           | Contact       | `name`, `email`, `phone`, `company`, …    |
+| `QrCode::MeCard(string $name, …)`        | Contact       | `name`, `phone`, `email`, `url`, …        |
+| `QrCode::Email(string $address, …)`      | Communication | `address`, `subject`, `body`, `cc`, `bcc` |
+| `QrCode::PhoneNumber(string $phone)`     | Communication | E.164 phone number                        |
+| `QrCode::SMS(string $phoneNumber, …)`    | Communication | `phoneNumber`, `message`                  |
+| `QrCode::WhatsApp(string\|array …)`      | Communication | `number`, `message`                       |
+| `QrCode::Telegram(string $username)`     | Communication | Telegram username                         |
+| `QrCode::BTC(string $address, …)`        | Payment       | `address`, `amount`, `label`, `message`   |
+| `QrCode::Ethereum(string $address, …)`   | Payment       | `address`, `amount` in ETH                |
+| `QrCode::WiFi(array $credentials)`       | Other         | `ssid`, `encryption`, `password`          |
+| `QrCode::Geo(float $lat, float $lng, …)` | Other         | `latitude`, `longitude`, `name`           |
+| `QrCode::CalendarEvent(array $attrs)`    | Other         | `summary`, `start`, `end`, …              |

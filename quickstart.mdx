@@ -7,54 +7,7 @@ description: "Generate a working QR code in under five minutes using the QrCode 
 Once you've [installed the package](/installation), you can generate a QR code in a single line. Choose the approach that best fits where you need it: a controller, a Blade template, or a terminal session.
 
 <Tabs>
-  <Tab title="Facade">
-    Use the `QrCode` facade anywhere PHP runs — controllers, jobs, service classes, or commands.
-
-    ```php
-    use Linkxtr\QrCode\Facades\QrCode;
-
-    // Generate an SVG string (default format)
-    $svg = QrCode::generate('https://example.com');
-    ```
-
-    `generate()` returns a `QrCodeResult` object that casts to a string, so you can echo it directly or pass it to a response.
-
-    **Return an SVG response from a controller:**
-
-    ```php
-    use Illuminate\Http\Response;
-    use Linkxtr\QrCode\Facades\QrCode;
-
-    public function show(): Response
-    {
-        $svg = QrCode::size(300)->generate('https://example.com');
-
-        return response((string) $svg, 200)
-            ->header('Content-Type', 'image/svg+xml');
-    }
-    ```
-
-    **Save a PNG to disk:**
-
-    ```php
-    QrCode::format('png')
-        ->size(400)
-        ->generate('https://example.com', storage_path('app/qrcodes/site.png'));
-    ```
-
-    **Render inline SVG in a Blade template:**
-
-    ```blade
-    {{-- Use {!! !!} to output raw (unescaped) SVG markup --}}
-    {!! QrCode::size(200)->generate('https://example.com') !!}
-    ```
-
-    <Warning>
-      Always use `{!! ... !!}` — not `{{ ... }}` — when rendering SVG output in Blade. The double-curly syntax HTML-escapes the string, which breaks the SVG tags.
-    </Warning>
-  </Tab>
-
-  <Tab title="Blade Component">
+<Tab title="Blade Component">
     The `<x-qr-code>` component is the simplest way to embed a QR code in a template. It handles SVG injection and accessibility attributes automatically.
 
     ```blade
@@ -105,6 +58,54 @@ Once you've [installed the package](/installation), you can generate a QR code i
     <Tip>
       Both `<x-qr-code>` and `<x-qrcode>` (no hyphen) are registered. Use whichever naming convention matches your project style.
     </Tip>
+
+  </Tab>
+  <Tab title="Facade">
+    Use the `QrCode` facade anywhere PHP runs — controllers, jobs, service classes, or commands.
+
+    ```php
+    use Linkxtr\QrCode\Facades\QrCode;
+
+    // Generate an SVG string (default format)
+    $svg = QrCode::generate('https://example.com');
+    ```
+
+    `generate()` returns a `QrCodeResult` object that casts to a string, so you can echo it directly or pass it to a response.
+
+    **Return an SVG response from a controller:**
+
+    ```php
+    use Illuminate\Http\Response;
+    use Linkxtr\QrCode\Facades\QrCode;
+
+    public function show(): Response
+    {
+        $svg = QrCode::size(300)->generate('https://example.com');
+
+        return response((string) $svg, 200)
+            ->header('Content-Type', 'image/svg+xml');
+    }
+    ```
+
+    **Save a PNG to disk:**
+
+    ```php
+    QrCode::format('png')
+        ->size(400)
+        ->generate('https://example.com', storage_path('app/qrcodes/site.png'));
+    ```
+
+    **Render inline SVG in a Blade template:**
+
+    ```blade
+    {{-- Use {!! !!} to output raw (unescaped) SVG markup --}}
+    {!! QrCode::size(200)->generate('https://example.com') !!}
+    ```
+
+    <Warning>
+      Always use `{!! ... !!}` — not `{{ ... }}` — when rendering SVG output in Blade. The double-curly syntax HTML-escapes the string, which breaks the SVG tags.
+    </Warning>
+
   </Tab>
 
   <Tab title="Artisan CLI">
@@ -163,17 +164,18 @@ Once you've [installed the package](/installation), you can generate a QR code i
       --format=png \
       --color=58,94,255
     ```
+
   </Tab>
 </Tabs>
 
 ## Next steps
 
 <CardGroup cols={3}>
-  <Card title="Facade Reference" icon="wand-magic-sparkles" href="/usage/facade">
-    Explore the full `QrCode` facade API — colors, gradients, styles, image merging, and all fluent methods.
-  </Card>
   <Card title="Blade Component" icon="code" href="/usage/blade-component">
     See every prop the `<x-qr-code>` component accepts, including gradient and eye-style customization.
+  </Card>
+  <Card title="Facade Reference" icon="wand-magic-sparkles" href="/usage/facade">
+    Explore the full `QrCode` facade API — colors, gradients, styles, image merging, and all fluent methods.
   </Card>
   <Card title="Data Types" icon="database" href="/data-types/overview">
     Generate QR codes for WiFi, vCard, SMS, Email, WhatsApp, Telegram, BTC, Ethereum, and more.

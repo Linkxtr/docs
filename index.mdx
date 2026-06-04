@@ -8,16 +8,19 @@ Laravel QR Code is a modern QR code generation package for Laravel 11+ and PHP 8
 
 <CardGroup cols={2}>
   <Card title="Introduction" icon="book-open" href="/introduction">
-    Learn what Laravel QR Code offers and how it fits into your Laravel application.
+    Learn what Laravel QR Code offers and how it fits into your Laravel
+    application.
   </Card>
   <Card title="Quickstart" icon="bolt" href="/quickstart">
     Install the package and generate your first QR code in under five minutes.
   </Card>
   <Card title="Usage Guide" icon="code" href="/usage/facade">
-    Explore the fluent `QrCode` facade API and its full range of chainable options.
+    Explore the fluent `QrCode` facade API and its full range of chainable
+    options.
   </Card>
   <Card title="Data Types" icon="shapes" href="/data-types/overview">
-    Encode WiFi credentials, vCards, geo coordinates, crypto addresses, and more.
+    Encode WiFi credentials, vCards, geo coordinates, crypto addresses, and
+    more.
   </Card>
 </CardGroup>
 
@@ -30,6 +33,7 @@ Laravel QR Code is a modern QR code generation package for Laravel 11+ and PHP 8
     ```bash
     composer require linkxtr/laravel-qrcode
     ```
+
   </Step>
   <Step title="Publish the config file">
     Publish the configuration file to customise default format, size, and error correction level.
@@ -37,30 +41,33 @@ Laravel QR Code is a modern QR code generation package for Laravel 11+ and PHP 8
     ```bash
     php artisan vendor:publish --tag=qrcode-config
     ```
+
   </Step>
   <Step title="Generate your first QR code">
     Use the facade, the Blade component, or the Artisan command — whichever fits your workflow.
 
     <CodeGroup>
-      ```php Facade
-      use QrCode;
-
-      $svg = QrCode::size(300)->generate('https://example.com');
-      ```
-
       ```blade Blade Component
       <x-qr-code value="https://example.com" size="300" />
+      ```
+
+      ```php Facade
+      use Linkxtr\QrCode\Facades\QrCode;
+
+      $svg = QrCode::size(300)->generate('https://example.com');
       ```
 
       ```bash Artisan CLI
       php artisan qr:generate "https://example.com"
       ```
     </CodeGroup>
+
   </Step>
 </Steps>
 
 <Note>
-  Laravel QR Code requires **PHP 8.2+** and **Laravel 11+**. Make sure your environment meets these requirements before installing.
+  Laravel QR Code requires **PHP 8.2+** and **Laravel 11+**. Make sure your
+  environment meets these requirements before installing.
 </Note>
 
 ## Explore Further
@@ -81,5 +88,7 @@ Laravel QR Code is a modern QR code generation package for Laravel 11+ and PHP 8
 </CardGroup>
 
 <Tip>
-  All output formats — SVG, PNG, WebP, and EPS — are available through the same fluent API. Chain `.format('png')` before `.generate()` to switch formats on the fly.
+  All output formats — SVG, PNG, WebP, and EPS — are available through the same
+  fluent API. Chain `.format('png')` before `.generate()` to switch formats on
+  the fly.
 </Tip>

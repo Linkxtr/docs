@@ -15,13 +15,16 @@ php artisan qr:generate
 ```
 
 The prompt sequence:
+
 1. **Payload** — what to encode (e.g. a URL or plain text)
 2. **Output path** — where to save the file (leave blank to print to the console)
 3. **Format** — `svg`, `png`, `webp`, or `eps` (shown only when an output path is provided)
 4. **Advanced options** — confirm whether to configure size, colors, margin, and error correction
 
 <Note>
-  If you have already passed any advanced flag (e.g. `--size`), the advanced-options prompt defaults to **yes** so you can fill in the remaining fields interactively.
+  If you have already passed any advanced flag (e.g. `--size`), the
+  advanced-options prompt defaults to **yes** so you can fill in the remaining
+  fields interactively.
 </Note>
 
 ## Non-interactive mode
@@ -61,15 +64,19 @@ php artisan qr:generate "https://example.com" --format=png > public/qr.png
 ## All available options
 
 <ParamField path="data" type="string">
-  **Positional argument.** The payload to encode in the QR code. Omit it to enter interactive mode.
+  **Positional argument.** The payload to encode in the QR code. Omit it to
+  enter interactive mode.
 </ParamField>
 
 <ParamField path="--output / -O" type="string">
-  File path to save the generated QR code (e.g. `public/qr.svg`, `storage/app/exports/badge.png`). If omitted, the output is printed to the console.
+  File path to save the generated QR code (e.g. `public/qr.svg`,
+  `storage/app/exports/badge.png`). If omitted, the output is printed to the
+  console.
 </ParamField>
 
 <ParamField path="--format / -F" type="string" default="svg">
-  Output format: `svg`, `png`, `webp`, or `eps`. Unlike the Blade component, the CLI supports all four formats including EPS for print workflows.
+  Output format: `svg`, `png`, `webp`, or `eps`. Unlike the Blade component, the
+  CLI supports all four formats including EPS for print workflows.
 </ParamField>
 
 <ParamField path="--size / -S" type="int" default="400">
@@ -77,7 +84,9 @@ php artisan qr:generate "https://example.com" --format=png > public/qr.png
 </ParamField>
 
 <ParamField path="--color / -C" type="string" default="0,0,0">
-  Foreground color as comma-separated RGB or RGBA integers. RGB channels are `0–255`; the optional alpha channel is `0–100`. Examples: `255,0,0` (red), `0,102,204,80` (blue at 80 % opacity).
+  Foreground color as comma-separated RGB or RGBA integers. RGB channels are
+  `0–255`; the optional alpha channel is `0–100`. Examples: `255,0,0` (red),
+  `0,102,204,80` (blue at 80 % opacity).
 </ParamField>
 
 <ParamField path="--backgroundColor / -B" type="string" default="255,255,255">
@@ -85,7 +94,8 @@ php artisan qr:generate "https://example.com" --format=png > public/qr.png
 </ParamField>
 
 <ParamField path="--errorCorrection / -E" type="string" default="M">
-  Error correction level: `L` (7 %), `M` (15 %), `Q` (25 %), or `H` (30 %). Use `H` when overlaying a logo to ensure the QR code remains scannable.
+  Error correction level: `L` (7 %), `M` (15 %), `Q` (25 %), or `H` (30 %). Use
+  `H` when overlaying a logo to ensure the QR code remains scannable.
 </ParamField>
 
 <ParamField path="--margin / -M" type="int" default="4">
@@ -128,25 +138,29 @@ Use the command in a shell loop to generate QR codes for a list of URLs in one g
 
 <CardGroup cols={2}>
   <Card title="Build scripts" icon="gears">
-    Generate static QR code assets during your deployment pipeline so they are always up to date without runtime generation overhead.
+    Generate static QR code assets during your deployment pipeline so they are
+    always up to date without runtime generation overhead.
   </Card>
   <Card title="Batch export" icon="layer-group">
-    Loop over a dataset and generate one QR code per record — product codes, event tickets, asset tags — without writing a custom Artisan command.
+    Loop over a dataset and generate one QR code per record — product codes,
+    event tickets, asset tags — without writing a custom Artisan command.
   </Card>
   <Card title="CI/CD pipelines" icon="circle-check">
-    Validate that QR generation works in your environment after every deploy by running a quick smoke test command in your pipeline.
+    Validate that QR generation works in your environment after every deploy by
+    running a quick smoke test command in your pipeline.
   </Card>
   <Card title="Local testing" icon="flask">
-    Preview QR code output for any format or option combination instantly, without spinning up a browser or writing throwaway PHP.
+    Preview QR code output for any format or option combination instantly,
+    without spinning up a browser or writing throwaway PHP.
   </Card>
 </CardGroup>
 
 ## Exit codes
 
-| Code | Meaning |
-|------|---------|
-| `0` | QR code generated successfully |
-| `1` | Validation error (invalid size, color format, error correction level) or file write failure |
+| Code | Meaning                                                                                     |
+| ---- | ------------------------------------------------------------------------------------------- |
+| `0`  | QR code generated successfully                                                              |
+| `1`  | Validation error (invalid size, color format, error correction level) or file write failure |
 
 Scripts can check `$?` immediately after the command to detect and handle failures:
 
@@ -162,14 +176,17 @@ fi
 ## Naming conventions
 
 <Warning>
-  The CLI flags use **camelCase** (e.g. `--errorCorrection`, `--backgroundColor`) while the `config/qrcode.php` keys use **snake_case** (e.g. `error_correction`, `background_color`). When translating your config values to CLI flags, remember to convert the case.
+  The CLI flags use **camelCase** (e.g. `--errorCorrection`,
+  `--backgroundColor`) while the `config/qrcode.php` keys use **snake_case**
+  (e.g. `error_correction`, `background_color`). When translating your config
+  values to CLI flags, remember to convert the case.
 </Warning>
 
-| `config/qrcode.php` key | CLI flag |
-|------------------------|----------|
-| `error_correction` | `--errorCorrection` / `-E` |
-| `background_color` | `--backgroundColor` / `-B` |
-| `format` | `--format` / `-F` |
-| `size` | `--size` / `-S` |
-| `margin` | `--margin` / `-M` |
-| `color` | `--color` / `-C` |
+| `config/qrcode.php` key | CLI flag                   |
+| ----------------------- | -------------------------- |
+| `error_correction`      | `--errorCorrection` / `-E` |
+| `background_color`      | `--backgroundColor` / `-B` |
+| `format`                | `--format` / `-F`          |
+| `size`                  | `--size` / `-S`            |
+| `margin`                | `--margin` / `-M`          |
+| `color`                 | `--color` / `-C`           |

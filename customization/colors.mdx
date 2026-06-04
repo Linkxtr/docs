@@ -31,7 +31,9 @@ QrCode::color(220, 38, 38, 50)
 ```
 
 <Warning>
-  Alpha values use a **0–100 scale**, not the 0–255 scale you may be used to from CSS or image editors. The package converts this to the correct internal representation automatically.
+  Alpha values use a **0–100 scale**, not the 0–255 scale you may be used to
+  from CSS or image editors. The package converts this to the correct internal
+  representation automatically.
 </Warning>
 
 ## CMYK
@@ -47,7 +49,8 @@ QrCode::cmyk()
 ```
 
 <Note>
-  Gradients are only available in RGB mode. Calling `gradient()` while in CMYK mode is not supported.
+  Gradients are only available in RGB mode. Calling `gradient()` while in CMYK
+  mode is not supported.
 </Note>
 
 You can switch back to RGB at any point by calling `rgb()`.
@@ -95,16 +98,17 @@ QrCode::gradient([255, 165, 0], [255, 0, 128], 'diagonal')
 
 ### Gradient Types
 
-| Value | Direction |
-|-------|-----------|
-| `vertical` | Top to bottom |
-| `horizontal` | Left to right |
-| `diagonal` | Top-left to bottom-right |
-| `inverse_diagonal` | Top-right to bottom-left |
-| `radial` | Radiates outward from the center |
+| Value              | Direction                        |
+| ------------------ | -------------------------------- |
+| `vertical`         | Top to bottom                    |
+| `horizontal`       | Left to right                    |
+| `diagonal`         | Top-left to bottom-right         |
+| `inverse_diagonal` | Top-right to bottom-left         |
+| `radial`           | Radiates outward from the center |
 
 <Warning>
-  Gradients are only available in **RGB mode**. Using `gradient()` after calling `cmyk()` is not supported.
+  Gradients are only available in **RGB mode**. Using `gradient()` after calling
+  `cmyk()` is not supported.
 </Warning>
 
 ## Per-Eye Color Overrides

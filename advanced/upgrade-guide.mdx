@@ -7,18 +7,20 @@ description: "Complete upgrade instructions for moving from linkxtr/laravel-qrco
 Version 2.x is a significant release that upgrades the underlying `bacon/bacon-qr-code` library from v2 to v3, hardens the API with strict types, and drops legacy compatibility layers. Most applications need only a few targeted changes to upgrade cleanly.
 
 <Note>
-  **Laravel 10 users:** v2.x requires Laravel 11+ and PHP 8.2+. If you are on Laravel 10 or PHP 8.1, stay on v1.x — it receives maintenance fixes and is the supported path for those environments.
+  **Laravel 10 users:** v2.x requires Laravel 11+ and PHP 8.2+. If you are on
+  Laravel 10 or PHP 8.1, stay on v1.x — it receives maintenance fixes and is the
+  supported path for those environments.
 </Note>
 
 ## System Requirements
 
-| Requirement | v1.x | v2.x |
-|---|---|---|
-| PHP | 8.1+ | **8.2+** |
-| Laravel | 10+ | **11+** |
-| ext-gd | Required | Required |
+| Requirement | v1.x     | v2.x                   |
+| ----------- | -------- | ---------------------- |
+| PHP         | 8.1+     | **8.2+**               |
+| Laravel     | 10+      | **11+**                |
+| ext-gd      | Required | Required               |
 | ext-imagick | Optional | Optional (recommended) |
-| Composer | 2.x | 2.x |
+| Composer    | 2.x      | 2.x                    |
 
 ## Breaking Changes
 
@@ -27,78 +29,84 @@ Review every item below before running the upgrade command. Most changes affect 
 <Accordion title="1. PHP and Laravel version requirements raised">
   The minimum PHP version is now **8.2** and the minimum Laravel version is **11.0**, matching the requirements of `bacon/bacon-qr-code` v3.
 
-  If your `composer.json` pins PHP or Laravel to an older constraint, update it first:
+If your `composer.json` pins PHP or Laravel to an older constraint, update it first:
 
-  ```json
-  "require": {
-      "php": "^8.2",
-      "laravel/framework": "^11.0"
-  }
-  ```
+```json
+"require": {
+    "php": "^8.2",
+    "laravel/framework": "^11.0"
+}
+```
+
 </Accordion>
 
 <Accordion title="2. Direct use of upstream library classes (advanced)">
   This item only applies if your application imports classes from the `BaconQrCode` library directly — for example, in a custom renderer or a low-level integration. If you only use the `QrCode` facade, the Blade component, or constructor injection, you are **not affected** and can skip this item.
 
-  The underlying `bacon/bacon-qr-code` library reorganized several namespaces between its v2 and v3 releases. Notable changes include:
+The underlying `bacon/bacon-qr-code` library reorganized several namespaces between its v2 and v3 releases. Notable changes include:
 
-  | Old class | New class |
-  |---|---|
-  | `BaconQrCode\Writer` | `BaconQrCode\Writer\Writer` |
-  | `BaconQrCode\Common\ErrorCorrectionLevel` | Constants updated — see the [bacon/bacon-qr-code releases](https://github.com/Bacon/BaconQrCode/releases) |
+| Old class                                 | New class                                                                                                 |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `BaconQrCode\Writer`                      | `BaconQrCode\Writer\Writer`                                                                               |
+| `BaconQrCode\Common\ErrorCorrectionLevel` | Constants updated — see the [bacon/bacon-qr-code releases](https://github.com/Bacon/BaconQrCode/releases) |
+
 </Accordion>
 
 <Accordion title="3. color() and backgroundColor() now require integers">
   Both methods now enforce **integer** arguments (0–255 for RGB, 0–100 for CMYK and alpha). Passing strings throws a type error.
 
-  ```php
-  // ❌ v1.x — strings were silently accepted
-  QrCode::color('255', '0', '0');
+```php
+// ❌ v1.x — strings were silently accepted
+QrCode::color('255', '0', '0');
 
-  // ✅ v2.x — integers required
-  QrCode::color(255, 0, 0);
-  ```
+// ✅ v2.x — integers required
+QrCode::color(255, 0, 0);
+```
 
-  Search your codebase for calls to `->color(` and `->backgroundColor(` and confirm all arguments are integer literals or variables typed as `int`.
+Search your codebase for calls to `->color(` and `->backgroundColor(` and confirm all arguments are integer literals or variables typed as `int`.
+
 </Accordion>
 
 <Accordion title="4. simplesoftwareio/simple-qrcode compatibility dropped">
   v2.x removes the compatibility layer that allowed the `QrCode` facade to act as a drop-in replacement for `simplesoftwareio/simple-qrcode`. If you migrated from that package and relied on any method signatures that do not exist in `linkxtr/laravel-qrcode`'s own API, you will need to update those call sites to use the new API.
 
-  Check the [API reference in the README](https://github.com/Linkxtr/laravel-qrcode/blob/main/README.md#-api-reference) for the current method signatures.
+Check the [API reference in the README](https://github.com/Linkxtr/laravel-qrcode/blob/main/README.md#-api-reference) for the current method signatures.
+
 </Accordion>
 
 <Accordion title="5. Strict data validation — InvalidArgumentException on bad input">
   In v1.x, passing malformed data to type methods (such as a bad phone number or an incomplete WiFi config) could silently generate a corrupted QR code. In v2.x, all data types validate their inputs strictly and throw `InvalidArgumentException` on failure.
 
-  Wrap any call that accepts dynamic user input in a `try/catch`:
+Wrap any call that accepts dynamic user input in a `try/catch`:
 
-  ```php
-  use InvalidArgumentException;
+```php
+use InvalidArgumentException;
 
-  try {
-      $qr = QrCode::WiFi([
-          'ssid'       => $request->ssid,
-          'encryption' => $request->encryption,
-          'password'   => $request->password,
-      ]);
-  } catch (InvalidArgumentException $e) {
-      // Return validation error to the user
-      return back()->withErrors(['wifi' => $e->getMessage()]);
-  }
-  ```
+try {
+    $qr = QrCode::WiFi([
+        'ssid'       => $request->ssid,
+        'encryption' => $request->encryption,
+        'password'   => $request->password,
+    ]);
+} catch (InvalidArgumentException $e) {
+    // Return validation error to the user
+    return back()->withErrors(['wifi' => $e->getMessage()]);
+}
+```
+
 </Accordion>
 
 <Accordion title="6. Config defaults changed in v2.4.x">
   Starting in v2.4.0, the package ships with updated defaults to better reflect modern usage:
 
-  | Key | v1.x / pre-2.4 default | v2.4.x+ default |
-  |---|---|---|
-  | `format` | `png` | `svg` |
-  | `size` | `200` | `400` |
-  | `error_correction` | `H` | `M` |
+| Key                | v1.x / pre-2.4 default | v2.4.x+ default |
+| ------------------ | ---------------------- | --------------- |
+| `format`           | `png`                  | `svg`           |
+| `size`             | `200`                  | `400`           |
+| `error_correction` | `H`                    | `M`             |
 
-  If your application relied on the previous defaults and you have not published the config file, you may notice changes in QR code output after upgrading. Publish the config and set these values explicitly to lock in your preferred defaults.
+If your application relied on the previous defaults and you have not published the config file, you may notice changes in QR code output after upgrading. Publish the config and set these values explicitly to lock in your preferred defaults.
+
 </Accordion>
 
 ## Upgrade Steps
@@ -112,6 +120,7 @@ Review every item below before running the upgrade command. Most changes affect 
     ```
 
     Composer will pull in the latest v2.x release along with `bacon/bacon-qr-code` v3.
+
   </Step>
 
   <Step title="Update color() and backgroundColor() calls">
@@ -130,6 +139,7 @@ Review every item below before running the upgrade command. Most changes affect 
     ```bash
     grep -rn "->color\|->backgroundColor" app/ resources/
     ```
+
   </Step>
 
   <Step title="Publish and review the config file">
@@ -152,6 +162,7 @@ Review every item below before running the upgrade command. Most changes affect 
         'background_color' => [255, 255, 255],
     ];
     ```
+
   </Step>
 
   <Step title="Wrap dynamic inputs in try/catch">
@@ -167,6 +178,7 @@ Review every item below before running the upgrade command. Most changes affect 
         return response()->json(['error' => $e->getMessage()], 422);
     }
     ```
+
   </Step>
 
   <Step title="Clear cached config and views">
@@ -193,5 +205,7 @@ php artisan view:clear
 ```
 
 <Warning>
-  If you published `config/qrcode.php` during the v2.x migration and changed values, review the config after rolling back — the v1.x config schema may differ from v2.x.
+  If you published `config/qrcode.php` during the v2.x migration and changed
+  values, review the config after rolling back — the v1.x config schema may
+  differ from v2.x.
 </Warning>

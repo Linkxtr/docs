@@ -19,15 +19,18 @@ Set the shape used to draw each QR module (the individual dots that make up the 
 <ParamField body="style" type="string" required>
   The module style. Accepted values:
 
-  | Value | Description |
-  |-------|-------------|
-  | `square` | Standard filled squares (default) |
-  | `dot` | Circular dots |
-  | `round` | Squares with rounded corners |
+| Value    | Description                       |
+| -------- | --------------------------------- |
+| `square` | Standard filled squares (default) |
+| `dot`    | Circular dots                     |
+| `round`  | Squares with rounded corners      |
+
 </ParamField>
 
 <ParamField body="size" type="float">
-  Optional scaling factor for the module size, between `0.0` and `1.0`. Useful with `dot` style to add spacing between dots. Defaults to the renderer's built-in size.
+  Optional scaling factor for the module size, between `0.0` and `1.0`. Useful
+  with `dot` style to add spacing between dots. Defaults to the renderer's
+  built-in size.
 </ParamField>
 
 <CodeGroup>
@@ -59,11 +62,12 @@ Set the style of the three **outer** finder-pattern squares (the large corner sq
 <ParamField body="style" type="string" required>
   Accepted values:
 
-  | Value | Description |
-  |-------|-------------|
-  | `square` | Standard square outline (default) |
-  | `circle` | Circular outer ring |
-  | `pointy` | Square with pointed inner corners |
+| Value    | Description                       |
+| -------- | --------------------------------- |
+| `square` | Standard square outline (default) |
+| `circle` | Circular outer ring               |
+| `pointy` | Square with pointed inner corners |
+
 </ParamField>
 
 ```php
@@ -104,15 +108,19 @@ public function eyeColor(int $eyeNumber, string|array $inner, string|array|null 
 Override the color of a single finder-pattern eye. Call this method up to three times to style each eye independently.
 
 <ParamField body="eyeNumber" type="int" required>
-  The index of the eye to color. Accepted values: `0`, `1`, `2` (top-left, top-right, bottom-left respectively).
+  The index of the eye to color. Accepted values: `0`, `1`, `2` (top-left,
+  top-right, bottom-left respectively).
 </ParamField>
 
 <ParamField body="inner" type="string | array" required>
-  Color for the **inner** square of the eye. Pass a hex string (e.g. `'#e11d48'`) or an RGB array (e.g. `[225, 29, 72]`).
+  Color for the **inner** square of the eye. Pass a hex string (e.g.
+  `'#e11d48'`) or an RGB array (e.g. `[225, 29, 72]`).
 </ParamField>
 
 <ParamField body="outer" type="string | array | null">
-  Color for the **outer** ring of the eye. Accepts the same formats as `inner`. When `null`, the outer ring inherits the global foreground color set by `color()`.
+  Color for the **outer** ring of the eye. Accepts the same formats as `inner`.
+  When `null`, the outer ring inherits the global foreground color set by
+  `color()`.
 </ParamField>
 
 <CodeGroup>
@@ -151,7 +159,8 @@ public function size(int $size): static
 Set the output image width and height in pixels. The QR code is always square.
 
 <ParamField body="size" type="int" required>
-  Pixel dimensions for both width and height. The default from the package config is `400`.
+  Pixel dimensions for both width and height. The default from the package
+  config is `400`.
 </ParamField>
 
 ```php
@@ -189,12 +198,13 @@ Set the output image format.
 <ParamField body="format" type="string" required>
   Accepted values:
 
-  | Value | Requires | Notes |
-  |-------|----------|-------|
-  | `svg` | — | Default. Vector format; no PHP extension required. |
-  | `png` | `ext-imagick` or `ext-gd` | Raster format. Falls back to GD if Imagick is unavailable. |
-  | `webp` | `ext-imagick` | Raster format. Requires Imagick. |
-  | `eps` | — | PostScript vector. Image merging is not supported for EPS. |
+| Value  | Requires                  | Notes                                                      |
+| ------ | ------------------------- | ---------------------------------------------------------- |
+| `svg`  | —                         | Default. Vector format; no PHP extension required.         |
+| `png`  | `ext-imagick` or `ext-gd` | Raster format. Falls back to GD if Imagick is unavailable. |
+| `webp` | `ext-imagick`             | Raster format. Requires Imagick.                           |
+| `eps`  | —                         | PostScript vector. Image merging is not supported for EPS. |
+
 </ParamField>
 
 <CodeGroup>
@@ -224,7 +234,8 @@ public function encoding(string $encoding): static
 Set the character encoding used when converting the text payload to QR code data. The default is `UTF-8`, which handles most use cases including multibyte characters.
 
 <ParamField body="encoding" type="string" required>
-  Any valid PHP character encoding string, such as `UTF-8`, `ISO-8859-1`, or `Shift_JIS`.
+  Any valid PHP character encoding string, such as `UTF-8`, `ISO-8859-1`, or
+  `Shift_JIS`.
 </ParamField>
 
 ```php
@@ -244,16 +255,19 @@ Set the Reed–Solomon error correction level. Higher correction means the QR co
 <ParamField body="errorCorrection" type="string" required>
   Accepted values:
 
-  | Level | Recovery capacity | Typical use |
-  |-------|-------------------|-------------|
-  | `L` | ~7% | Maximum data density; minimal redundancy |
-  | `M` | ~15% | Balanced default for most use cases |
-  | `Q` | ~25% | Good choice when embedding a logo |
-  | `H` | ~30% | Best durability; use for printed materials |
+| Level | Recovery capacity | Typical use                                |
+| ----- | ----------------- | ------------------------------------------ |
+| `L`   | ~7%               | Maximum data density; minimal redundancy   |
+| `M`   | ~15%              | Balanced default for most use cases        |
+| `Q`   | ~25%              | Good choice when embedding a logo          |
+| `H`   | ~30%              | Best durability; use for printed materials |
+
 </ParamField>
 
 <Tip>
-  Use `H` error correction when you overlay a logo using `merge()` or `mergeString()`. The extra redundancy ensures scanners can still read the code even though part of it is covered.
+  Use `H` error correction when you overlay a logo using `merge()` or
+  `mergeString()`. The extra redundancy ensures scanners can still read the code
+  even though part of it is covered.
 </Tip>
 
 <CodeGroup>

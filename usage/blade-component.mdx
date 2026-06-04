@@ -7,7 +7,10 @@ description: "Drop the <x-qr-code> Blade component into any template to render Q
 The `<x-qr-code>` Blade component is the simplest way to display QR codes directly in your templates. Pass your content as the `data` prop, add any styling options you need, and the component takes care of the rest — including accessibility attributes, inline SVG rendering, and base64-encoded image embedding for PNG and WebP output.
 
 <Tip>
-  The Blade component is the recommended choice for templates. It handles HTML escaping, accessibility markup, and binary-to-base64 conversion automatically. For programmatic generation in controllers or jobs, use the [QrCode facade](/usage/facade) instead.
+  The Blade component is the recommended choice for templates. It handles HTML
+  escaping, accessibility markup, and binary-to-base64 conversion automatically.
+  For programmatic generation in controllers or jobs, use the [QrCode
+  facade](/usage/facade) instead.
 </Tip>
 
 ## Basic usage
@@ -21,7 +24,8 @@ This renders an inline SVG QR code at the default size of 100 px. No PHP imports
 ## Available props
 
 <ParamField path="data" type="string" required>
-  The payload to encode. This is the only required prop. Pass any string: a URL, plain text, a phone number, etc.
+  The payload to encode. This is the only required prop. Pass any string: a URL,
+  plain text, a phone number, etc.
 </ParamField>
 
 <ParamField path="size" type="int" default="100">
@@ -29,11 +33,13 @@ This renders an inline SVG QR code at the default size of 100 px. No PHP imports
 </ParamField>
 
 <ParamField path="format" type="string" default="svg">
-  Output format: `svg`, `png`, or `webp`. EPS is **not** supported in the Blade component.
+  Output format: `svg`, `png`, or `webp`. EPS is **not** supported in the Blade
+  component.
 </ParamField>
 
 <ParamField path="color" type="string">
-  Foreground color as a hex string (e.g. `#ff0000`) or a comma-separated RGB value (e.g. `255,0,0`).
+  Foreground color as a hex string (e.g. `#ff0000`) or a comma-separated RGB
+  value (e.g. `255,0,0`).
 </ParamField>
 
 <ParamField path="backgroundColor" type="string">
@@ -49,7 +55,8 @@ This renders an inline SVG QR code at the default size of 100 px. No PHP imports
 </ParamField>
 
 <ParamField path="errorCorrection" type="string">
-  Error correction level: `L` (7 %), `M` (15 %), `Q` (25 %), or `H` (30 %). Defaults to the value in `config/qrcode.php` (package default `M`).
+  Error correction level: `L` (7 %), `M` (15 %), `Q` (25 %), or `H` (30 %).
+  Defaults to the value in `config/qrcode.php` (package default `M`).
 </ParamField>
 
 <ParamField path="encoding" type="string">
@@ -61,27 +68,35 @@ This renders an inline SVG QR code at the default size of 100 px. No PHP imports
 </ParamField>
 
 <ParamField path="gradient" type="string">
-  A gradient color pair as two hex or RGB values separated by `;` (e.g. `#0000ff;#ff0000`). The component maps the pair to start and end colors.
+  A gradient color pair as two hex or RGB values separated by `;` (e.g.
+  `#0000ff;#ff0000`). The component maps the pair to start and end colors.
 </ParamField>
 
 <ParamField path="gradientType" type="string">
-  Direction of the gradient: `vertical` or `horizontal`. Only applied when `gradient` is also set.
+  Direction of the gradient: `vertical` or `horizontal`. Only applied when
+  `gradient` is also set.
 </ParamField>
 
 <ParamField path="merge" type="string">
-  Absolute file path to an image (e.g. a logo) to overlay at the center. Supported for `svg`, `png`, and `webp` formats.
+  Absolute file path to an image (e.g. a logo) to overlay at the center.
+  Supported for `svg`, `png`, and `webp` formats.
 </ParamField>
 
 <ParamField path="mergeString" type="string">
-  Raw binary image content to overlay at the center, as an alternative to `merge` when you have the image data in memory rather than on disk. Supported for `svg`, `png`, and `webp` formats. Only one of `merge` or `mergeString` is applied; `merge` takes precedence if both are set.
+  Raw binary image content to overlay at the center, as an alternative to
+  `merge` when you have the image data in memory rather than on disk. Supported
+  for `svg`, `png`, and `webp` formats. Only one of `merge` or `mergeString` is
+  applied; `merge` takes precedence if both are set.
 </ParamField>
 
 <ParamField path="mergePercentage" type="float" default="0.2">
-  The size of the merged image as a fraction of the total QR code size (e.g. `0.3` = 30 %). Applied when either `merge` or `mergeString` is set.
+  The size of the merged image as a fraction of the total QR code size (e.g.
+  `0.3` = 30 %). Applied when either `merge` or `mergeString` is set.
 </ParamField>
 
 <ParamField path="eyeColor0" type="string">
-  Color(s) for finder eye 0. Accepts one or two hex/RGB values separated by `;` — the first for the inner eye, the second for the outer eye ring.
+  Color(s) for finder eye 0. Accepts one or two hex/RGB values separated by `;`
+  — the first for the inner eye, the second for the outer eye ring.
 </ParamField>
 
 <ParamField path="eyeColor1" type="string">
@@ -93,7 +108,9 @@ This renders an inline SVG QR code at the default size of 100 px. No PHP imports
 </ParamField>
 
 <Warning>
-  EPS format is not supported in the Blade component. Using `format="eps"` throws an `InvalidConfigurationException`. For EPS output, use the [QrCode facade](/usage/facade) directly.
+  EPS format is not supported in the Blade component. Using `format="eps"`
+  throws an `InvalidConfigurationException`. For EPS output, use the [QrCode
+  facade](/usage/facade) directly.
 </Warning>
 
 ## Accessibility
@@ -208,6 +225,7 @@ Because `<x-qr-code>` is a standard Blade component, you can pass arbitrary HTML
     ```blade
     <x-qr-code data="https://example.com" format="svg" size="200" />
     ```
+
   </Tab>
   <Tab title="PNG">
     PNG is a raster format rendered server-side and embedded as a base64 `data:` URI:
@@ -219,6 +237,7 @@ Because `<x-qr-code>` is a standard Blade component, you can pass arbitrary HTML
     ```blade
     <x-qr-code data="https://example.com" format="png" size="300" />
     ```
+
   </Tab>
   <Tab title="WebP">
     WebP offers better compression than PNG at similar quality:
@@ -230,6 +249,7 @@ Because `<x-qr-code>` is a standard Blade component, you can pass arbitrary HTML
     ```blade
     <x-qr-code data="https://example.com" format="webp" size="300" />
     ```
+
   </Tab>
 </Tabs>
 
@@ -246,10 +266,10 @@ The `<x-qr-code>` component works inside Livewire and Alpine.js views with no ex
 
 ## Comparing the component to the facade
 
-| | `<x-qr-code>` component | `QrCode` facade |
-|---|---|---|
-| Ideal for | Blade templates | Controllers, jobs, services |
-| Escaping | Handled automatically | Use `{!! !!}` for SVG |
-| Accessibility | Automatic `aria-label` / `role` | Manual |
-| PNG/WebP in HTML | Inline base64 `<img>` | Raw binary — handle manually |
-| EPS support | ❌ Not supported | ✅ Supported |
+|                  | `<x-qr-code>` component         | `QrCode` facade              |
+| ---------------- | ------------------------------- | ---------------------------- |
+| Ideal for        | Blade templates                 | Controllers, jobs, services  |
+| Escaping         | Handled automatically           | Use `{!! !!}` for SVG        |
+| Accessibility    | Automatic `aria-label` / `role` | Manual                       |
+| PNG/WebP in HTML | Inline base64 `<img>`           | Raw binary — handle manually |
+| EPS support      | ❌ Not supported                | ✅ Supported                 |

@@ -17,11 +17,15 @@ Render the QR code for `$text` and, if you supply a `$filename`, write the outpu
 ### Parameters
 
 <ParamField body="text" type="string" required>
-  The data payload to encode — a URL, plain string, or the pre-formatted output from any data-type method.
+  The data payload to encode — a URL, plain string, or the pre-formatted output
+  from any data-type method.
 </ParamField>
 
 <ParamField body="filename" type="string | null">
-  Absolute or app-relative path where the QR code should be saved (e.g. `storage_path('app/qrcodes/qr.svg')`). The **directory must already exist and be writable**; the package will not create it for you. When omitted, the QR code is generated in memory only.
+  Absolute or app-relative path where the QR code should be saved (e.g.
+  `storage_path('app/qrcodes/qr.svg')`). The **directory must already exist and
+  be writable**; the package will not create it for you. When omitted, the QR
+  code is generated in memory only.
 </ParamField>
 
 ### Return value
@@ -54,7 +58,10 @@ Render the QR code for `$text` and, if you supply a `$filename`, write the outpu
 ### Exceptions
 
 <Warning>
-  `CannotWriteFileException` is thrown when you supply a `$filename` and either the parent directory does not exist or the process lacks write permission. Always ensure the directory exists before calling `generate()` with a filename.
+  `CannotWriteFileException` is thrown when you supply a `$filename` and either
+  the parent directory does not exist or the process lacks write permission.
+  Always ensure the directory exists before calling `generate()` with a
+  filename.
 </Warning>
 
 ---
@@ -66,53 +73,59 @@ You do not need to construct a `Generator` manually. The `QrCode` facade exposes
 <ParamField query="size" type="int">
   Set the width and height of the QR code in pixels. Returns a cloned `Generator`.
 
-  ```php
-  QrCode::size(300)->generate('https://example.com');
-  ```
+```php
+QrCode::size(300)->generate('https://example.com');
+```
+
 </ParamField>
 
 <ParamField query="format" type="string">
   Set the output format before calling `generate()`. Accepted values: `svg`, `png`, `webp`, `eps`. Returns a cloned `Generator`.
 
-  ```php
-  QrCode::format('png')->generate('https://example.com');
-  ```
+```php
+QrCode::format('png')->generate('https://example.com');
+```
+
 </ParamField>
 
 <ParamField query="margin" type="int">
   Set the quiet-zone (whitespace) margin around the QR code in pixels. Returns a cloned `Generator`.
 
-  ```php
-  QrCode::margin(2)->generate('https://example.com');
-  ```
+```php
+QrCode::margin(2)->generate('https://example.com');
+```
+
 </ParamField>
 
 <ParamField query="errorCorrection" type="string">
   Set the Reed–Solomon error correction level. Accepted values: `L` (7%), `M` (15%), `Q` (25%), `H` (30%). Returns a cloned `Generator`.
 
-  ```php
-  QrCode::errorCorrection('H')->generate('Critical data');
-  ```
+```php
+QrCode::errorCorrection('H')->generate('Critical data');
+```
+
 </ParamField>
 
 <ParamField query="encoding" type="string">
   Set the character encoding used when encoding the payload. Defaults to `UTF-8`. Returns a cloned `Generator`.
 
-  ```php
-  QrCode::encoding('UTF-8')->generate('Unicode: こんにちは');
-  ```
+```php
+QrCode::encoding('UTF-8')->generate('Unicode: こんにちは');
+```
+
 </ParamField>
 
 <Note>
   Because every fluent method returns a **clone**, you can safely store a base configuration and derive variations from it without side-effects:
 
-  ```php
-  $base = QrCode::size(300)->errorCorrection('H');
+```php
+$base = QrCode::size(300)->errorCorrection('H');
 
-  $red = $base->color(220, 38, 38)->generate('Red QR');
-  $blue = $base->color(37, 99, 235)->generate('Blue QR');
-  // $base is unchanged
-  ```
+$red = $base->color(220, 38, 38)->generate('Red QR');
+$blue = $base->color(37, 99, 235)->generate('Blue QR');
+// $base is unchanged
+```
+
 </Note>
 
 ---

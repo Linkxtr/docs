@@ -16,7 +16,9 @@ When you call an unrecognized method on the `QrCode` facade (such as `QrCode::Sp
 Any other return type causes an exception at runtime. Always return either a `string` or the result of `$this->generate()`.
 
 <Note>
-  Inside a macro closure, `$this` refers to the `Generator` instance. You can call any fluent builder method — `size()`, `margin()`, `format()`, `color()`, and so on — directly on `$this`.
+  Inside a macro closure, `$this` refers to the `Generator` instance. You can
+  call any fluent builder method — `size()`, `margin()`, `format()`, `color()`,
+  and so on — directly on `$this`.
 </Note>
 
 ## Registering Macros
@@ -159,5 +161,8 @@ You can still chain builder methods before calling a macro. The chained options 
 </Warning>
 
 <Tip>
-  Macros are ideal for standardizing QR generation patterns across your application. Define one macro per business concept — `AssetTag`, `ProductLabel`, `EventTicket` — and every developer on your team gets a consistent, documented interface without having to know the payload format.
+  Macros are ideal for standardizing QR generation patterns across your
+  application. Define one macro per business concept — `AssetTag`,
+  `ProductLabel`, `EventTicket` — and every developer on your team gets a
+  consistent, documented interface without having to know the payload format.
 </Tip>

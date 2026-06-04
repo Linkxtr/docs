@@ -8,55 +8,67 @@ Laravel QR Code gives you a clean, fluent API for generating QR codes in any Lar
 
 <CardGroup cols={2}>
   <Card title="Fluent Facade" icon="wand-magic-sparkles">
-    Chain methods on `QrCode::` to set size, color, format, and error correction — then call `generate()` to get the result.
+    Chain methods on `QrCode::` to set size, color, format, and error correction
+    — then call `generate()` to get the result.
   </Card>
   <Card title="Blade Component" icon="code">
-    Drop `<x-qr-code data="…" />` into any template and get an accessible, inline SVG or base64 image with no extra PHP.
+    Drop `<x-qr-code data="…" />` into any template and get an accessible,
+    inline SVG or base64 image with no extra PHP.
   </Card>
   <Card title="Artisan CLI" icon="terminal">
-    Run `php artisan qr:generate` for interactive generation or pass flags for scripted, non-interactive output.
+    Run `php artisan qr:generate` for interactive generation or pass flags for
+    scripted, non-interactive output.
   </Card>
   <Card title="Rich Data Types" icon="database">
-    Built-in helpers for URLs, Email, SMS, WiFi, vCard, MeCard, Geo, WhatsApp, Telegram, Calendar Events, BTC, and Ethereum.
+    Built-in helpers for URLs, Email, SMS, WiFi, vCard, MeCard, Geo, WhatsApp,
+    Telegram, Calendar Events, BTC, and Ethereum.
   </Card>
   <Card title="Multiple Formats" icon="file-image">
-    Output SVG (default, no extensions needed), PNG, WebP, or EPS. PNG and WebP use Imagick when available, GD otherwise.
+    Output SVG (default, no extensions needed), PNG, WebP, or EPS. PNG and WebP
+    use Imagick when available, GD otherwise.
   </Card>
   <Card title="Deep Customization" icon="palette">
-    Control colors (RGB, RGBA, CMYK, grayscale), gradients, dot/round/square module styles, eye styles, image merging, and error correction levels.
+    Control colors (RGB, RGBA, CMYK, grayscale), gradients, dot/round/square
+    module styles, eye styles, image merging, and error correction levels.
   </Card>
   <Card title="Auto-Discovery" icon="bolt">
-    The service provider and `QrCode` facade alias are registered automatically — no `config/app.php` edits required.
+    The service provider and `QrCode` facade alias are registered automatically
+    — no `config/app.php` edits required.
   </Card>
   <Card title="Macros" icon="puzzle-piece">
-    Register your own named data types with Laravel's `Macroable` trait and call them as first-class facade methods.
+    Register your own named data types with Laravel's `Macroable` trait and call
+    them as first-class facade methods.
   </Card>
 </CardGroup>
 
 ## Requirements
 
-| Dependency | Required version |
-|---|---|
-| PHP | 8.2 or higher |
-| Laravel | 11.0 or higher |
-| `ext-imagick` | Optional — recommended for PNG/WebP performance |
-| `ext-gd` | Optional — automatic fallback for PNG/WebP when Imagick is absent |
+| Dependency    | Required version                                                  |
+| ------------- | ----------------------------------------------------------------- |
+| PHP           | 8.2 or higher                                                     |
+| Laravel       | 11.0 or higher                                                    |
+| `ext-imagick` | Optional — recommended for PNG/WebP performance                   |
+| `ext-gd`      | Optional — automatic fallback for PNG/WebP when Imagick is absent |
 
 <Note>
-  SVG and EPS generation require no PHP image extensions. `ext-imagick` or `ext-gd` is only needed when you output PNG or WebP.
+  SVG and EPS generation require no PHP image extensions. `ext-imagick` or
+  `ext-gd` is only needed when you output PNG or WebP.
 </Note>
 
 ## Version guidance
 
-| Package version | PHP | Laravel | Status |
-|---|---|---|---|
-| **v2.x** (current) | 8.2+ | 11+ | Active development |
-| v1.x | 8.1+ | 10 | Maintenance only |
+| Package version    | PHP  | Laravel | Status             |
+| ------------------ | ---- | ------- | ------------------ |
+| **v3.x** (current) | 8.2+ | 11+     | Active development |
+| v2.x               | 8.2+ | 11+     | Maintenance only   |
+| v1.x               | 8.1+ | 10      | Maintenance only   |
 
-Always install `linkxtr/laravel-qrcode` without a version constraint to get the latest v2.x release. If your project runs Laravel 10, pin to `^1.0` instead.
+Always install `linkxtr/laravel-qrcode` without a version constraint to get the latest v3.x release. If your project runs Laravel 10, pin to `^1.0` instead.
 
 <Tip>
-  Upgrading from v1.x? Read the [Upgrade Guide](https://github.com/Linkxtr/laravel-qrcode/blob/main/docs/UPGRADE-2.0.md) before updating — the v2 API is a breaking change from the `simplesoftwareio/simple-qrcode`-compatible v1 interface.
+  Upgrading from v2.x? Read the [Upgrade
+  Guide](https://github.com/Linkxtr/laravel-qrcode/blob/main/docs/UPGRADE-3.0.md)
+  before updating — the v3 API is a breaking change from the v2 interface.
 </Tip>
 
 ## Next steps
