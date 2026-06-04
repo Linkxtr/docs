@@ -12,7 +12,13 @@
     "primary": {
       "type": "github",
       "href": "https://github.com/Linkxtr/laravel-qrcode"
-    }
+    },
+    "links": [
+      {
+        "href": "https://buymeacoffee.com/khaled.sadek",
+        "label": "Support Me"
+      }
+    ]
   },
   "navigation": {
     "tabs": [
