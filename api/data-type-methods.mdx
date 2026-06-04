@@ -26,29 +26,35 @@ try {
 ## Email()
 
 ```php
-QrCode::Email(string $address, string $subject = '', string $body = '', string $cc = '', string $bcc = ''): QrCodeResult
+QrCode::Email(
+    string $address,
+    ?string $subject = null,
+    ?string $body = null,
+    ?string $cc = null,
+    ?string $bcc = null,
+): QrCodeResult
 ```
 
-Generate a `mailto:` QR code.
+Generate a `mailto:` QR code. The `address`, `cc`, and `bcc` values are validated with `FILTER_VALIDATE_EMAIL`; an invalid value throws `InvalidEmailArgumentException`.
 
 <ParamField body="address" type="string" required>
-  The primary recipient email address.
+  The primary recipient email address. Must be a valid email.
 </ParamField>
 
-<ParamField body="subject" type="string">
-  Pre-filled subject line. Defaults to an empty string.
+<ParamField body="subject" type="string | null">
+  Pre-filled subject line. Defaults to `null`.
 </ParamField>
 
-<ParamField body="body" type="string">
-  Pre-filled message body. Defaults to an empty string.
+<ParamField body="body" type="string | null">
+  Pre-filled message body. Defaults to `null`.
 </ParamField>
 
-<ParamField body="cc" type="string">
-  Carbon copy address. Defaults to an empty string.
+<ParamField body="cc" type="string | null">
+  Carbon copy address. Must be a valid email when provided.
 </ParamField>
 
-<ParamField body="bcc" type="string">
-  Blind carbon copy address. Defaults to an empty string.
+<ParamField body="bcc" type="string | null">
+  Blind carbon copy address. Must be a valid email when provided.
 </ParamField>
 
 ```php
@@ -83,17 +89,17 @@ QrCode::PhoneNumber('+12025551234');
 ## SMS()
 
 ```php
-QrCode::SMS(string $smsAddress = '', string $message = ''): QrCodeResult
+QrCode::SMS(string|int|float $phoneNumber, ?string $message = null): QrCodeResult
 ```
 
-Generate an `smsto:` QR code that opens the device SMS app.
+Generate an `sms:` QR code that opens the device SMS app.
 
-<ParamField body="smsAddress" type="string">
-  The recipient phone number. Defaults to an empty string.
+<ParamField body="phoneNumber" type="string | int | float" required>
+  The recipient phone number, ideally in E.164 format (e.g. `+12025551234`).
 </ParamField>
 
-<ParamField body="message" type="string">
-  Pre-filled SMS message text. Defaults to an empty string.
+<ParamField body="message" type="string | null">
+  Pre-filled SMS message text. Defaults to `null`.
 </ParamField>
 
 ```php
@@ -193,30 +199,48 @@ QrCode::WiFi([
 ## BTC()
 
 ```php
-QrCode::BTC(string $address, int|float|string $amount, array $options = []): QrCodeResult
+QrCode::BTC(
+    string $address,
+    float|string $amount,
+    ?string $label = null,
+    ?string $message = null,
+    ?string $returnAddress = null,
+): QrCodeResult
 ```
 
 Generate a Bitcoin payment request QR code using the `bitcoin:` URI scheme (BIP 21).
 
 <ParamField body="address" type="string" required>
-  The Bitcoin wallet address.
+  The Bitcoin wallet address. Must be a non-empty string.
 </ParamField>
 
-<ParamField body="amount" type="int | float | string" required>
+<ParamField body="amount" type="float | string" required>
   The requested amount in BTC (e.g. `0.005`). Must be a non-negative numeric
-  value.
+  value. Pass as a string for very small amounts to avoid floating-point
+  precision issues.
 </ParamField>
 
-<ParamField body="options" type="array">
-  An optional associative array of additional BIP 21 parameters such as `label`,
-  `message`, or `r` (payment protocol URL).
+<ParamField body="label" type="string | null">
+  Human-readable label for the payment destination (maps to the `label` query
+  parameter).
+</ParamField>
+
+<ParamField body="message" type="string | null">
+  Note attached to the payment request (maps to the `message` query parameter).
+</ParamField>
+
+<ParamField body="returnAddress" type="string | null">
+  URL the wallet should redirect to after the transaction is broadcast (maps to
+  the `r` query parameter).
 </ParamField>
 
 ```php
-QrCode::BTC('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', 0.005, [
-    'label'   => 'Donation',
-    'message' => 'Thanks for your support!',
-]);
+QrCode::BTC(
+    address: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
+    amount:  0.005,
+    label:   'Donation',
+    message: 'Thanks for your support!',
+);
 ```
 
 ---
@@ -267,23 +291,41 @@ Generate a vCard 3.0 QR code for contact sharing.
     <ParamField body="name" type="string" required>
       Full display name (`FN` field). Must not be empty.
     </ParamField>
-    <ParamField body="first_name" type="string">
+    <ParamField body="firstName" type="string">
       First name component used in the structured `N` field.
     </ParamField>
-    <ParamField body="last_name" type="string">
+    <ParamField body="lastName" type="string">
       Last name component used in the structured `N` field.
     </ParamField>
     <ParamField body="email" type="string">
       Internet email address.
     </ParamField>
+    <ParamField body="emailWork" type="string">
+      Work email address (`EMAIL;type=INTERNET,WORK`).
+    </ParamField>
+    <ParamField body="emailHome" type="string">
+      Home email address (`EMAIL;type=INTERNET,HOME`).
+    </ParamField>
     <ParamField body="phone" type="string">
       General phone number.
+    </ParamField>
+    <ParamField body="phoneWork" type="string">
+      Work phone number (`TEL;type=WORK`).
+    </ParamField>
+    <ParamField body="phoneHome" type="string">
+      Home phone number (`TEL;type=HOME`).
+    </ParamField>
+    <ParamField body="phoneCell" type="string">
+      Mobile phone number (`TEL;type=CELL`).
     </ParamField>
     <ParamField body="company" type="string">
       Organisation name (`ORG` field).
     </ParamField>
-    <ParamField body="title" type="string">
+    <ParamField body="job" type="string">
       Job title (`TITLE` field).
+    </ParamField>
+    <ParamField body="role" type="string">
+      Role within the organisation (`ROLE` field).
     </ParamField>
     <ParamField body="url" type="string">
       Personal or company website URL.
@@ -302,14 +344,14 @@ Generate a vCard 3.0 QR code for contact sharing.
 
 ```php
 QrCode::VCard([
-    'name'       => 'Jane Smith',
-    'first_name' => 'Jane',
-    'last_name'  => 'Smith',
-    'email'      => 'jane@example.com',
-    'phone'      => '+12025551234',
-    'company'    => 'Acme Corp',
-    'title'      => 'Senior Engineer',
-    'url'        => 'https://janesmith.dev',
+    'name'      => 'Jane Smith',
+    'firstName' => 'Jane',
+    'lastName'  => 'Smith',
+    'email'     => 'jane@example.com',
+    'phone'     => '+12025551234',
+    'company'   => 'Acme Corp',
+    'job'       => 'Senior Engineer',
+    'url'       => 'https://janesmith.dev',
 ]);
 ```
 
@@ -319,58 +361,87 @@ QrCode::VCard([
 
 ```php
 QrCode::MeCard(
-    string|array $name,
+    string $name,
     ?string $phone = null,
     ?string $email = null,
+    ?string $url = null,
+    ?string $address = null,
+    ?string $reading = null,
+    ?string $nickname = null,
+    ?string $phone2 = null,
+    ?string $phone3 = null,
+    ?string $videoPhone = null,
     ?string $note = null,
     ?string $birthday = null,
-    ?string $address = null,
-    ?string $url = null
+    ?string $postOfficeBox = null,
 ): QrCodeResult
 ```
 
-Generate a MeCard QR code — a lighter contact format popular in Japan and supported by most mobile QR scanners.
+Generate a MeCard QR code — a lighter contact format popular in Japan and supported by most mobile QR scanners. You may also pass a single associative array using these parameter names as keys.
 
-<ParamField body="name" type="string | array" required>
-  The contact's full name as a string, or an associative array of all MeCard
-  properties (see below). Must not be empty.
+<ParamField body="name" type="string" required>
+  The contact's full name. Must not be empty.
 </ParamField>
 
 <ParamField body="phone" type="string | null">
-  Phone number. Pass `null` to omit.
+  Primary phone number.
 </ParamField>
 
 <ParamField body="email" type="string | null">
-  Email address. Pass `null` to omit.
-</ParamField>
-
-<ParamField body="note" type="string | null">
-  Free-text note. Pass `null` to omit.
-</ParamField>
-
-<ParamField body="birthday" type="string | null">
-  Birthday in `YYYYMMDD` format. Pass `null` to omit.
-</ParamField>
-
-<ParamField body="address" type="string | null">
-  Postal address. Pass `null` to omit.
+  Email address.
 </ParamField>
 
 <ParamField body="url" type="string | null">
-  Website URL. Pass `null` to omit.
+  Website URL.
+</ParamField>
+
+<ParamField body="address" type="string | null">
+  Postal address.
+</ParamField>
+
+<ParamField body="reading" type="string | null">
+  Phonetic reading of the name (`SOUND` field).
+</ParamField>
+
+<ParamField body="nickname" type="string | null">
+  Nickname (`NICKNAME` field).
+</ParamField>
+
+<ParamField body="phone2" type="string | null">
+  Secondary phone number.
+</ParamField>
+
+<ParamField body="phone3" type="string | null">
+  Tertiary phone number.
+</ParamField>
+
+<ParamField body="videoPhone" type="string | null">
+  Video-call number (`TEL-AV` field).
+</ParamField>
+
+<ParamField body="note" type="string | null">
+  Free-text note.
+</ParamField>
+
+<ParamField body="birthday" type="string | null">
+  Birthday in `YYYYMMDD` format.
+</ParamField>
+
+<ParamField body="postOfficeBox" type="string | null">
+  PO box (`POBOX` field).
 </ParamField>
 
 <CodeGroup>
 
-```php Positional arguments
+```php Named arguments
 QrCode::MeCard(
-    'Jane Smith',
-    '+12025551234',
-    'jane@example.com',
-    'Laravel developer',
-    '19900115',
-    '123 Main St',
-    'https://janesmith.dev'
+    name:     'Jane Smith',
+    phone:    '+12025551234',
+    email:    'jane@example.com',
+    url:      'https://janesmith.dev',
+    address:  '123 Main St',
+    note:     'Laravel developer',
+    birthday: '19900115',
 );
 ```
 
@@ -444,19 +515,18 @@ QrCode::CalendarEvent([
 ## WhatsApp()
 
 ```php
-QrCode::WhatsApp(string|array $number, ?string $message = null): QrCodeResult
+QrCode::WhatsApp(string|int|float $phoneNumber, ?string $message = null): QrCodeResult
 ```
 
-Generate a `https://wa.me/` deep-link QR code that opens a WhatsApp chat.
+Generate a `https://wa.me/` deep-link QR code that opens a WhatsApp chat. You may also pass a single associative array using `phoneNumber` and `message` as keys. The leading `+` is stripped automatically.
 
-<ParamField body="number" type="string | array" required>
-  The recipient phone number (with country code, e.g. `'+12025551234'`), or an
-  associative array with `number` and optional `message` keys.
+<ParamField body="phoneNumber" type="string | int | float" required>
+  The recipient phone number, ideally in E.164 format (e.g. `+12025551234`).
+  Must not be empty.
 </ParamField>
 
 <ParamField body="message" type="string | null">
-  Pre-filled message text. Ignored when `$number` is an array that already
-  includes a `message` key.
+  Pre-filled message text. Defaults to `null`.
 </ParamField>
 
 <CodeGroup>
@@ -467,8 +537,8 @@ QrCode::WhatsApp('+12025551234', 'Hello from Laravel!');
 
 ```php Array form
 QrCode::WhatsApp([
-    'number'  => '+12025551234',
-    'message' => 'Hello from Laravel!',
+    'phoneNumber' => '+12025551234',
+    'message'     => 'Hello from Laravel!',
 ]);
 ```
 
@@ -483,15 +553,16 @@ QrCode::WhatsApp('+12025551234');
 ## Telegram()
 
 ```php
-QrCode::Telegram(string|array $username): QrCodeResult
+QrCode::Telegram(string $username): QrCodeResult
 ```
 
 Generate a `https://t.me/` deep-link QR code that opens a Telegram profile or channel.
 
-<ParamField body="username" type="string | array" required>
-  The Telegram username as a string, or an associative array with a `username`
-  key. The leading `@` is stripped automatically if present. Must be 5–32
-  characters long and start with a letter, following Telegram's username rules.
+<ParamField body="username" type="string" required>
+  The Telegram username. The leading `@` is stripped automatically if present.
+  Must be 5–32 characters long, start with a letter, and contain only letters,
+  digits, and underscores — following Telegram's username rules. You can also
+  pass an associative array with a `username` key.
 </ParamField>
 
 <CodeGroup>
