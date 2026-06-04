@@ -70,7 +70,7 @@ Once you've [installed the package](/installation), you can generate a QR code i
     $svg = QrCode::generate('https://example.com');
     ```
 
-    `generate()` returns a `QrCodeResult` object that casts to a string, so you can echo it directly or pass it to a response.
+    `generate()` returns a `QrCodeResult` object. The object casts to a string automatically. You can echo it directly or pass it to a response.
 
     **Return an SVG response from a controller:**
 

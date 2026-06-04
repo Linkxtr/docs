@@ -17,11 +17,11 @@ Every data type method returns a `QrCodeResult`, which means you can chain rende
 
 ```php
 use Linkxtr\QrCode\Facades\QrCode;
-use Linkxtr\QrCode\Contracts\QrCodeExceptionInterface;
+use Linkxtr\QrCode\Exceptions\InvalidDataTypeArgumentException;
 
 try {
     $qr = QrCode::Email($request->input('email'));
-} catch (QrCodeExceptionInterface $e) {
+} catch (InvalidDataTypeArgumentException $e) {
     // Handle validation error
 }
 ```

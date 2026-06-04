@@ -26,6 +26,12 @@ Use `QrCode::VCard(array $config)` to produce a vCard 3.0 payload. VCard is the 
   The contact's family name.
 </ParamField>
 
+<Note>
+  If `firstName` and `lastName` are provided, they will automatically construct
+  the structured `N` field in the VCard, while `name` populates the `FN`
+  (Formatted Name) field.
+</Note>
+
 <ParamField body="email" type="string">
   A general internet email address.
 </ParamField>

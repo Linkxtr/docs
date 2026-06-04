@@ -14,12 +14,12 @@
 
 ## Terminology
 
-{/_ Add product-specific terms and preferred usage _/}
-{/_ Example: Use "workspace" not "project", "member" not "user" _/}
+<!-- Add product-specific terms and preferred usage -->
+<!-- Example: Use "workspace" not "project", "member" not "user" -->
 
 ## Style preferences
 
-{/_ Add any project-specific style rules below _/}
+<!-- Add any project-specific style rules below -->
 
 - Use active voice and second person ("you")
 - Keep sentences concise — one idea per sentence
@@ -29,5 +29,5 @@
 
 ## Content boundaries
 
-{/_ Define what should and shouldn't be documented _/}
-{/_ Example: Don't document internal admin features _/}
+<!-- Define what should and shouldn't be documented -->
+<!-- Example: Don't document internal admin features -->

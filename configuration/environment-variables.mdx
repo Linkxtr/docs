@@ -29,11 +29,11 @@ QR_CODE_MARGIN=4
 # Foreground color
 # Accepted formats: "R,G,B" | "R,G,B,A" | "#RRGGBB"  (alpha 0–100)
 # Default: 0,0,0  (black)
-QR_CODE_COLOR=0,0,0
+QR_CODE_COLOR="0,0,0"
 
 # Background color — same formats as QR_CODE_COLOR
 # Default: 255,255,255  (white)
-QR_CODE_BACKGROUND_COLOR=255,255,255
+QR_CODE_BACKGROUND_COLOR="255,255,255"
 
 # ─── Error correction ─────────────────────────────────────────────────────────
 # Accepted: L | M | Q | H
@@ -55,12 +55,12 @@ QR_CODE_FORCE_GD=false
 <ParamField path="QR_CODE_FORMAT" type="string" default="svg">
   Sets the default image format for every generated QR code.
 
-| Value  | Notes                                                            |
-| ------ | ---------------------------------------------------------------- |
-| `svg`  | Vector — scales perfectly at any size, no image extension needed |
-| `png`  | Raster — requires GD or Imagick                                  |
-| `webp` | Modern raster — requires GD or Imagick                           |
-| `eps`  | Vector for print; image merging is not supported in this format  |
+| Value  | Notes                                                                   |
+| ------ | ----------------------------------------------------------------------- |
+| `svg`  | Vector format. Scales perfectly at any size. No image extension needed. |
+| `png`  | Raster — requires GD or Imagick                                         |
+| `webp` | Modern raster — requires GD or Imagick                                  |
+| `eps`  | Vector format for print. Image merging is not supported.                |
 
 ```ini
 QR_CODE_FORMAT=png
@@ -112,7 +112,8 @@ QR_CODE_COLOR=#1E40AF
   Sets the default background color. Accepts the same three formats as `QR_CODE_COLOR`.
 
 ```ini
-# Transparent background (PNG/WebP only; alpha 0 = fully transparent)
+# Transparent background (PNG/WebP only)
+# Alpha 0 = fully transparent
 QR_CODE_BACKGROUND_COLOR=255,255,255,0
 
 # Light gray background
@@ -203,7 +204,7 @@ When using **PHP arrays** directly in `config/qrcode.php` (after publishing the 
 
 <Note>
   Environment variables are read by `config/qrcode.php` at boot time. **You do
-  not need to publish the config file** to use env vars — the unpublished config
+  not need to publish the config file** to use env vars. The unpublished config
   that ships with the package already calls `env('QR_CODE_*', ...)` for every
   option. Publishing the config only adds the ability to set PHP array values
   (such as `[R, G, B]`) directly in PHP, which is not possible in a `.env` file.

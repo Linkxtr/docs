@@ -125,10 +125,10 @@ return [
 
 | Value  | Description                                                                        |
 | ------ | ---------------------------------------------------------------------------------- |
-| `svg`  | Scalable vector graphic — no image extension required, renders crisply at any size |
+| `svg`  | Scalable vector graphic. No image extension required. Renders crisply at any size. |
 | `png`  | Raster PNG — requires GD or Imagick                                                |
 | `webp` | Modern raster format — requires GD or Imagick                                      |
-| `eps`  | Encapsulated PostScript — vector, for print workflows                              |
+| `eps`  | Encapsulated PostScript vector format for print workflows                          |
 
   <Note>
     The default changed from `png` to `svg` in v2.4.x. If you're upgrading and rely on PNG output, set `'format' => 'png'` (or `QR_CODE_FORMAT=png` in your `.env`).
@@ -213,7 +213,7 @@ return [
 <ParamField path="force_gd" type="boolean" default="false">
   When `true`, the package skips Imagick entirely and uses PHP's GD extension to render raster images (`png`, `webp`), even when Imagick is installed.
 
-Enable this if your server has Imagick installed but restricts its usage through strict security policies (e.g., ImageMagick security policy XML).
+Enable this when your server has Imagick installed but restricts its usage. Common restrictions include strict security policies such as ImageMagick security policy XML.
 
 ```php
 'force_gd' => true,
