@@ -95,5 +95,10 @@
     "playground": {
       "display": "simple"
     }
+  },
+  "integrations": {
+    "ga4": {
+      "measurementId": "G-LM8L025J0F"
+    }
   }
 }
