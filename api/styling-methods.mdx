@@ -107,6 +107,13 @@ public function eyeColor(int $eyeNumber, string|array $inner, string|array|null 
 
 Override the color of a single finder-pattern eye. Call this method up to three times to style each eye independently.
 
+<Warning>
+  Requires the `ext-imagick` PHP extension for raster output (PNG). The GD
+  fallback does not support per-eye colors and will throw a
+  `MissingExtensionException` if `eyeColor()` is used without Imagick. SVG
+  and EPS output work without Imagick.
+</Warning>
+
 <ParamField body="eyeNumber" type="int" required>
   The index of the eye to color. Accepted values: `0`, `1`, `2` (top-left,
   top-right, bottom-left respectively).

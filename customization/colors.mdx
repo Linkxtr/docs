@@ -132,6 +132,14 @@ QrCode::eyeColor(0, [220, 38, 38], [30, 64, 175])  // eye 0: red inner, blue out
 QrCode::eyeColor(0, [220, 38, 38])->generate('https://example.com');
 ```
 
+<Warning>
+  Custom eye colors require the `ext-imagick` PHP extension when generating
+  raster formats like PNG. The GD fallback supports the default foreground
+  color only — calling `eyeColor()` without Imagick installed throws a
+  `MissingExtensionException`. SVG and EPS output are unaffected and work
+  without Imagick.
+</Warning>
+
 ## Complete Color Example
 
 Chain color options with style and format options to build a fully branded QR code.
