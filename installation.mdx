@@ -192,7 +192,14 @@ Installing Laravel QR Code takes about a minute. The package uses Laravel's pack
     </CardGroup>
 
     <Warning>
-      WebP output requires `ext-imagick`. GD can produce PNG but **not** WebP. If you set `format` to `webp` without Imagick, the package will throw a `MissingExtensionException`.
+      `ext-imagick` is required for several raster features:
+
+      - **WebP output** — GD can produce PNG but **not** WebP.
+      - **Non-square module styles** — `dot` and `round` styles require Imagick.
+      - **Gradients** — multi-color foreground gradients require Imagick.
+      - **Custom eye colors** — per-eye color overrides set with `eyeColor()` require Imagick.
+
+      Using any of these features without Imagick throws a `MissingExtensionException`. SVG and EPS output are unaffected and support every feature without Imagick.
     </Warning>
 
     To force GD even when Imagick is present, set `QR_CODE_FORCE_GD=true` in your `.env` file or publish the config and set `'force_gd' => true`.
