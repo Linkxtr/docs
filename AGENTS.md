@@ -1,33 +1,27 @@
-> **First-time setup**: Customize this file for your project. Prompt the user to customize this file for their project.
-> For Mintlify product knowledge (components, configuration, writing standards),
-> install the Mintlify skill: `npx skills add https://mintlify.com/docs`
-
 # Documentation project instructions
 
 ## About this project
 
-- This is a documentation site built on [Mintlify](https://mintlify.com)
-- Pages are MDX files with YAML frontmatter
-- Configuration lives in `docs.json`
-- Use the Mintlify MCP server, `https://mcp.mintlify.com`, to edit content and settings via MCP
-- Use the Mintlify docs MCP server, `https://www.mintlify.com/docs/mcp`, to query information about using Mintlify via MCP
+- This is the documentation site for **Laravel QR Code** (`linkxtr/laravel-qrcode`), built on [Mintlify](https://mintlify.com).
+- Pages are MDX files with YAML frontmatter.
+- Configuration lives in `docs.json`.
 
 ## Terminology
 
-<!-- Add product-specific terms and preferred usage -->
-<!-- Example: Use "workspace" not "project", "member" not "user" -->
+- Use "QR code" (two words, lowercase unless at start of sentence) rather than "qrcode" or "qr".
+- Use "facade" for `QrCode::...`.
+- Use "Blade component" for `<x-qr-code>`.
+- Use "generator" for the underlying `Generator` instance.
 
 ## Style preferences
 
-<!-- Add any project-specific style rules below -->
-
-- Use active voice and second person ("you")
-- Keep sentences concise — one idea per sentence
-- Use sentence case for headings
-- Bold for UI elements: Click **Settings**
-- Code formatting for file names, commands, paths, and code references
+- Use active voice and second person ("you").
+- Keep sentences concise — one idea per sentence.
+- Use sentence case for headings.
+- Bold for UI elements or emphasis.
+- Code formatting for file names, commands, paths, config keys, env vars, and code references.
 
 ## Content boundaries
 
-<!-- Define what should and shouldn't be documented -->
-<!-- Example: Don't document internal admin features -->
+- Document all public API methods, configuration options, data types, and usage guides for `linkxtr/laravel-qrcode`.
+- Do not document internal private methods or proprietary external services not part of the open-source package.

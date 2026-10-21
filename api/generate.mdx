@@ -52,6 +52,9 @@ Render the QR code for `$text` and, if you supply a `$filename`, write the outpu
     <ResponseField name="isSvg()" type="bool">
       Returns `true` when the current format is SVG.
     </ResponseField>
+    <ResponseField name="saveToFile(string $filename)" type="void">
+      Saves the QR code content directly to the specified file path. Throws `CannotWriteFileException` if the target directory does not exist or if writing fails.
+    </ResponseField>
   </Expandable>
 </ResponseField>
 

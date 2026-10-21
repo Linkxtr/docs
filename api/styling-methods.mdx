@@ -296,6 +296,47 @@ QrCode::size(600)
 
 ---
 
+## cache()
+
+```php
+public function cache(DateTimeInterface|DateInterval|int|null $ttl = null): static
+```
+
+Enable caching for the generated QR code using Laravel's cache store. When caching is enabled, the QR code is generated once and cached for the specified Time-To-Live (TTL). Subsequent requests for the same QR code load from the cache instantly.
+
+<ParamField body="ttl" type="DateTimeInterface | DateInterval | int | null">
+  The time-to-live for the cached QR code. Pass an integer (seconds), a `DateInterval` instance, a `DateTimeInterface` expiration time, or `null` to use the default cache TTL configured in `config/qrcode.php` (default: `1440` minutes / 24 hours).
+</ParamField>
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+// Cache with default TTL (1440 minutes / 24 hours)
+$qr = QrCode::cache()->generate("https://example.com");
+
+// Cache with custom TTL (e.g., 3600 seconds / 1 hour)
+$qr = QrCode::cache(3600)->generate("https://example.com");
+```
+
+---
+
+## withoutCache()
+
+```php
+public function withoutCache(): static
+```
+
+Explicitly disable caching for the current generator instance, overriding any package-wide caching enabled in `config/qrcode.php`.
+
+```php
+use Linkxtr\QrCode\Facades\QrCode;
+
+// Bypasses cache even if cache_enabled is true in config
+$qr = QrCode::withoutCache()->generate("https://example.com");
+```
+
+---
+
 ## Full styling example
 
 ```php
