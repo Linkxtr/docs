@@ -1,0 +1,59 @@
+---
+title: "Filament QR Configuration Guide"
+sidebarTitle: "Configuration"
+description: "Configure global defaults, rendering dimensions, preview modal behavior, and color schemes."
+---
+
+After running `php artisan vendor:publish --tag="filament-qr-config"`, the configuration file is available at `config/filament-qr.php`.
+
+## Full configuration structure
+
+```php config/filament-qr.php
+<?php
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default QR Code Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Default values applied across Filament table columns, infolist entries,
+    | and actions when not overridden via fluent component setters.
+    |
+    */
+    'defaults' => [
+        'size' => 160,
+        'margin' => 1,
+        'format' => 'svg', // svg, png, webp
+        'error_correction' => 'M', // L, M, Q, H
+        'color' => '#000000',
+        'background_color' => '#ffffff',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Preview Modal Settings
+    |--------------------------------------------------------------------------
+    |
+    | Default settings for the zoom/preview modal opened on click.
+    |
+    */
+    'preview' => [
+        'modal_width' => 'sm',
+        'render_size' => 320,
+    ],
+];
+```
+
+## Options reference
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `defaults.size` | `int` | `160` | Default pixel dimensions (width/height) when not specified. |
+| `defaults.margin` | `int` | `1` | Default quiet-zone modules surrounding the QR code. |
+| `defaults.format` | `string` | `'svg'` | Default export format (`svg`, `png`, `webp`). |
+| `defaults.error_correction` | `string` | `'M'` | Default error correction level (`L`, `M`, `Q`, `H`). |
+| `defaults.color` | `string` | `'#000000'` | Default foreground color HEX. |
+| `defaults.background_color` | `string` | `'#ffffff'` | Default background color HEX. |
+| `preview.modal_width` | `string` | `'sm'` | Filament modal width preset for preview modals. |
+| `preview.render_size` | `int` | `320` | Pixel size for rendering enlarged QR code inside preview modals. |

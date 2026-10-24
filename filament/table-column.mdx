@@ -1,0 +1,106 @@
+---
+title: "Filament Table QR Code Column"
+sidebarTitle: "Table Column"
+description: "Render inline QR codes in Filament tables with custom styling, preview modals, and downloads."
+---
+
+The `QrCodeColumn` class allows you to render QR codes inside any Filament table column.
+
+## Basic usage
+
+```php
+use Linkxtr\FilamentQr\Tables\Columns\QrCodeColumn;
+
+QrCodeColumn::make('ticket_code')
+```
+
+By default, the column uses the model attribute matching the column name as the payload, renders an inline SVG, and provides a hover tooltip with the payload string.
+
+## Sizing and quiet zone
+
+Set custom pixel dimensions and quiet-zone margins:
+
+```php
+QrCodeColumn::make('code')
+    ->qrSize(120)       // Pixel dimensions (width and height)
+    ->qrMargin(2);      // Quiet-zone margin in modules
+```
+
+## Formats and error correction
+
+Choose between vector SVG (default) or raster formats (PNG, WebP):
+
+```php
+use Linkxtr\FilamentQr\Enums\ErrorCorrectionLevel;
+use Linkxtr\FilamentQr\Enums\QrFormat;
+
+QrCodeColumn::make('serial')
+    ->qrFormat(QrFormat::Png) // or 'svg', 'webp'
+    ->qrErrorCorrection(ErrorCorrectionLevel::High); // 'L', 'M', 'Q', 'H'
+```
+
+### Error correction levels
+
+- **`L` (Low)**: 7% recovery. Ideal for clean digital displays with small data density.
+- **`M` (Medium)**: 15% recovery (default). Recommended balance for general usage.
+- **`Q` (Quartile)**: 25% recovery. Suitable for print media where partial obstruction may occur.
+- **`H` (High)**: 30% recovery. Best when embedding logos or when harsh scanning conditions exist.
+
+## Brand colors and palette tokens
+
+You can pass standard HEX color codes or Filament theme palette tokens:
+
+```php
+// Filament color palette tokens
+QrCodeColumn::make('status_code')
+    ->qrColor('primary')
+    ->qrBackgroundColor('gray');
+
+// Custom HEX colors
+QrCodeColumn::make('badge_code')
+    ->qrColor('#1e293b')
+    ->qrBackgroundColor('#f8fafc');
+```
+
+Supported palette tokens: `primary`, `danger`, `warning`, `success`, `info`, `gray`.
+
+## Gradients and finder eyes
+
+Enhance visual presentation with custom gradients and individual eye colors:
+
+```php
+QrCodeColumn::make('vip_pass')
+    ->qrGradient(from: '#0ea5e9', to: '#6366f1', type: 'vertical')
+    ->qrEyeColor(eyeIndex: 0, inner: '#0ea5e9', outer: '#1e293b')
+    ->qrEyeColor(eyeIndex: 1, inner: '#0ea5e9', outer: '#1e293b')
+    ->qrEyeColor(eyeIndex: 2, inner: '#6366f1', outer: '#1e293b');
+```
+
+## Embedding a logo
+
+Overlay an icon or brand logo in the center of the QR code:
+
+```php
+QrCodeColumn::make('membership_id')
+    ->qrLogo(path: public_path('images/brand-icon.png'), size: 0.22)
+    ->qrErrorCorrection('H'); // Higher error correction preserves scannability
+```
+
+## Interactive actions: download and preview
+
+Enable single-click download or preview behaviors:
+
+```php
+QrCodeColumn::make('order_qr')
+    ->downloadable() // Triggers instant file download on click
+    ->previewable(false); // Disables modal preview if needed
+```
+
+## Custom payload resolution
+
+Override the raw state resolution using a closure:
+
+```php
+QrCodeColumn::make('qr')
+    ->payload(fn ($record) => route('orders.verify', ['id' => $record->id, 'hash' => $record->hash]));
+```

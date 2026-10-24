@@ -1,0 +1,79 @@
+---
+title: "Filament QR Quickstart"
+sidebarTitle: "Quickstart"
+description: "Get started with QR code columns, infolist entries, and download actions in under 5 minutes."
+---
+
+This guide shows you how to integrate QR codes into your Filament resources.
+
+## 1. Add a QR code to a table
+
+Open a Filament resource table definition, such as `app/Filament/Resources/OrderResource.php`:
+
+```php
+use Filament\Tables\Table;
+use Linkxtr\FilamentQr\Tables\Columns\QrCodeColumn;
+
+public static function table(Table $table): Table
+{
+    return $table
+        ->columns([
+            QrCodeColumn::make('order_number')
+                ->label('Order QR')
+                ->qrSize(100)
+                ->qrColor('primary')
+                ->downloadable(),
+        ]);
+}
+```
+
+This column generates an inline SVG QR code from the `order_number` attribute, applies your theme primary color, and triggers an instant download when clicked.
+
+## 2. Display a QR code on an infolist view page
+
+Add a `QrCodeEntry` to your resource infolist schema:
+
+```php
+use Filament\Infolists\Infolist;
+use Linkxtr\FilamentQr\Infolists\Entries\QrCodeEntry;
+
+public static function infolist(Infolist $infolist): Infolist
+{
+    return $infolist
+        ->schema([
+            QrCodeEntry::make('uuid')
+                ->label('Validation QR Code')
+                ->qrSize(240)
+                ->asUrl(fn ($record) => route('tickets.verify', $record)),
+        ]);
+}
+```
+
+The infolist entry displays a centered, high-contrast QR code with a monospace text readout of the resolved URL underneath.
+
+## 3. Add table download actions
+
+Allow your users to download individual QR codes or batch-export records:
+
+```php
+use Filament\Tables\Table;
+use Linkxtr\FilamentQr\Actions\DownloadQrAction;
+use Linkxtr\FilamentQr\Actions\DownloadQrBulkAction;
+
+public static function table(Table $table): Table
+{
+    return $table
+        ->actions([
+            DownloadQrAction::make()
+                ->filename(fn ($record) => "order-{$record->id}")
+                ->qrFormat('png')
+                ->qrSize(300),
+        ])
+        ->bulkActions([
+            DownloadQrBulkAction::make()
+                ->archiveFilename('orders-qr-export'),
+        ]);
+}
+```
+
+Explore [Table Column](/filament/table-column) and [Infolist Entry](/filament/infolist-entry) for deep customization options.

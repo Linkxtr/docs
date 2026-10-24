@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "name": "Laravel QR Code",
+  "name": "Linkxtr Docs",
   "theme": "maple",
   "favicon": "https://media.brand.dev/ed1ea708-4249-4d42-9233-93fde61f32fc.jpg",
   "colors": {
@@ -15,6 +15,10 @@
     },
     "links": [
       {
+        "href": "https://github.com/Linkxtr/filament-qr",
+        "label": "Filament QR"
+      },
+      {
         "href": "https://buymeacoffee.com/khaled.sadek",
         "label": "Support Me"
       }
@@ -23,11 +27,15 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Documentation",
+        "tab": "Laravel Package",
         "groups": [
           {
             "group": "Get Started",
-            "pages": ["introduction", "installation", "quickstart"]
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
           },
           {
             "group": "Usage",
@@ -68,6 +76,37 @@
               "advanced/macros",
               "advanced/upgrade-guide",
               "advanced/troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Filament Plugin",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "filament/introduction",
+              "filament/installation",
+              "filament/quickstart"
+            ]
+          },
+          {
+            "group": "Components",
+            "pages": [
+              "filament/table-column",
+              "filament/infolist-entry",
+              "filament/actions"
+            ]
+          },
+          {
+            "group": "Guides & Reference",
+            "pages": [
+              "filament/styling-and-colors",
+              "filament/payload-formatters",
+              "filament/configuration",
+              "filament/api-reference",
+              "filament/release-notes"
             ]
           }
         ]

@@ -1,0 +1,85 @@
+---
+title: "Filament Infolist QR Code Entry"
+sidebarTitle: "Infolist Entry"
+description: "Display prominent, high-fidelity QR codes in Filament resource view pages, relation managers, and slide-overs."
+---
+
+The `QrCodeEntry` component provides a dedicated infolist component for displaying QR codes with rich styling and state readouts.
+
+## Basic usage
+
+Add `QrCodeEntry` to your resource infolist schema:
+
+```php
+use Filament\Infolists\Infolist;
+use Linkxtr\FilamentQr\Infolists\Entries\QrCodeEntry;
+
+public static function infolist(Infolist $infolist): Infolist
+{
+    return $infolist
+        ->schema([
+            QrCodeEntry::make('qr_token')
+                ->label('Device Provisioning QR'),
+        ]);
+}
+```
+
+The component renders an elevated container with a light background for maximum barcode scanner contrast, regardless of whether the user is in light or dark mode. Below the code, a selectable monospace string displays the resolved payload.
+
+## Sizing for infolists
+
+Infolist entries typically display larger QR codes than table cells:
+
+```php
+QrCodeEntry::make('auth_secret')
+    ->label('Two-Factor Authentication Setup')
+    ->qrSize(280)
+    ->qrMargin(2);
+```
+
+## Wi-Fi network credential display
+
+Generate scannable Wi-Fi setup codes for guest portals or IoT devices:
+
+```php
+QrCodeEntry::make('guest_wifi')
+    ->label('Guest Wi-Fi Access')
+    ->qrSize(240)
+    ->asWifi(
+        ssid: fn ($record) => $record->network_ssid,
+        password: fn ($record) => $record->network_key,
+        encryption: 'WPA'
+    );
+```
+
+## Brand styling and logos
+
+Apply theme colors and company logos:
+
+```php
+QrCodeEntry::make('ticket_uuid')
+    ->qrColor('primary')
+    ->qrErrorCorrection('H')
+    ->qrLogo(public_path('assets/logo-mark.png'), size: 0.2);
+```
+
+## Infolist layout integration
+
+Use Filament layout components like `Section` and `Grid` to place QR codes alongside details:
+
+```php
+use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+
+Section::make('Access Credentials')
+    ->schema([
+        Grid::make(3)->schema([
+            TextEntry::make('name'),
+            TextEntry::make('created_at')->dateTime(),
+            QrCodeEntry::make('access_token')
+                ->qrSize(180)
+                ->columnSpan(1),
+        ]),
+    ]);
+```

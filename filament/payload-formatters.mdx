@@ -1,0 +1,72 @@
+---
+title: "Payload Formatters & Data Types"
+sidebarTitle: "Payload Formatters"
+description: "Use fluent helpers for Wi-Fi networks, URLs, emails, SMS, and custom dynamic payloads."
+---
+
+Filament QR provides dedicated formatters via `HasPayloadFormatters` to generate structured payloads recognized by smartphone camera apps.
+
+## Web URLs (`asUrl`)
+
+Generates a standard URL payload:
+
+```php
+QrCodeColumn::make('website')
+    ->asUrl(fn ($record) => $record->website_url);
+```
+
+## Wi-Fi networks (`asWifi`)
+
+Generates a `WIFI:` configuration string that allows mobile devices to connect immediately upon scanning:
+
+```php
+QrCodeEntry::make('wifi')
+    ->asWifi(
+        ssid: fn ($record) => $record->ssid,
+        password: fn ($record) => $record->password,
+        encryption: 'WPA', // 'WPA', 'WEP', or 'nopass'
+        hidden: false
+    );
+```
+
+Output format: `WIFI:S:<ssid>;T:<encryption>;P:<password>;H:<hidden>;;`
+
+## Email messages (`asEmail`)
+
+Generates a `mailto:` payload with prefilled recipient, subject, and body:
+
+```php
+QrCodeColumn::make('support_email')
+    ->asEmail(
+        email: 'support@example.com',
+        subject: fn ($record) => "Support Request for Order #{$record->id}",
+        body: 'Please describe your inquiry:'
+    );
+```
+
+Output format: `mailto:support@example.com?subject=...&body=...`
+
+## SMS messages (`asSms`)
+
+Generates an `smsto:` payload that opens the device SMS composer:
+
+```php
+QrCodeColumn::make('sms')
+    ->asSms(
+        phone: fn ($record) => $record->phone_number,
+        message: 'CONFIRM'
+    );
+```
+
+Output format: `smsto:+15551234567:CONFIRM`
+
+## Custom formatters (`formatPayloadUsing`)
+
+When you need custom payload structures (such as vCards, JSON tokens, or proprietary protocols), use `formatPayloadUsing`:
+
+```php
+QrCodeColumn::make('contact_card')
+    ->formatPayloadUsing(function ($record) {
+        return "BEGIN:VCARD\nVERSION:3.0\nFN:{$record->name}\nTEL:{$record->phone}\nEMAIL:{$record->email}\nEND:VCARD";
+    });
+```

@@ -1,0 +1,72 @@
+---
+title: "Install Filament QR"
+sidebarTitle: "Installation"
+description: "Install the linkxtr/filament-qr package with Composer, register the plugin in your Filament panel, and publish assets."
+---
+
+Install Filament QR in your Laravel application using Composer.
+
+<Steps>
+  <Step title="Require the package">
+    Run the Composer require command in your project root:
+
+    ```bash
+    composer require linkxtr/filament-qr
+    ```
+
+    Composer resolves `linkxtr/filament-qr` and its dependencies, including `linkxtr/laravel-qrcode`.
+  </Step>
+
+  <Step title="Register the panel plugin">
+    Open your Filament panel provider, typically located at `app/Providers/Filament/AdminPanelProvider.php`, and register `FilamentQrPlugin`:
+
+    ```php app/Providers/Filament/AdminPanelProvider.php
+    namespace App\Providers\Filament;
+
+    use Filament\Panel;
+    use Filament\PanelProvider;
+    use Linkxtr\FilamentQr\FilamentQrPlugin;
+
+    class AdminPanelProvider extends PanelProvider
+    {
+        public function panel(Panel $panel): Panel
+        {
+            return $panel
+                ->default()
+                ->id('admin')
+                ->path('admin')
+                ->plugin(FilamentQrPlugin::make());
+        }
+    }
+    ```
+  </Step>
+
+  <Step title="Publish configuration (optional)">
+    If you want to customize application-wide default dimensions, format, error correction, or modal settings, publish the configuration file:
+
+    ```bash
+    php artisan vendor:publish --tag="filament-qr-config"
+    ```
+
+    This copies `config/filament-qr.php` into your Laravel configuration directory.
+  </Step>
+
+  <Step title="Publish views (optional)">
+    To adjust the HTML markup or Tailwind classes of table columns or infolist entries:
+
+    ```bash
+    php artisan vendor:publish --tag="filament-qr-views"
+    ```
+
+    The Blade templates will be placed in `resources/views/vendor/filament-qr/`.
+  </Step>
+</Steps>
+
+## Image extension requirements
+
+- **SVG output (default)**: Requires no additional PHP image extensions. SVG renders cleanly and quickly in all modern browsers.
+- **PNG & WebP raster output**: Requires either the `ext-imagick` or `ext-gd` PHP extension.
+
+<Tip>
+  If your application uses raster formats (PNG or WebP), `ext-imagick` is recommended for high-resolution output and gradient rendering.
+</Tip>

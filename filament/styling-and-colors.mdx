@@ -1,0 +1,85 @@
+---
+title: "QR Code Styling, Colors & Branding"
+sidebarTitle: "Styling & Colors"
+description: "Customize dimensions, margins, theme palette tokens, gradients, finder eyes, and embedded logos."
+---
+
+Both `QrCodeColumn`, `QrCodeEntry`, `DownloadQrAction`, and `DownloadQrBulkAction` use the `HasQrCodeStyling` trait to provide a uniform, fluent configuration API.
+
+## Sizing and quiet zones
+
+```php
+$component
+    ->qrSize(200)    // Target pixel size (width and height)
+    ->qrMargin(3);   // Quiet zone border modules around the code
+```
+
+## Theme color palette tokens
+
+Filament QR automatically resolves Filament color tokens into theme-consistent hex codes:
+
+| Token | Resolved Default HEX |
+|---|---|
+| `'primary'` | `#fbbf24` |
+| `'danger'` | `#ef4444` |
+| `'gray'` | `#6b7280` |
+| `'info'` | `#3b82f6` |
+| `'success'` | `#10b981` |
+| `'warning'` | `#f59e0b` |
+
+```php
+$component
+    ->qrColor('primary')
+    ->qrBackgroundColor('gray');
+```
+
+You can also pass any standard CSS HEX string:
+
+```php
+$component
+    ->qrColor('#0f172a')
+    ->qrBackgroundColor('#f8fafc');
+```
+
+## Linear gradients
+
+Add multi-stop linear gradients to the QR code foreground:
+
+```php
+$component->qrGradient(
+    from: '#3b82f6',
+    to: '#9333ea',
+    type: 'vertical' // 'vertical', 'horizontal', 'diagonal', 'inverse_diagonal', 'radial'
+);
+```
+
+<Note>
+  Gradients render natively in SVG. For raster formats (PNG, WebP), `ext-imagick` is required.
+</Note>
+
+## Custom finder eye colors
+
+QR codes feature three square finder patterns in the corners (indices `0`, `1`, and `2`). You can customize the inner pupil and outer frame of each finder eye independently:
+
+```php
+$component
+    // Top-left eye
+    ->qrEyeColor(eyeIndex: 0, inner: '#ef4444', outer: '#991b1b')
+    // Top-right eye
+    ->qrEyeColor(eyeIndex: 1, inner: '#3b82f6', outer: '#1e40af')
+    // Bottom-left eye
+    ->qrEyeColor(eyeIndex: 2, inner: '#10b981', outer: '#065f46');
+```
+
+## Embedded logos
+
+Embed a company logo or icon in the center of the QR code:
+
+```php
+$component
+    ->qrLogo(
+        path: public_path('images/brand-logo.png'),
+        size: 0.2 // Fraction of the total QR code size (0.1 to 0.3 recommended)
+    )
+    ->qrErrorCorrection('H'); // High error correction reserves 30% redundancy for the logo
+```

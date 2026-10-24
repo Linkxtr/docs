@@ -1,0 +1,36 @@
+---
+title: "v0.1.0 Release Notes & Packagist Checklist"
+sidebarTitle: "Release Notes (v0.1.0)"
+description: "Release highlights for linkxtr/filament-qr v0.1.0 and submission verification checklist."
+---
+
+## Release highlights (v0.1.0)
+
+Version `v0.1.0` marks the initial open-source release of `linkxtr/filament-qr`.
+
+### Features included
+
+- **Filament Panel Plugin (`FilamentQrPlugin`)**: Clean registration via `$panel->plugin(FilamentQrPlugin::make())`.
+- **Table Column (`QrCodeColumn`)**: Inline preview, responsive sizing, dark mode compatibility, click-to-download, and preview modals.
+- **Infolist Entry (`QrCodeEntry`)**: High-contrast display with light-contrast backing and monospace payload readout.
+- **Table Single Action (`DownloadQrAction`)**: Streaming download of individual QR codes in SVG, PNG, or WebP.
+- **Table Bulk Action (`DownloadQrBulkAction`)**: Multi-record selection export into a compressed `.zip` archive.
+- **Brand Colors & Token Support**: Native mapping for Filament palette tokens (`primary`, `danger`, `warning`, `success`, `info`, `gray`).
+- **Advanced Aesthetics**: Linear gradient stops, per-eye corner color customization, and center logo embedding.
+- **Payload Formatters**: Built-in helpers for Wi-Fi credentials (`asWifi`), URLs (`asUrl`), Emails (`asEmail`), and SMS (`asSms`).
+
+---
+
+## Packagist submission checklist
+
+Use this checklist prior to tagging the initial release:
+
+- [x] **Canonical package name**: Registered as `linkxtr/filament-qr` in `composer.json`.
+- [x] **Licensing**: Valid open-source MIT license present in repository root.
+- [x] **Semantic version tag**: Tagged as `v0.1.0` following SemVer 2.0.
+- [x] **Package auto-discovery**: `Linkxtr\FilamentQr\FilamentQrServiceProvider` registered in `extra.laravel.providers`.
+- [x] **PHP matrix**: Validated for PHP `8.2`, `8.3`, `8.4`, and `8.5`.
+- [x] **Laravel matrix**: Validated for Laravel `11.x`, `12.x`, and `13.x`.
+- [x] **Filament matrix**: Validated for Filament `3.x`, `4.x`, and `5.x`.
+- [x] **Automated testing**: Pest test suite passing across all components and actions.
+- [x] **Mintlify documentation**: Full documentation published in `Linkxtr/docs`.

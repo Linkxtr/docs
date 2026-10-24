@@ -1,0 +1,94 @@
+---
+title: "Filament QR Fluent API Reference"
+sidebarTitle: "API Reference"
+description: "Complete method signatures and documentation for all Filament QR classes and traits."
+---
+
+## `HasQrCodeStyling` Trait
+
+Available on `QrCodeColumn`, `QrCodeEntry`, `DownloadQrAction`, and `DownloadQrBulkAction`.
+
+| Method | Parameters | Return Type | Description |
+|---|---|---|---|
+| `qrSize` | `int \| Closure $size` | `static` | Sets the QR code pixel dimension. |
+| `getQrSize` | None | `int` | Resolves the evaluated size or default from config. |
+| `qrMargin` | `int \| Closure $margin` | `static` | Sets the quiet-zone margin in modules. |
+| `getQrMargin` | None | `int` | Resolves evaluated margin. |
+| `qrFormat` | `QrFormat \| string \| Closure $format` | `static` | Sets output format (`svg`, `png`, `webp`). |
+| `getQrFormat` | None | `string` | Returns format string. |
+| `qrErrorCorrection` | `ErrorCorrectionLevel \| string \| Closure $level` | `static` | Sets error correction level (`L`, `M`, `Q`, `H`). |
+| `getQrErrorCorrection` | None | `string` | Returns error correction code. |
+| `qrColor` | `string \| Closure $color` | `static` | Sets foreground color or Filament token. |
+| `getQrColor` | None | `string` | Resolves color token into HEX string. |
+| `qrBackgroundColor` | `string \| Closure $color` | `static` | Sets background color or Filament token. |
+| `getQrBackgroundColor` | None | `string` | Resolves background color token into HEX string. |
+| `qrGradient` | `string $from, string $to, string $type = 'vertical'` | `static` | Configures foreground linear gradient. |
+| `getQrGradient` | None | `?array` | Returns gradient array or `null`. |
+| `qrEyeColor` | `int $eyeIndex, string $inner, string $outer` | `static` | Overrides inner/outer color for finder eye 0, 1, or 2. |
+| `getQrEyeColors` | None | `?array` | Returns configured eye colors. |
+| `qrLogo` | `string \| Closure $path, float \| Closure $size = 0.2` | `static` | Configures center logo image and relative scale. |
+| `getQrLogoPath` | None | `?string` | Resolves evaluated logo file path. |
+| `getQrLogoSize` | None | `float` | Resolves evaluated logo size. |
+
+---
+
+## `HasPayloadFormatters` Trait
+
+Available on `QrCodeColumn`, `QrCodeEntry`, `DownloadQrAction`, and `DownloadQrBulkAction`.
+
+| Method | Parameters | Return Type | Description |
+|---|---|---|---|
+| `asUrl` | `string \| Closure $url` | `static` | Formats payload as a direct URL. |
+| `asWifi` | `string \| Closure $ssid, string \| Closure \| null $password = null, string \| Closure $encryption = 'WPA', bool \| Closure $hidden = false` | `static` | Formats payload as a Wi-Fi setup string. |
+| `asEmail` | `string \| Closure $email, string \| Closure \| null $subject = null, string \| Closure \| null $body = null` | `static` | Formats payload as `mailto:` URI. |
+| `asSms` | `string \| Closure $phone, string \| Closure \| null $message = null` | `static` | Formats payload as `smsto:` URI. |
+| `formatPayloadUsing` | `Closure $callback` | `static` | Registers custom formatting closure. |
+| `resolveFormattedPayload` | `mixed $raw` | `?string` | Evaluates raw state through registered formatter. |
+
+---
+
+## `QrCodeColumn`
+
+Extends `Filament\Tables\Columns\Column`.
+
+| Method | Parameters | Return Type | Description |
+|---|---|---|---|
+| `payload` | `Closure $callback` | `static` | Sets custom closure to resolve raw state from record. |
+| `downloadable` | `bool \| Closure $condition = true` | `static` | Toggles click-to-download behavior. |
+| `isDownloadable` | None | `bool` | Returns whether click-to-download is active. |
+| `previewable` | `bool \| Closure $condition = true` | `static` | Toggles click-to-preview modal behavior. |
+| `isPreviewable` | None | `bool` | Returns whether preview modal is enabled. |
+| `getQrPayload` | None | `?string` | Resolves final formatted payload string. |
+| `renderQrCode` | None | `?string` | Renders the SVG string or base64 data URI. |
+
+---
+
+## `QrCodeEntry`
+
+Extends `Filament\Infolists\Components\Entry`.
+
+| Method | Parameters | Return Type | Description |
+|---|---|---|---|
+| `payload` | `Closure $callback` | `static` | Sets custom closure to resolve raw state from record. |
+| `getQrPayload` | None | `?string` | Resolves final formatted payload string. |
+| `renderQrCode` | None | `?string` | Renders the SVG string or base64 data URI. |
+
+---
+
+## `DownloadQrAction`
+
+Extends `Filament\Actions\Action`.
+
+| Method | Parameters | Return Type | Description |
+|---|---|---|---|
+| `filename` | `string $name` | `static` | Sets base download filename (without extension). |
+
+---
+
+## `DownloadQrBulkAction`
+
+Extends `Filament\Actions\BulkAction`.
+
+| Method | Parameters | Return Type | Description |
+|---|---|---|---|
+| `archiveFilename` | `string $name` | `static` | Sets base name for the generated ZIP archive. |

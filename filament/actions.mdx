@@ -1,0 +1,66 @@
+---
+title: "Filament QR Code Table Actions"
+sidebarTitle: "Actions"
+description: "Export individual or bulk QR codes from Filament tables in SVG, PNG, or WebP."
+---
+
+Filament QR includes pre-built table actions for single-record streaming downloads and multi-record bulk ZIP archives.
+
+## Single download action (`DownloadQrAction`)
+
+Add `DownloadQrAction` to your table's row actions:
+
+```php
+use Filament\Tables\Table;
+use Linkxtr\FilamentQr\Actions\DownloadQrAction;
+
+public static function table(Table $table): Table
+{
+    return $table
+        ->actions([
+            DownloadQrAction::make()
+                ->filename(fn ($record) => "ticket-{$record->id}")
+                ->qrFormat('svg')
+                ->qrSize(400)
+                ->qrColor('#000000'),
+        ]);
+}
+```
+
+### Methods on `DownloadQrAction`
+
+- **`filename(string|Closure $name)`**: Sets the downloaded file name (without extension).
+- **`qrFormat(string|QrFormat $format)`**: File format (`svg`, `png`, or `webp`).
+- **`qrSize(int|Closure $size)`**: Pixel resolution of the exported file.
+- **`qrColor(string|Closure $color)`**: Foreground color.
+- **`qrBackgroundColor(string|Closure $color)`**: Background color.
+- All fluent styling methods from `HasQrCodeStyling`.
+
+## Bulk download action (`DownloadQrBulkAction`)
+
+Allow operators to select multiple rows in a table and download a single `.zip` file containing individual QR codes:
+
+```php
+use Filament\Tables\Table;
+use Linkxtr\FilamentQr\Actions\DownloadQrBulkAction;
+
+public static function table(Table $table): Table
+{
+    return $table
+        ->bulkActions([
+            DownloadQrBulkAction::make()
+                ->archiveFilename('tickets-batch')
+                ->qrFormat('png')
+                ->qrSize(500)
+                ->qrColor('primary'),
+        ]);
+}
+```
+
+### Methods on `DownloadQrBulkAction`
+
+- **`archiveFilename(string $name)`**: Sets the generated ZIP file name (defaults to `qr-codes`).
+- Inherits styling methods (`qrSize`, `qrMargin`, `qrFormat`, `qrColor`, `qrGradient`, etc.) from `HasQrCodeStyling`.
+- Inherits payload helpers (`asUrl`, `asWifi`, `asEmail`, `asSms`, `formatPayloadUsing`) from `HasPayloadFormatters`.
+
+Each file in the ZIP archive is named according to the record key (e.g. `qr-101.png`, `qr-102.png`).
