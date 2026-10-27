@@ -24,7 +24,32 @@ Laravel QR Code is a modern QR code generation package for Laravel 12+ and PHP 8
   </Card>
 </CardGroup>
 
-## Get Started in Three Steps
+## Visual showcase
+
+Explore real vector QR codes generated directly by the package with custom shapes, gradients, multi-eye colors, and embedded logos:
+
+<CardGroup cols={3}>
+  <Frame caption="Classic blue (RGB)">
+    <img src="/images/showcase/classic-blue.svg" alt="Classic blue QR code" />
+  </Frame>
+  <Frame caption="Dots & circle eyes">
+    <img src="/images/showcase/dot-circle.svg" alt="Dots with circle eyes QR code" />
+  </Frame>
+  <Frame caption="Diagonal gradient">
+    <img src="/images/showcase/gradient-diagonal.svg" alt="Diagonal gradient QR code" />
+  </Frame>
+  <Frame caption="Radial gradient">
+    <img src="/images/showcase/gradient-radial.svg" alt="Radial gradient QR code" />
+  </Frame>
+  <Frame caption="Multi-eye color accents">
+    <img src="/images/showcase/multi-eye-colors.svg" alt="Multi-eye colors QR code" />
+  </Frame>
+  <Frame caption="Logo overlay (Error correction H)">
+    <img src="/images/showcase/logo-merged.svg" alt="Logo merged QR code" />
+  </Frame>
+</CardGroup>
+
+## Get started in three steps
 
 <Steps>
   <Step title="Install the package">
@@ -48,7 +73,7 @@ Laravel QR Code is a modern QR code generation package for Laravel 12+ and PHP 8
 
     <CodeGroup>
       ```blade Blade Component
-      <x-qr-code value="https://example.com" size="300" />
+      <x-qr-code data="https://example.com" size="300" />
       ```
 
       ```php Facade

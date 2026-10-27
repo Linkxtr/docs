@@ -1,0 +1,238 @@
+---
+title: "Migrating from simple-qrcode to Laravel QR Code"
+sidebarTitle: "Migrating from simple-qrcode"
+description: "Step-by-step guide to migrate from simplesoftwareio/simple-qrcode or endroid/qr-code to linkxtr/laravel-qrcode — with side-by-side code comparisons and feature matrix."
+---
+
+If your application currently relies on `simplesoftwareio/simple-qrcode`, you are likely running into compatibility barriers on modern PHP and Laravel versions. The `simple-qrcode` package has remained unmaintained since February 2021, lacks support for PHP 8.2+ and Laravel 12+, relies on mutable builder instances, and lacks modern vector styling features.
+
+`linkxtr/laravel-qrcode` is engineered as a modern, high-performance replacement. It maintains drop-in API compatibility for common generation calls while providing immutable builder safety, a native Blade component, an interactive Artisan CLI, WebP support, custom eye shapes, and 100% decode-verified scannability.
+
+## Feature comparison
+
+| Feature | `linkxtr/laravel-qrcode` | `simplesoftwareio/simple-qrcode` | `endroid/qr-code` |
+| :--- | :--- | :--- | :--- |
+| **Laravel 12+ and 13+ support** | Full support | Abandoned (max Laravel 8) | Needs manual wrapper |
+| **PHP 8.2, 8.3 & 8.4** | Full strict-types support | Incompatible | Supported |
+| **Active maintenance** | Yes | Abandoned (Feb 2021) | Yes (standalone PHP) |
+| **Fluent syntax** | `QrCode::size(300)->generate()` | `QrCode::size(300)->generate()` | Verbose builder objects |
+| **Immutable builder** | Yes (zero side-effects) | No (mutable instance bugs) | Yes |
+| **Blade component** | `<x-qr-code data="..." />` | None | None |
+| **Artisan CLI** | `php artisan qr:generate` | None | None |
+| **Vector default** | SVG (zero PHP extensions) | SVG | SVG |
+| **Raster formats** | PNG, WebP, EPS | PNG, EPS | PNG, WebP |
+| **Eye shape customization** | Square, circle, pointy | Square only | Square only |
+| **Per-eye colors** | Yes (all 3 corners) | No | No |
+| **Gradients** | 5 directions (RGB) | Linear only | No |
+| **Center logo merge** | SVG, PNG, WebP, EPS | PNG only (requires Imagick) | Layered logo object |
+| **Controller response** | Built-in `Responsable` | Manual header setup | PSR-7 response helper |
+| **Built-in caching** | `QrCode::cache(3600)` | No | Cache decorators |
+
+## Migrating in three steps
+
+<Steps>
+  <Step title="Swap Composer dependencies">
+    Remove the unmaintained package and install `linkxtr/laravel-qrcode`:
+
+    ```bash
+    composer remove simplesoftwareio/simple-qrcode
+    composer require linkxtr/laravel-qrcode
+    ```
+
+    Laravel automatically registers the `QrCode` facade and `<x-qr-code>` Blade component.
+  </Step>
+
+  <Step title="Publish configuration">
+    Publish the configuration file to customize global defaults:
+
+    ```bash
+    php artisan vendor:publish --tag=qrcode-config
+    ```
+
+    This creates `config/qrcode.php` with default format, size, margin, colors, error correction, and cache settings.
+  </Step>
+
+  <Step title="Update facade imports">
+    Update your facade namespace imports across your codebase.
+
+    ```php
+    // Before (simple-qrcode)
+    use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
+    // After (linkxtr/laravel-qrcode)
+    use Linkxtr\QrCode\Facades\QrCode;
+    ```
+
+    If your application used global facade aliases without imports, the `QrCode` alias resolves directly to `Linkxtr\QrCode\Facades\QrCode`.
+  </Step>
+</Steps>
+
+## Side-by-side code comparison
+
+### Basic generation
+
+The core fluent API is identical. Your existing calls continue to work without changes.
+
+<CodeGroup>
+```php Laravel QR Code (New)
+use Linkxtr\QrCode\Facades\QrCode;
+
+// Returns a QrCodeResult (implements Stringable, Htmlable, Responsable)
+$svg = QrCode::size(300)->generate('https://laravel-qrcode.mintlify.app');
+```
+
+```php simple-qrcode (Legacy)
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
+// Returned raw string or generator
+$svg = QrCode::size(300)->generate('https://example.com');
+```
+</CodeGroup>
+
+### Colors and background
+
+Both packages support RGB values, but `linkxtr/laravel-qrcode` adds support for alpha channels and hex strings.
+
+<CodeGroup>
+```php Laravel QR Code (New)
+// Clean RGB color chaining
+QrCode::size(300)
+    ->color(30, 64, 175)
+    ->backgroundColor(255, 255, 255)
+    ->generate('https://example.com');
+
+// Supports hex colors directly
+QrCode::size(300)
+    ->color(30, 64, 175, 50) // 50% opacity
+    ->generate('https://example.com');
+```
+
+```php simple-qrcode (Legacy)
+QrCode::size(300)
+    ->color(30, 64, 175)
+    ->backgroundColor(255, 255, 255)
+    ->generate('https://example.com');
+```
+</CodeGroup>
+
+### Logo merge with high error correction
+
+Embedding logos requires error correction level **H** to ensure scannability.
+
+<CodeGroup>
+```php Laravel QR Code (New)
+QrCode::size(400)
+    ->errorCorrection('H')
+    ->style('dot')
+    ->eye('circle')
+    ->merge(public_path('logo.png'), 0.25)
+    ->generate('https://example.com');
+```
+
+```php simple-qrcode (Legacy)
+QrCode::format('png')
+    ->size(400)
+    ->errorCorrection('H')
+    ->merge(public_path('logo.png'), 0.25, true)
+    ->generate('https://example.com');
+```
+</CodeGroup>
+
+### Structured data types
+
+Helper methods for structured payloads map cleanly:
+
+<CodeGroup>
+```php Laravel QR Code (New)
+// WiFi credentials
+QrCode::WiFi([
+    'ssid' => 'OfficeWiFi',
+    'encryption' => 'WPA2',
+    'password' => 'secret123',
+]);
+
+// Email
+QrCode::Email('team@example.com', 'Subject', 'Body content');
+
+// Phone SMS
+QrCode::SMS('+1234567890', 'Hello!');
+```
+
+```php simple-qrcode (Legacy)
+QrCode::wifi([
+    'ssid' => 'OfficeWiFi',
+    'encryption' => 'WPA',
+    'password' => 'secret123',
+]);
+
+QrCode::email('team@example.com', 'Subject', 'Body content');
+
+QrCode::sms('+1234567890', 'Hello!');
+```
+</CodeGroup>
+
+## New features unlocked
+
+Migrating to `linkxtr/laravel-qrcode` provides immediate architectural improvements:
+
+### 1. Immutable builder safety
+`simplesoftwareio/simple-qrcode` mutated generator instances in place. If you shared a base generator or resolved it from a singleton container, subsequent calls inherited options set by earlier requests. `linkxtr/laravel-qrcode` clones its internal configuration on every fluent call, preventing cross-request leaks.
+
+```php
+$base = QrCode::size(300)->color(30, 64, 175);
+
+// Both calls remain completely independent and isolated
+$badgeQr = $base->style('dot')->generate('https://example.com/badge');
+$cardQr = $base->style('square')->generate('https://example.com/card');
+```
+
+### 2. Blade component with automatic accessibility
+Render accessible QR codes directly in your Blade views without `{!! !!}` directives:
+
+```blade
+<x-qr-code
+    data="https://laravel-qrcode.mintlify.app"
+    size="250"
+    style="dot"
+    eye="circle"
+    color="#1e40af"
+/>
+```
+
+### 3. Interactive Artisan CLI
+Generate QR codes in terminals, build steps, and deployments:
+
+```bash
+# Interactive guided mode
+php artisan qr:generate
+
+# Scripting flag mode
+php artisan qr:generate "https://example.com" --output=public/qr.svg --size=500
+```
+
+### 4. Built-in caching
+Cache rendered QR codes directly using your application cache:
+
+```php
+// Cache for 3600 seconds (1 hour)
+QrCode::cache(3600)->generate('https://example.com');
+```
+
+### 5. Controller Responsable support
+Return QR code results directly from your controller methods:
+
+```php
+public function show(): QrCodeResult
+{
+    return QrCode::size(300)->generate('https://example.com');
+}
+```
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="bolt" href="/quickstart">
+    Get started with installation and your first QR code.
+  </Card>
+  <Card title="Blade Component" icon="puzzle-piece" href="/usage/blade-component">
+    Learn how to drop the Blade component into your templates.
+  </Card>
+</CardGroup>
