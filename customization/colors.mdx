@@ -19,6 +19,10 @@ QrCode::color(220, 38, 38)
     ->generate('https://example.com');
 ```
 
+<Frame caption="Red foreground (220, 38, 38) on white background">
+  <img src="/images/colors/rgb-red.svg" alt="RGB red QR code" />
+</Frame>
+
 ### RGB with Alpha
 
 Add a fourth argument to include an **alpha (transparency) channel**. The scale is **0–100**, where `0` is fully opaque and `100` is fully transparent.
@@ -35,6 +39,10 @@ QrCode::color(220, 38, 38, 50)
   from CSS or image editors. The package converts this to the correct internal
   representation automatically.
 </Warning>
+
+<Frame caption="Semi-transparent blue foreground with alpha channel (60) on light gray background">
+  <img src="/images/colors/rgba-semi-transparent.svg" alt="RGBA semi-transparent QR code" />
+</Frame>
 
 ## CMYK
 
@@ -78,6 +86,10 @@ QrCode::gray(0)->generate('https://example.com');
 - **First argument** — foreground shade (0 = black, 100 = white).
 - **Second argument** — background shade. Defaults to `100` (white) when omitted.
 
+<Frame caption="Grayscale: dark gray foreground (20) with light gray background (92)">
+  <img src="/images/colors/grayscale.svg" alt="Grayscale QR code" />
+</Frame>
+
 ## Gradients
 
 Apply a two-color gradient to the QR code foreground with `gradient()`. Provide start and end colors as RGB arrays or hex strings, then choose a direction.
@@ -111,6 +123,24 @@ QrCode::gradient([255, 165, 0], [255, 0, 128], 'diagonal')
   `cmyk()` is not supported.
 </Warning>
 
+<CardGroup cols={3}>
+  <Frame caption="Vertical gradient (top to bottom)">
+    <img src="/images/colors/gradient-vertical.svg" alt="Vertical gradient QR code" />
+  </Frame>
+  <Frame caption="Horizontal gradient (left to right)">
+    <img src="/images/colors/gradient-horizontal.svg" alt="Horizontal gradient QR code" />
+  </Frame>
+  <Frame caption="Diagonal gradient (top-left to bottom-right)">
+    <img src="/images/colors/gradient-diagonal.svg" alt="Diagonal gradient QR code" />
+  </Frame>
+  <Frame caption="Inverse diagonal (top-right to bottom-left)">
+    <img src="/images/colors/gradient-inverse-diagonal.svg" alt="Inverse diagonal gradient QR code" />
+  </Frame>
+  <Frame caption="Radial gradient (center outward)">
+    <img src="/images/colors/gradient-radial.svg" alt="Radial gradient QR code" />
+  </Frame>
+</CardGroup>
+
 ## Per-Eye Color Overrides
 
 Override the color of any individual eye with `eyeColor()`. Each QR code has three positional eyes indexed `0`, `1`, and `2`.
@@ -140,6 +170,10 @@ QrCode::eyeColor(0, [220, 38, 38])->generate('https://example.com');
   without Imagick.
 </Warning>
 
+<Frame caption="Per-eye custom color overrides for all three corner positional eyes">
+  <img src="/images/colors/eye-colors-three.svg" alt="Per-eye colors QR code" />
+</Frame>
+
 ## Complete Color Example
 
 Chain color options with style and format options to build a fully branded QR code.
@@ -158,6 +192,10 @@ $qr = QrCode::format('png')
     ->eyeColor(2, [99, 102, 241], [30, 27, 75])
     ->generate('https://example.com');
 ```
+
+<Frame caption="Complete branded QR code with diagonal gradient, circle eyes, and per-eye color accents">
+  <img src="/images/colors/complete-color-example.svg" alt="Complete color example QR code" />
+</Frame>
 
 <CardGroup cols={2}>
   <Card title="Styling" icon="brush" href="/customization/styling">

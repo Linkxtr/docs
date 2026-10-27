@@ -192,36 +192,41 @@ $eps = (string) QrCode::format('eps')->generate('https://example.com');
 
 ## Returning a QR code from a controller
 
+`QrCodeResult` implements Laravel's `Responsable` interface. You can return the result object directly from any controller method, and Laravel automatically invokes `toResponse()` to return an HTTP 200 response with the correct `Content-Type` header (such as `image/svg+xml` or `image/png`).
+
 <Tabs>
-  <Tab title="SVG response">
+  <Tab title="Automatic Responsable">
     ```php
-    use Illuminate\Http\Response;
     use Linkxtr\QrCode\Facades\QrCode;
+    use Linkxtr\QrCode\Support\QrCodeResult;
 
-    public function show(): Response
+    public function show(): QrCodeResult
     {
-        $svg = (string) QrCode::size(300)->generate('https://example.com');
-
-        return response($svg, 200)
-            ->header('Content-Type', 'image/svg+xml');
+        // Returns HTTP 200 with automatic Content-Type: image/svg+xml
+        return QrCode::size(300)->generate('https://example.com');
     }
     ```
-
   </Tab>
-  <Tab title="PNG response">
+  <Tab title="Custom headers & HTTP caching">
     ```php
+    use Illuminate\Http\Request;
     use Illuminate\Http\Response;
     use Linkxtr\QrCode\Facades\QrCode;
 
-    public function show(): Response
+    public function show(Request $request): Response
     {
-        $png = (string) QrCode::size(300)->format('png')->generate('https://example.com');
+        $result = QrCode::size(300)->generate('https://example.com');
+        $etag = md5((string) $result);
 
-        return response($png, 200)
-            ->header('Content-Type', 'image/png');
+        if ($request->header('If-None-Match') === $etag) {
+            return response('', 304);
+        }
+
+        return $result->toResponse($request)
+            ->header('ETag', $etag)
+            ->header('Cache-Control', 'public, max-age=86400, immutable');
     }
     ```
-
   </Tab>
   <Tab title="File download">
     ```php
@@ -239,9 +244,34 @@ $eps = (string) QrCode::format('eps')->generate('https://example.com');
         return response()->download($path, 'qrcode.png');
     }
     ```
-
   </Tab>
 </Tabs>
+
+## Caching generated QR codes
+
+Rendering complex vector or raster QR codes with high error correction and merged logos consumes CPU cycles. The `cache()` method caches generated output in your application's cache store, avoiding redundant rendering for identical requests.
+
+```php
+use Carbon\Carbon;
+use DateInterval;
+use Linkxtr\QrCode\Facades\QrCode;
+
+// Cache for 3600 seconds (1 hour)
+QrCode::cache(3600)->generate('https://example.com');
+
+// Cache with a Carbon DateTime instance (e.g., until midnight)
+QrCode::cache(Carbon::tomorrow())->generate('https://example.com');
+
+// Cache with DateInterval (e.g., 2 hours)
+QrCode::cache(new DateInterval('PT2H'))->generate('https://example.com');
+
+// Explicitly bypass cache for one-time tokens or dynamic OTPs
+QrCode::withoutCache()->generate('https://example.com');
+```
+
+<Tip>
+  Cache keys are generated deterministically from the payload and serialized generator configuration. If you change any parameter (such as size, color, or error correction), the package automatically generates and caches a new QR code.
+</Tip>
 
 ## Styled QR code examples
 

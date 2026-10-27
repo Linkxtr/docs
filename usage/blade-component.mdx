@@ -23,7 +23,7 @@ The `<x-qr-code>` Blade component is the simplest way to display QR codes direct
 <x-qr-code data="https://example.com" />
 ```
 
-This renders an inline SVG QR code at the default size of 100 px. No PHP imports or extra configuration needed — the component is auto-registered by the package's service provider.
+This renders an inline SVG QR code. When size and margin are omitted, the component automatically inherits dimensions from `config/qrcode.php` (default size of 400 px and quiet zone margin of 4 modules). No PHP imports or extra configuration needed — the component is auto-registered by the package's service provider.
 
 ## Available props
 
@@ -32,8 +32,8 @@ This renders an inline SVG QR code at the default size of 100 px. No PHP imports
   plain text, a phone number, etc.
 </ParamField>
 
-<ParamField path="size" type="int" default="100">
-  Width and height of the QR code in pixels.
+<ParamField path="size" type="int | null" default="null">
+  Width and height of the QR code in pixels. When omitted or `null`, the component automatically inherits `size` from `config/qrcode.php` (package default `400`).
 </ParamField>
 
 <ParamField path="format" type="string" default="svg">
@@ -50,8 +50,8 @@ This renders an inline SVG QR code at the default size of 100 px. No PHP imports
   Background color. Accepts the same formats as `color`.
 </ParamField>
 
-<ParamField path="margin" type="int" default="0">
-  Quiet-zone margin around the QR code.
+<ParamField path="margin" type="int | null" default="null">
+  Quiet-zone margin around the QR code in module units. When omitted or `null`, the component automatically inherits `margin` from `config/qrcode.php` (package default `4` quiet-zone modules).
 </ParamField>
 
 <ParamField path="style" type="string">
@@ -200,6 +200,27 @@ Both the `<title>` text and `aria-label` value run through Laravel's `__()` help
 ```
 
 </CodeGroup>
+
+<CardGroup cols={3}>
+  <Frame caption="Minimal default">
+    <img src="/images/usage/blade-minimal.svg" alt="Minimal Blade component QR code" />
+  </Frame>
+  <Frame caption="Hex color (#0066cc)">
+    <img src="/images/usage/blade-hex-blue.svg" alt="Hex color Blade QR code" />
+  </Frame>
+  <Frame caption="Dot style & circle eyes">
+    <img src="/images/usage/blade-dot-circle.svg" alt="Dot style and circle eyes Blade QR code" />
+  </Frame>
+  <Frame caption="Vertical gradient">
+    <img src="/images/usage/blade-gradient.svg" alt="Vertical gradient Blade QR code" />
+  </Frame>
+  <Frame caption="Custom eye colors">
+    <img src="/images/usage/blade-custom-eyes.svg" alt="Custom eye colors Blade QR code" />
+  </Frame>
+  <Frame caption="Logo overlay (Error correction H)">
+    <img src="/images/usage/logo-merged.svg" alt="Merged logo Blade QR code" />
+  </Frame>
+</CardGroup>
 
 ## Passing extra HTML attributes
 
