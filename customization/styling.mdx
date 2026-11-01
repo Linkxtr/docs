@@ -35,6 +35,18 @@ QrCode::style('square')->generate('https://example.com');
   equivalent.
 </Tip>
 
+<CardGroup cols={3}>
+  <Frame caption="Square modules (default)">
+    <img src="/images/styling/style-square.svg" alt="Square modules QR code" />
+  </Frame>
+  <Frame caption="Circular dot modules">
+    <img src="/images/styling/style-dot.svg" alt="Circular dot modules QR code" />
+  </Frame>
+  <Frame caption="Rounded modules">
+    <img src="/images/styling/style-round.svg" alt="Rounded modules QR code" />
+  </Frame>
+</CardGroup>
+
 ## Eye Style
 
 The three large **positional squares** in the corners of every QR code are called eyes. Use `eye()` to set their outer shape.
@@ -53,6 +65,18 @@ QrCode::style('dot')->eye('circle')->generate('https://example.com');
 QrCode::style('round')->eye('pointy')->generate('https://example.com');
 ```
 
+<CardGroup cols={3}>
+  <Frame caption="Square eyes (default)">
+    <img src="/images/styling/eye-square.svg" alt="Square eyes QR code" />
+  </Frame>
+  <Frame caption="Circle eyes">
+    <img src="/images/styling/eye-circle.svg" alt="Circle eyes QR code" />
+  </Frame>
+  <Frame caption="Pointy eyes">
+    <img src="/images/styling/eye-pointy.svg" alt="Pointy eyes QR code" />
+  </Frame>
+</CardGroup>
+
 ## Internal (Composite) Eye Style
 
 Each positional eye is made of two parts: an outer frame and an inner marker. By default both share the same style set by `eye()`. Call `internalEye()` to style the **inner marker** independently, giving you composite eyes.
@@ -70,6 +94,15 @@ QrCode::style('dot')->eye('circle')->internalEye('pointy')->generate('https://ex
   and `'pointy'`.
 </Note>
 
+<CardGroup cols={2}>
+  <Frame caption="Square outer with circle inner">
+    <img src="/images/styling/internal-eye-square-circle.svg" alt="Square outer with circle inner eye QR code" />
+  </Frame>
+  <Frame caption="Circle outer with pointy inner">
+    <img src="/images/styling/internal-eye-circle-pointy.svg" alt="Circle outer with pointy inner eye QR code" />
+  </Frame>
+</CardGroup>
+
 ## Size and Margin
 
 Control the pixel dimensions and quiet zone around the code with `size()` and `margin()`.
@@ -84,6 +117,18 @@ QrCode::size(500)->margin(6)->generate('https://example.com');
 
 - **`size(int $size)`** — Total width and height in pixels. Default: `400`.
 - **`margin(int $margin)`** — Quiet-zone thickness in modules. Default: `4`.
+
+<CardGroup cols={3}>
+  <Frame caption="Margin 0 (no quiet zone)">
+    <img src="/images/styling/margin-0.svg" alt="Margin 0 QR code" />
+  </Frame>
+  <Frame caption="Margin 2 (compact quiet zone)">
+    <img src="/images/styling/margin-2.svg" alt="Margin 2 QR code" />
+  </Frame>
+  <Frame caption="Margin 6 (wide quiet zone)">
+    <img src="/images/styling/margin-6.svg" alt="Margin 6 QR code" />
+  </Frame>
+</CardGroup>
 
 ## Output Format
 

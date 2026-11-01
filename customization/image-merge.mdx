@@ -87,6 +87,15 @@ QrCode::format('png')
   logo.
 </Tip>
 
+<CardGroup cols={2}>
+  <Frame caption="20% logo merge (recommended safe default)">
+    <img src="/images/merge/merged-logo-20.svg" alt="20% logo merge QR code" />
+  </Frame>
+  <Frame caption="30% logo merge (maximum recommended size)">
+    <img src="/images/merge/merged-logo-30.svg" alt="30% logo merge QR code" />
+  </Frame>
+</CardGroup>
+
 ## Save to a File
 
 Pass a second argument to `generate()` to write the result directly to disk.
@@ -154,6 +163,10 @@ $qr = QrCode::format('png')
 // Render in a Blade view
 // {!! $qr !!}
 ```
+
+<Frame caption="Complete branded QR code with dark blue dot modules, circle eyes, error correction H, and centered logo">
+  <img src="/images/merge/merged-branded-complete.svg" alt="Complete branded QR code with merged logo" />
+</Frame>
 
 <CardGroup cols={2}>
   <Card title="Styling" icon="brush" href="/customization/styling">

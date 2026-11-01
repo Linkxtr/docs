@@ -75,6 +75,7 @@
             "pages": [
               "advanced/macros",
               "advanced/upgrade-guide",
+              "advanced/migrating-from-simple-qrcode",
               "advanced/troubleshooting"
             ]
           }

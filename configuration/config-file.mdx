@@ -120,11 +120,13 @@ return [
     | Cache Configuration
     |--------------------------------------------------------------------------
     |
-    | Controls whether generated QR codes are cached and their TTL in minutes.
+    | Controls whether generated QR codes are cached, their TTL in seconds,
+    | and the cache store to use.
     |
     */
     'cache_enabled' => env('QR_CODE_CACHE_ENABLED', false),
-    'cache_ttl' => env('QR_CODE_CACHE_TTL', 1440),
+    'cache_ttl' => (int) (env('QR_CODE_CACHE_TTL') ?? 86400),
+    'cache_store' => env('QR_CODE_CACHE_STORE', null),
 
 ];
 ```
