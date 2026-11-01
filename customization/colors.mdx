@@ -25,12 +25,12 @@ QrCode::color(220, 38, 38)
 
 ### RGB with Alpha
 
-Add a fourth argument to include an **alpha (transparency) channel**. The scale is **0–100**, where `0` is fully opaque and `100` is fully transparent.
+Add a fourth argument to include an **alpha (transparency) channel**. The scale is **0–100**, where `100` is fully opaque and `0` is fully transparent.
 
 ```php
-// 50 % transparent foreground on a transparent background
-QrCode::color(220, 38, 38, 50)
-    ->backgroundColor(255, 255, 255, 0)
+// Semi-transparent blue foreground with alpha channel (60) on light gray background
+QrCode::color(30, 64, 175, 60)
+    ->backgroundColor(241, 245, 249)
     ->generate('https://example.com');
 ```
 
@@ -77,7 +77,7 @@ Use `gray()` for a one-call shorthand that sets both foreground and (optionally)
 
 ```php
 // Dark gray foreground, light gray background
-QrCode::gray(20, 90)->generate('https://example.com');
+QrCode::gray(20, 92)->generate('https://example.com');
 
 // Black foreground, white background (defaults)
 QrCode::gray(0)->generate('https://example.com');

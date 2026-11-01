@@ -4,7 +4,7 @@ sidebarTitle: "Migrating from simple-qrcode"
 description: "Step-by-step guide to migrate from simplesoftwareio/simple-qrcode or endroid/qr-code to linkxtr/laravel-qrcode — with side-by-side code comparisons and feature matrix."
 ---
 
-If your application currently relies on `simplesoftwareio/simple-qrcode`, you are likely running into compatibility barriers on modern PHP and Laravel versions. The `simple-qrcode` package has remained unmaintained since February 2021, lacks support for PHP 8.2+ and Laravel 12+, relies on mutable builder instances, and lacks modern vector styling features.
+If your application currently relies on `simplesoftwareio/simple-qrcode`, you are likely running into maintenance and compatibility concerns on modern PHP and Laravel versions. The `simple-qrcode` package has remained unmaintained since February 2021 and has not been tested or updated for PHP 8.2+ or modern Laravel releases, relies on mutable builder instances, and lacks modern vector styling features.
 
 `linkxtr/laravel-qrcode` is engineered as a modern, high-performance replacement. It maintains drop-in API compatibility for common generation calls while providing immutable builder safety, a native Blade component, an interactive Artisan CLI, WebP support, custom eye shapes, and 100% decode-verified scannability.
 
@@ -12,8 +12,8 @@ If your application currently relies on `simplesoftwareio/simple-qrcode`, you ar
 
 | Feature | `linkxtr/laravel-qrcode` | `simplesoftwareio/simple-qrcode` | `endroid/qr-code` |
 | :--- | :--- | :--- | :--- |
-| **Laravel 12+ and 13+ support** | Full support | Abandoned (max Laravel 8) | Needs manual wrapper |
-| **PHP 8.2, 8.3 & 8.4** | Full strict-types support | Incompatible | Supported |
+| **Laravel 12+ and 13+ support** | Full support | Untested (unmaintained since Laravel 8) | Needs manual wrapper |
+| **PHP 8.2, 8.3 & 8.4** | Full strict-types support | Untested / unmaintained | Supported |
 | **Active maintenance** | Yes | Abandoned (Feb 2021) | Yes (standalone PHP) |
 | **Fluent syntax** | `QrCode::size(300)->generate()` | `QrCode::size(300)->generate()` | Verbose builder objects |
 | **Immutable builder** | Yes (zero side-effects) | No (mutable instance bugs) | Yes |
@@ -21,9 +21,9 @@ If your application currently relies on `simplesoftwareio/simple-qrcode`, you ar
 | **Artisan CLI** | `php artisan qr:generate` | None | None |
 | **Vector default** | SVG (zero PHP extensions) | SVG | SVG |
 | **Raster formats** | PNG, WebP, EPS | PNG, EPS | PNG, WebP |
-| **Eye shape customization** | Square, circle, pointy | Square only | Square only |
-| **Per-eye colors** | Yes (all 3 corners) | No | No |
-| **Gradients** | 5 directions (RGB) | Linear only | No |
+| **Eye shape customization** | Square, circle, pointy | Square, circle | Square only |
+| **Per-eye colors** | Yes (all 3 corners) | Yes | No |
+| **Gradients** | 5 directions (RGB) | 5 directions | No |
 | **Center logo merge** | SVG, PNG, WebP, EPS | PNG only (requires Imagick) | Layered logo object |
 | **Controller response** | Built-in `Responsable` | Manual header setup | PSR-7 response helper |
 | **Built-in caching** | `QrCode::cache(3600)` | No | Cache decorators |
@@ -71,7 +71,7 @@ If your application currently relies on `simplesoftwareio/simple-qrcode`, you ar
 
 ### Basic generation
 
-The core fluent API is identical. Your existing calls continue to work without changes.
+The core fluent API is identical. While most existing calls work unchanged, calls that omit `size()` and `margin()` use package defaults of 400 px and four quiet-zone modules instead of the legacy 100 px and zero margin. To retain the legacy output dimensions and layout, explicitly set `size(100)` and `margin(0)`.
 
 <CodeGroup>
 ```php Laravel QR Code (New)
@@ -91,7 +91,7 @@ $svg = QrCode::size(300)->generate('https://example.com');
 
 ### Colors and background
 
-Both packages support RGB values, but `linkxtr/laravel-qrcode` adds support for alpha channels and hex strings.
+Both packages support RGB and alpha channels, where the facade's `color()` accepts integer channels. If you want to use hex strings, you can pass them to the Blade component, configuration files (`config/qrcode.php` and `.env`), or `gradient()`.
 
 <CodeGroup>
 ```php Laravel QR Code (New)
@@ -101,7 +101,7 @@ QrCode::size(300)
     ->backgroundColor(255, 255, 255)
     ->generate('https://example.com');
 
-// Supports hex colors directly
+// RGBA with alpha channel (0–100 scale)
 QrCode::size(300)
     ->color(30, 64, 175, 50) // 50% opacity
     ->generate('https://example.com');
@@ -222,6 +222,9 @@ QrCode::cache(3600)->generate('https://example.com');
 Return QR code results directly from your controller methods:
 
 ```php
+use Linkxtr\QrCode\Facades\QrCode;
+use Linkxtr\QrCode\Support\QrCodeResult;
+
 public function show(): QrCodeResult
 {
     return QrCode::size(300)->generate('https://example.com');

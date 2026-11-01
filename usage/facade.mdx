@@ -216,15 +216,13 @@ $eps = (string) QrCode::format('eps')->generate('https://example.com');
     public function show(Request $request): Response
     {
         $result = QrCode::size(300)->generate('https://example.com');
-        $etag = md5((string) $result);
 
-        if ($request->header('If-None-Match') === $etag) {
-            return response('', 304);
-        }
+        $response = $result->toResponse($request);
+        $response->setEtag(md5((string) $result));
+        $response->header('Cache-Control', 'public, max-age=86400, immutable');
+        $response->isNotModified($request);
 
-        return $result->toResponse($request)
-            ->header('ETag', $etag)
-            ->header('Cache-Control', 'public, max-age=86400, immutable');
+        return $response;
     }
     ```
   </Tab>
